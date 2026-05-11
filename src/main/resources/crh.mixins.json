@@ -1,9 +1,11 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "top.fus_lingx.crh.crh.mixin",
+  "package": "top.fmutren.crh.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "CreateEncasingBlockMixin",
+    "CreateWrenchItemMixin"
   ],
   "client": [
   ],

@@ -2,26 +2,26 @@ plugins {
     `java-library`
     `maven-publish`
     idea
-    id("net.neoforged.moddev") version "2.0.141"
+    alias(libs.plugins.moddev)
 }
 
-val minecraft_version: String by project
-val minecraft_version_range: String by project
-val neo_version: String by project
-val neo_version_range: String by project
-val loader_version_range: String by project
-val mod_id: String by project
-val mod_name: String by project
-val mod_license: String by project
-val mod_version: String by project
-val mod_group_id: String by project
-val mod_authors: String by project
-val mod_description: String by project
-val create_version: String by project
-val ponder_version: String by project
+val minecraftVersion = libs.versions.minecraft.get()
+val minecraftVersionRange = libs.versions.minecraftRange.get()
+val neoForgeVersion = libs.versions.neoForge.get()
+val neoForgeVersionRange = libs.versions.neoForgeRange.get()
+val loaderVersionRange = libs.versions.loaderRange.get()
+val modVersion = libs.versions.mod.get()
+val createVersionRange = libs.versions.createRange.get()
 
-version = mod_version
-group = mod_group_id
+val modId = providers.gradleProperty("mod_id").get()
+val modName = providers.gradleProperty("mod_name").get()
+val modLicense = providers.gradleProperty("mod_license").get()
+val modGroupId = providers.gradleProperty("mod_group_id").get()
+val modAuthors = providers.gradleProperty("mod_authors").get()
+val modDescription = providers.gradleProperty("mod_description").get()
+
+version = modVersion
+group = modGroupId
 
 repositories {
     mavenLocal()
@@ -45,13 +45,12 @@ repositories {
     }
 
     maven {
-        // Registrate
         url = uri("https://maven.gegy.dev/releases")
     }
 }
 
 base {
-    archivesName.set(mod_id)
+    archivesName.set(modId)
 }
 
 java {
@@ -64,23 +63,22 @@ val mainSourceSet = sourceSets.named("main")
 
 val generateModMetadata by tasks.registering(ProcessResources::class) {
     val replaceProperties = mapOf(
-        "minecraft_version" to minecraft_version,
-        "minecraft_version_range" to minecraft_version_range,
-        "neo_version" to neo_version,
-        "neo_version_range" to neo_version_range,
-        "loader_version_range" to loader_version_range,
-        "mod_id" to mod_id,
-        "mod_name" to mod_name,
-        "mod_license" to mod_license,
-        "mod_version" to mod_version,
-        "mod_authors" to mod_authors,
-        "mod_description" to mod_description
+        "minecraft_version" to minecraftVersion,
+        "minecraft_version_range" to minecraftVersionRange,
+        "neo_version" to neoForgeVersion,
+        "neo_version_range" to neoForgeVersionRange,
+        "loader_version_range" to loaderVersionRange,
+        "mod_id" to modId,
+        "mod_name" to modName,
+        "mod_license" to modLicense,
+        "mod_version" to modVersion,
+        "mod_authors" to modAuthors,
+        "mod_description" to modDescription,
+        "create_version_range" to createVersionRange
     )
 
     inputs.properties(replaceProperties)
-
     expand(replaceProperties)
-
     from("src/main/templates")
     into(layout.buildDirectory.dir("generated/sources/modMetadata"))
 }
@@ -91,31 +89,30 @@ sourceSets.named("main") {
 }
 
 neoForge {
-    version = neo_version
+    version = neoForgeVersion
 
     runs {
         create("client") {
             client()
-            systemProperty("neoforge.enabledGameTestNamespaces", mod_id)
+            systemProperty("neoforge.enabledGameTestNamespaces", modId)
         }
 
         create("server") {
             server()
             programArgument("--nogui")
-            systemProperty("neoforge.enabledGameTestNamespaces", mod_id)
+            systemProperty("neoforge.enabledGameTestNamespaces", modId)
         }
 
         create("gameTestServer") {
             type.set("gameTestServer")
-            systemProperty("neoforge.enabledGameTestNamespaces", mod_id)
+            systemProperty("neoforge.enabledGameTestNamespaces", modId)
         }
 
         create("data") {
             data()
-
             programArguments.addAll(
                 listOf(
-                    "--mod", mod_id,
+                    "--mod", modId,
                     "--all",
                     "--output", file("src/generated/resources/").absolutePath,
                     "--existing", file("src/main/resources/").absolutePath
@@ -130,7 +127,7 @@ neoForge {
     }
 
     mods {
-        create(mod_id) {
+        create(modId) {
             sourceSet(mainSourceSet.get())
         }
     }
@@ -139,11 +136,11 @@ neoForge {
 }
 
 dependencies {
-    compileOnly("com.simibubi.create:create-$minecraft_version:$create_version:slim") {
+    compileOnly(variantOf(libs.create) { classifier("slim") }) {
         isTransitive = false
     }
-
-    compileOnly("net.createmod.ponder:Ponder-NeoForge-$minecraft_version:$ponder_version")
+    compileOnly(libs.registrate)
+    compileOnly(libs.ponder)
 }
 
 publishing {

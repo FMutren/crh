@@ -1,34 +1,34 @@
 package top.fmutren.crh;
 
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
+import top.fmutren.crh.input.ClientEventRegister;
 import top.fmutren.crh.network.ModMessages;
-import top.fmutren.crh.server.ServerPayloadHandler;
+import top.fmutren.crh.server.ServerEventHandlers;
 
-// The value here should match an entry in the META-INF/neoforge.mods.toml file
-@Mod(value = Crh.MODID)
-public class Crh {
+@Mod(Crh.MODID)
+public final class Crh {
 
-    // Define mod id in a common place for everything to reference
     public static final String MODID = "crh";
 
-    public Crh(IEventBus bus) {
-        bus.addListener(Crh::onPayloadRegister);
+    public Crh(IEventBus modBus, ModContainer modContainer) {
+        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        modBus.addListener(ModMessages::registerPayloads);
+        NeoForge.EVENT_BUS.addListener(ServerEventHandlers::onPlayerLoggedOut);
+
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            ClientEventRegister.register(modBus);
+        }
     }
 
-    @SubscribeEvent
-    public static void onPayloadRegister(RegisterPayloadHandlersEvent event) {
-        final PayloadRegistrar registrar = event.registrar("1.1");
-
-        registrar.playToServer(
-                ModMessages.EncasingNetWork.TYPE,
-                ModMessages.EncasingNetWork.STREAM_CODEC,
-                ServerPayloadHandler::ServerEncase
-        );
+    public static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 
 }

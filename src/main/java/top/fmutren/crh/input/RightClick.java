@@ -1,12 +1,14 @@
 package top.fmutren.crh.input;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.simibubi.create.content.fluids.pipes.EncasedPipeBlock;
+import com.simibubi.create.content.fluids.pipes.FluidPipeBlock;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.bus.api.SubscribeEvent;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -14,8 +16,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 import top.fmutren.crh.network.ModMessages;
 
-@OnlyIn(Dist.CLIENT)
-public class RightClick {
+public final class RightClick {
 
     public static final Lazy<KeyMapping> ENCASE_MAPPING = Lazy.of(() ->
             new KeyMapping(
@@ -26,23 +27,33 @@ public class RightClick {
             )
     );
 
-    @SubscribeEvent
-    public static void RightClickEvent(PlayerInteractEvent.RightClickBlock event) {
-        Level level = event.getLevel();
-        if (!level.isClientSide) return;
-        InteractionHand hand = event.getHand();
-        if (!KeyDown.rightClickPressed) {
-            KeyDown.rightClickPressed = true;
-
-            int handN = hand == InteractionHand.OFF_HAND ? 1 : 0;
-            int isAlt = ENCASE_MAPPING.get().isDown() ? 1 : 0;
-
-            // 发送包到服务端
-            PacketDistributor.sendToServer(new ModMessages.EncasingNetWork(event.getPos(), event.getFace(), handN, isAlt));
-        }
+    private RightClick() {
     }
 
-    @SubscribeEvent
+    public static void rightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        Level level = event.getLevel();
+        if (!level.isClientSide) return;
+
+        KeyDown.syncChainKeyState(event.getEntity());
+
+        ItemStack stack = event.getItemStack();
+        if (!stack.isEmpty()) return;
+
+        BlockState state = level.getBlockState(event.getPos());
+        if (!(state.getBlock() instanceof FluidPipeBlock) && !(state.getBlock() instanceof EncasedPipeBlock)) return;
+
+        InteractionHand hand = event.getHand();
+        PacketDistributor.sendToServer(new ModMessages.PipeConnectionPayload(
+                event.getPos(),
+                event.getFace(),
+                hand == InteractionHand.OFF_HAND,
+                event.getEntity().isShiftKeyDown()
+        ));
+
+        event.setCancellationResult(InteractionResult.SUCCESS);
+        event.setCanceled(true);
+    }
+
     public static void registerBindings(RegisterKeyMappingsEvent event) {
         event.register(ENCASE_MAPPING.get());
     }

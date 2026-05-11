@@ -1,7 +1,9 @@
 {
-  "fus.message.pipelowertwo": "§cThe fluid pipe has at least two openings!",
-  "fus.message.altdownwithwrench": "§aPressing will enable chain exposing",
-  "fus.message.altdownwithcasing": "§aPressing will enable chain encasing",
-  "key.crh.encasing": "Chain Encasing",
-  "key.categories.crh.encasing": "Create: Right Hand"
+  "crh.message.pipelowerthantwo": "Fluid pipes must keep at least two openings!",
+  "crh.message.chainkey": "Hold to enable Create wrench/encasing chain operations",
+  "crh.message.altdownwithwrench": "Hold to enable chain de-encasing",
+  "crh.message.altdownwithcasing": "Hold to enable chain encasing",
+  "key.crh.encasing": "Chain Encasing/Exposing",
+  "key.categories.crh.encasing": "Create: Right Hand",
+  "crh.message.chain_limit": "Chain operation limit reached: {0} blocks"
 }

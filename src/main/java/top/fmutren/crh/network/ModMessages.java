@@ -6,37 +6,80 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import org.jetbrains.annotations.NotNull;
+import top.fmutren.crh.Crh;
+import top.fmutren.crh.server.ServerPayloadHandler;
 
-public class ModMessages {
+public final class ModMessages {
 
-    public record EncasingNetWork(
+    private static final String NETWORK_VERSION = "1";
+
+    private ModMessages() {
+    }
+
+    public static void registerPayloads(RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registrar = event.registrar(NETWORK_VERSION);
+
+        registrar.playToServer(
+                PipeConnectionPayload.TYPE,
+                PipeConnectionPayload.STREAM_CODEC,
+                ServerPayloadHandler::handlePipeConnection
+        );
+
+        registrar.playToServer(
+                ChainKeyStatePayload.TYPE,
+                ChainKeyStatePayload.STREAM_CODEC,
+                ServerPayloadHandler::handleChainKeyState
+        );
+    }
+
+    public record PipeConnectionPayload(
             BlockPos pos,
             Direction face,
-            int hand,
-            int Alt
+            boolean offHand,
+            boolean shift
     ) implements CustomPacketPayload {
 
-        public static final Type<EncasingNetWork> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath("crh", "encase_data"));
+        public static final Type<PipeConnectionPayload> TYPE = new Type<>(Crh.id("pipe_connection"));
 
-        public static final StreamCodec<ByteBuf, EncasingNetWork> STREAM_CODEC = StreamCodec.composite(
+        public static final StreamCodec<ByteBuf, PipeConnectionPayload> STREAM_CODEC = StreamCodec.composite(
                 BlockPos.STREAM_CODEC,
-                EncasingNetWork::pos,
+                PipeConnectionPayload::pos,
                 Direction.STREAM_CODEC,
-                EncasingNetWork::face,
-                ByteBufCodecs.VAR_INT,
-                EncasingNetWork::hand,
-                ByteBufCodecs.VAR_INT,
-                EncasingNetWork::Alt,
-                EncasingNetWork::new
+                PipeConnectionPayload::face,
+                ByteBufCodecs.BOOL,
+                PipeConnectionPayload::offHand,
+                ByteBufCodecs.BOOL,
+                PipeConnectionPayload::shift,
+                PipeConnectionPayload::new
         );
 
         @Override
-        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        public @NotNull Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+
+    }
+
+    public record ChainKeyStatePayload(
+            boolean down
+    ) implements CustomPacketPayload {
+
+        public static final Type<ChainKeyStatePayload> TYPE = new Type<>(Crh.id("chain_key_state"));
+
+        public static final StreamCodec<ByteBuf, ChainKeyStatePayload> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.BOOL,
+                ChainKeyStatePayload::down,
+                ChainKeyStatePayload::new
+        );
+
+        @Override
+        public @NotNull Type<? extends CustomPacketPayload> type() {
             return TYPE;
         }
 
     }
 
 }
-

@@ -64,6 +64,14 @@ ordering = "NONE"
 # Side this dependency is applied on - BOTH, CLIENT, or SERVER
 side = "BOTH"
 # Here's another dependency
+
+[[dependencies."${mod_id}"]]
+modId = "create"
+type = "required"
+versionRange = "${create_version_range}"
+ordering = "AFTER"
+side = "BOTH"
+
 [[dependencies."${mod_id}"]]
 modId = "minecraft"
 type = "required"
