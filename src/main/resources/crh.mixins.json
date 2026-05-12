@@ -4,8 +4,10 @@
   "package": "top.fmutren.crh.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "CreateBeltBlockMixin",
     "CreateCogWheelBlockMixin",
     "CreateEncasingBlockMixin",
+    "CreateShaftBlockMixin",
     "CreateWrenchItemMixin"
   ],
   "client": [
