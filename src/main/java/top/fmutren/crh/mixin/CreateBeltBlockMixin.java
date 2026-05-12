@@ -1,24 +1,22 @@
 package top.fmutren.crh.mixin;
 
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
-import com.simibubi.create.content.kinetics.belt.BeltSlicer;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
+//import com.simibubi.create.content.kinetics.belt.BeltSlicer;
+//import net.minecraft.core.BlockPos;
+//import net.minecraft.world.InteractionHand;
+//import net.minecraft.world.ItemInteractionResult;
+//import net.minecraft.world.entity.player.Player;
+//import net.minecraft.world.item.ItemStack;
+//import net.minecraft.world.level.Level;
+//import net.minecraft.world.level.block.state.BlockState;
+//import net.minecraft.world.phys.BlockHitResult;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-import top.fmutren.crh.interaction.ChainInteraction;
-
-import static top.fmutren.crh.interaction.ShaftSwitch.isInShaftCasing;
+//import org.spongepowered.asm.mixin.injection.At;
+//import org.spongepowered.asm.mixin.injection.Inject;
+//import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+//import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+//import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+//import top.fmutren.crh.interaction.ChainInteraction;
 
 @Mixin(BeltBlock.class)
 public abstract class CreateBeltBlockMixin {

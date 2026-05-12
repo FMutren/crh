@@ -9,6 +9,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.HashMap;
 import java.util.Map;
 
+import static top.fmutren.crh.interaction.util.PredicatesCreator.isShaftCasing;
+
 public class ShaftSwitch {
     private static final Map<String, String> shaftCasingType = new HashMap<>();
     static {
@@ -18,17 +20,12 @@ public class ShaftSwitch {
 
     public static BlockState ShaftSwitchToBlockState(ItemStack itemStack, BlockState state) {
         if(itemStack.isEmpty()) return state;
-        if(!isInShaftCasing(itemStack)) return state;
+        if(!isShaftCasing(itemStack)) return state;
         String result = shaftCasingType.get(itemStack.getItem().toString());
         if(result == null) return state;
         return BuiltInRegistries.BLOCK.get(ResourceLocation
                 .parse(result))
                 .defaultBlockState()
                 .setValue(ShaftBlock.AXIS, state.getValue(ShaftBlock.AXIS));
-    }
-
-    public static boolean isInShaftCasing(ItemStack itemStack){
-        if(itemStack.isEmpty()) return false;
-        return itemStack.getItem().toString().equals("create:andesite_casing") || itemStack.getItem().toString().equals("create:brass_casing");
     }
 }

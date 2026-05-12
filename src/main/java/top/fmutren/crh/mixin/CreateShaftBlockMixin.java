@@ -1,5 +1,6 @@
 package top.fmutren.crh.mixin;
 
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.decoration.encasing.EncasableBlock;
 import com.simibubi.create.content.kinetics.simpleRelays.ShaftBlock;
 import net.createmod.catnip.placement.IPlacementHelper;
@@ -22,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import top.fmutren.crh.interaction.ShaftSwitch;
 
 import static com.simibubi.create.content.kinetics.simpleRelays.ShaftBlock.placementHelperId;
-import static top.fmutren.crh.interaction.ShaftSwitch.isInShaftCasing;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.isShaftCasing;
 
 
 @Mixin(ShaftBlock.class)
@@ -53,7 +54,7 @@ public class CreateShaftBlockMixin {
             at = @At("HEAD"),
             cancellable = true
     )
-    private static void createShaftUseItemOnMixin(
+    private static void crh$EncaseAfterPlaceInShaft(
             ItemStack stack,
             BlockState state,
             Level level,
@@ -66,8 +67,8 @@ public class CreateShaftBlockMixin {
     {
         ItemStack heldOffHandItem = player.getOffhandItem();
 
-        if(!(stack.getItem().toString().equals("create:shaft")) || stack.isEmpty()) return;
-        if(!isInShaftCasing(heldOffHandItem)) return;
+        if(!AllBlocks.SHAFT.isIn(stack) || stack.isEmpty()) return;
+        if(!isShaftCasing(heldOffHandItem)) return;
 
         IPlacementHelper helper = PlacementHelpers.get(placementHelperId);
         Vec3i vec3i = helper.getOffset(player, level, state, pos, hitResult).getPos();
