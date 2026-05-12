@@ -34,8 +34,6 @@ public final class RightClick {
         Level level = event.getLevel();
         if (!level.isClientSide) return;
 
-        KeyDown.syncChainKeyState(event.getEntity());
-
         ItemStack stack = event.getItemStack();
         if (!stack.isEmpty()) return;
 

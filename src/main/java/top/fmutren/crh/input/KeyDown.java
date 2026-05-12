@@ -10,7 +10,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
-import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter;
 import top.fmutren.crh.interaction.util.ChainKeyStateTracker;
 import top.fmutren.crh.interaction.util.PredicatesCreator;
 import top.fmutren.crh.network.ModMessages;
