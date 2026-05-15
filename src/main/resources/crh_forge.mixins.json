@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "top.fmutren.crh.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "crh_forge.refmap.json",
+  "mixins": [
+    "CreateBeltBlockMixin",
+    "CreateChuteBlockMixin",
+    "CreateCogWheelBlockMixin",
+    "CreateEncasingBlockMixin",
+    "CreateFluidPipeMixin",
+    "CreateShaftBlockMixin",
+    "CreateWrenchItemMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
