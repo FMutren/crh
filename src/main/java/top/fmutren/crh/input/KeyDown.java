@@ -30,6 +30,8 @@ public final class KeyDown {
 
         syncChainKeyState(player);
 
+        if (!Config.builtinChainAllowed()) return;
+
         if (ENCASE_MAPPING.get().consumeClick()) {
             String result = null;
             ItemStack mainHand = player.getItemInHand(InteractionHand.MAIN_HAND);

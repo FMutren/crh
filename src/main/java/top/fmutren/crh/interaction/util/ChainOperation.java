@@ -67,7 +67,7 @@ public final class ChainOperation {
             BlockState current = level.getBlockState(targetPos);
 
             if (beltCasingType != null && AllBlocks.BELT.has(current)) {
-                if (applySingleBeltCasing(level, stack, targetPos, current, beltCasingType, creative)) {
+                if (applySingleBeltCasing(level, targetPos, current, beltCasingType)) {
                     if (firstBeltChanged == null) {
                         firstBeltChanged = targetPos.immutable();
                     }
@@ -104,11 +104,9 @@ public final class ChainOperation {
 
     private static boolean applySingleBeltCasing(
             Level level,
-            ItemStack stack,
             BlockPos targetPos,
             BlockState current,
-            BeltBlockEntity.CasingType casingType,
-            boolean creative
+            BeltBlockEntity.CasingType casingType
     ) {
         if (!(current.getBlock() instanceof BeltBlock beltBlock)) {
             return false;
@@ -130,11 +128,6 @@ public final class ChainOperation {
 
         BlockState updatedState = level.getBlockState(targetPos);
         level.sendBlockUpdated(targetPos, previousState, updatedState, Block.UPDATE_ALL);
-
-        if (!creative) {
-            stack.shrink(1);
-        }
-
         return true;
     }
 
@@ -173,7 +166,7 @@ public final class ChainOperation {
                 continue;
             }
 
-            if (applySingleBeltCasing(level, stack, targetPos, current, casingType, creative)) {
+            if (applySingleBeltCasing(level, targetPos, current, casingType)) {
                 if (firstChanged == null) {
                     firstChanged = targetPos.immutable();
                 }
