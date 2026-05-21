@@ -14,6 +14,7 @@ import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
+import top.fmutren.crh.Config;
 import top.fmutren.crh.network.ModMessages;
 
 public final class RightClick {
@@ -31,6 +32,8 @@ public final class RightClick {
     }
 
     public static void rightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        if (!Config.builtinChainAllowed()) return;
+
         Level level = event.getLevel();
         if (!level.isClientSide) return;
 

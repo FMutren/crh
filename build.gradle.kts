@@ -47,6 +47,21 @@ repositories {
     maven {
         url = uri("https://maven.gegy.dev/releases")
     }
+
+    maven {
+        url = uri("https://maven.ftb.dev/releases")
+        content {
+            includeGroup("dev.ftb.mods")
+            includeGroup("dev.architectury")
+        }
+    }
+
+    maven {
+        url = uri("https://maven.architectury.dev")
+        content {
+            includeGroup("dev.architectury")
+        }
+    }
 }
 
 base {
@@ -142,6 +157,9 @@ dependencies {
     compileOnly(libs.registrate)
     compileOnly(libs.ponder)
     compileOnly(libs.flywheel) { isTransitive = false }
+    compileOnly(libs.ftbUltimineNeoForge)
+
+    runtimeOnly(libs.ftbUltimineNeoForge)
 }
 
 publishing {

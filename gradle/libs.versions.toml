@@ -13,12 +13,16 @@ ponder = "1.0.63"
 flywheel = "1.0.6"
 moddev = "2.0.141"
 foojayResolverConvention = "0.8.0"
+ftbUltimine = "2101.1.12"
 
 [libraries]
 create = { module = "com.simibubi.create:create-1.21.1", version.ref = "create" }
 ponder = { module = "net.createmod.ponder:Ponder-NeoForge-1.21.1", version.ref = "ponder" }
 registrate = { module = "com.tterrag.registrate:Registrate", version.ref = "registrate" }
 flywheel = { module = "dev.engine-room.flywheel:flywheel-neoforge-api-1.21.1", version.ref = "flywheel" }
+
+ftbUltimine = { module = "dev.ftb.mods:ftb-ultimine", version.ref = "ftbUltimine" }
+ftbUltimineNeoForge = { module = "dev.ftb.mods:ftb-ultimine-neoforge", version.ref = "ftbUltimine" }
 
 [plugins]
 moddev = { id = "net.neoforged.moddev", version.ref = "moddev" }

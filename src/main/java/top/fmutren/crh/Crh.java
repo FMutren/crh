@@ -4,10 +4,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
+import top.fmutren.crh.compat.ftbultimine.FTBUltimineCompat;
 import top.fmutren.crh.input.ClientEventRegister;
 import top.fmutren.crh.network.ModMessages;
 import top.fmutren.crh.server.ServerEventHandlers;
@@ -21,6 +23,10 @@ public final class Crh {
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
         modBus.addListener(ModMessages::registerPayloads);
         NeoForge.EVENT_BUS.addListener(ServerEventHandlers::onPlayerLoggedOut);
+
+        if (ModList.get().isLoaded("ftbultimine")) {
+            FTBUltimineCompat.register();
+        }
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             ClientEventRegister.register(modBus);

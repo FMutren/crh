@@ -29,6 +29,8 @@ import top.fmutren.crh.Config;
 import top.fmutren.crh.interaction.ChainInteraction;
 import top.fmutren.crh.interaction.ChainSelection;
 
+import java.util.Collection;
+
 public final class ChainOperation {
 
     private ChainOperation() {
@@ -42,17 +44,38 @@ public final class ChainOperation {
             ItemStack stack,
             ChainSelection selection
     ) {
-        if (PredicatesCreator.beltCasingType(stack) != null && targetsBelt(level, selection)) {
-            return applyBelt(level, player, hand, stack, selection);
+        if (level == null || player == null || hand == null || originalHit == null
+                || stack == null || selection == null || selection.isEmpty()) {
+            return new ChainInteraction.ChainOperationResult(player, hand, selection, 0);
         }
 
         int changed = 0;
+        BlockPos firstBeltChanged = null;
+        BeltBlockEntity.CasingType beltCasingType = PredicatesCreator.beltCasingType(stack);
+        boolean creative = player.getAbilities().instabuild;
+        Direction face = originalHit.getDirection();
+
         for (BlockPos targetPos : selection.positions()) {
+            if (!creative && stack.isEmpty()) {
+                break;
+            }
+
             if (!level.isLoaded(targetPos)) {
                 continue;
             }
 
             BlockState current = level.getBlockState(targetPos);
+
+            if (beltCasingType != null && AllBlocks.BELT.has(current)) {
+                if (applySingleBeltCasing(level, targetPos, current, beltCasingType)) {
+                    if (firstBeltChanged == null) {
+                        firstBeltChanged = targetPos.immutable();
+                    }
+                    changed++;
+                }
+                continue;
+            }
+
             if (!(current.getBlock() instanceof EncasableBlock encasableBlock)) {
                 continue;
             }
@@ -64,7 +87,7 @@ public final class ChainOperation {
                     stack,
                     player,
                     hand,
-                    centerHit(targetPos, originalHit.getDirection())
+                    centerHit(targetPos, face)
             );
 
             if (result.consumesAction()) {
@@ -72,17 +95,44 @@ public final class ChainOperation {
             }
         }
 
+        if (firstBeltChanged != null) {
+            InteractionFeedback.playBeltCasingSound(level, player, firstBeltChanged, beltCasingType);
+        }
+
         return new ChainInteraction.ChainOperationResult(player, hand, selection, changed);
     }
 
-
-    private static boolean targetsBelt(Level level, ChainSelection selection) {
-        for (BlockPos targetPos : selection.positions()) {
-            if (level.isLoaded(targetPos) && AllBlocks.BELT.has(level.getBlockState(targetPos))) {
-                return true;
-            }
+    private static boolean applySingleBeltCasing(
+            Level level,
+            BlockPos targetPos,
+            BlockState current,
+            BeltBlockEntity.CasingType casingType
+    ) {
+        if (!(current.getBlock() instanceof BeltBlock beltBlock)) {
+            return false;
         }
-        return false;
+
+        if (!(level.getBlockEntity(targetPos) instanceof BeltBlockEntity beltEntity)) {
+            return false;
+        }
+
+        if (beltEntity.casing == casingType) {
+            return false;
+        }
+
+        BlockState previousState = current;
+
+        beltEntity.setCasingType(casingType);
+        beltBlock.updateCoverProperty(level, targetPos, level.getBlockState(targetPos));
+        beltEntity.setChanged();
+
+        BlockState updatedState = level.getBlockState(targetPos);
+        level.sendBlockUpdated(targetPos, previousState, updatedState, Block.UPDATE_ALL);
+        return true;
+    }
+
+    public static BlockHitResult centerHit(BlockPos pos, Direction face) {
+        return new BlockHitResult(Vec3.atCenterOf(pos), face, pos, false);
     }
 
     public static ChainInteraction.ChainOperationResult applyBelt(
@@ -93,7 +143,7 @@ public final class ChainOperation {
             ChainSelection selection
     ) {
         BeltBlockEntity.CasingType casingType = PredicatesCreator.beltCasingType(stack);
-        if (casingType == null) {
+        if (casingType == null || selection == null || selection.isEmpty()) {
             return new ChainInteraction.ChainOperationResult(player, hand, selection, 0);
         }
 
@@ -111,36 +161,17 @@ public final class ChainOperation {
             }
 
             BlockState current = level.getBlockState(targetPos);
+
             if (!AllBlocks.BELT.has(current)) {
                 continue;
             }
 
-            if (!(current.getBlock() instanceof BeltBlock beltBlock)) {
-                continue;
+            if (applySingleBeltCasing(level, targetPos, current, casingType)) {
+                if (firstChanged == null) {
+                    firstChanged = targetPos.immutable();
+                }
+                changed++;
             }
-
-            if (!(level.getBlockEntity(targetPos) instanceof BeltBlockEntity beltEntity)) {
-                continue;
-            }
-
-            if (beltEntity.casing == casingType) {
-                continue;
-            }
-
-            BlockState previousState = current;
-            beltEntity.setCasingType(casingType);
-            beltBlock.updateCoverProperty(level, targetPos, level.getBlockState(targetPos));
-            beltEntity.setChanged();
-            level.sendBlockUpdated(targetPos, previousState, level.getBlockState(targetPos), Block.UPDATE_ALL);
-
-            if (!creative) {
-                stack.shrink(1);
-            }
-
-            if (firstChanged == null) {
-                firstChanged = targetPos.immutable();
-            }
-            changed++;
         }
 
         if (firstChanged != null) {
@@ -148,10 +179,6 @@ public final class ChainOperation {
         }
 
         return new ChainInteraction.ChainOperationResult(player, hand, selection, changed);
-    }
-
-    public static BlockHitResult centerHit(BlockPos pos, Direction face) {
-        return new BlockHitResult(Vec3.atCenterOf(pos), face, pos, false);
     }
 
     public static boolean applyPipe(
@@ -162,64 +189,154 @@ public final class ChainOperation {
             InteractionHand hand,
             boolean shift
     ) {
+        PipeApplyResult result = applyPipeInternal(player, level, pos, face, hand, shift, true, true);
+
+        if (result.consumesAction()) {
+            player.swing(hand, true);
+            return true;
+        }
+
+        return false;
+    }
+
+    private static PipeApplyResult applyPipeInternal(
+            Player player,
+            Level level,
+            BlockPos pos,
+            Direction face,
+            InteractionHand hand,
+            boolean shift,
+            boolean checkReach,
+            boolean showMessage
+    ) {
         if (player == null || level == null || pos == null || face == null || hand == null) {
-            return false;
+            return PipeApplyResult.PASS;
         }
 
         if (level.isClientSide || player.isSpectator() || !player.mayBuild()) {
-            return false;
+            return PipeApplyResult.PASS;
         }
 
         if (!player.getItemInHand(hand).isEmpty()) {
-            return false;
+            return PipeApplyResult.PASS;
         }
 
-        if (!level.isLoaded(pos) || player.distanceToSqr(Vec3.atCenterOf(pos)) > Config.maxEmptyHandPipeReachSqr()) {
-            return false;
+        if (!level.isLoaded(pos)) {
+            return PipeApplyResult.PASS;
+        }
+
+        if (checkReach && player.distanceToSqr(Vec3.atCenterOf(pos)) > Config.maxEmptyHandPipeReachSqr()) {
+            return PipeApplyResult.PASS;
         }
 
         BlockState state = level.getBlockState(pos);
         if (!PredicatesCreator.isManualPipe(state)) {
-            return false;
+            return PipeApplyResult.PASS;
         }
 
         Direction targetFace = shift ? face.getOpposite() : face;
         BooleanProperty property = PredicatesCreator.pipeProperty(targetFace);
         if (property == null || !state.hasProperty(property)) {
-            return false;
+            return PipeApplyResult.PASS;
         }
 
         boolean current = state.getValue(property);
-        if (AllBlocks.FLUID_PIPE.has(state) && current && PredicatesCreator.countOpenPipeFaces(state) <= 2) {
-            player.displayClientMessage(Component.translatable("crh.message.pipelowerthantwo")
-                    .withStyle(ChatFormatting.RED), true);
-            return true;
+
+        if (current && AllBlocks.FLUID_PIPE.has(state) && PredicatesCreator.countOpenPipeFaces(state) <= 2) {
+            if (showMessage) {
+                player.displayClientMessage(Component.translatable("crh.message.pipelowerthantwo")
+                        .withStyle(ChatFormatting.RED), true);
+            }
+
+            return PipeApplyResult.CONSUMED;
         }
 
         BlockState updated = state.setValue(property, !current);
+
         FluidTransportBehaviour.cacheFlows(level, pos);
         level.setBlock(pos, updated, Block.UPDATE_ALL);
         level.scheduleTick(pos, updated.getBlock(), 1, TickPriority.HIGH);
         FluidTransportBehaviour.loadFlows(level, pos);
+
         level.playSound(null, pos, SoundEvents.COPPER_PLACE, SoundSource.BLOCKS, 0.6f, 1.2f);
-        player.swing(hand, true);
-        return true;
+
+        return PipeApplyResult.CHANGED;
+    }
+
+    public static int applyPipeSelectionFromUltimine(
+            Player player,
+            Level level,
+            Collection<BlockPos> positions,
+            Direction face,
+            InteractionHand hand,
+            boolean shift
+    ) {
+        if (player == null || level == null || positions == null || positions.isEmpty()
+                || face == null || hand == null) {
+            return 0;
+        }
+
+        if (level.isClientSide || player.isSpectator() || !player.mayBuild()) {
+            return 0;
+        }
+
+        if (!player.getItemInHand(hand).isEmpty()) {
+            return 0;
+        }
+
+        int changed = 0;
+        boolean consumedAny = false;
+        boolean showedWarning = false;
+
+        for (BlockPos pos : positions) {
+            PipeApplyResult result = applyPipeInternal(
+                    player,
+                    level,
+                    pos,
+                    face,
+                    hand,
+                    shift,
+                    false,
+                    !showedWarning
+            );
+
+            if (result.consumesAction()) {
+                consumedAny = true;
+            }
+
+            if (result.changed()) {
+                changed++;
+            }
+
+            if (result == PipeApplyResult.CONSUMED) {
+                showedWarning = true;
+            }
+        }
+
+        if (consumedAny) {
+            player.swing(hand, true);
+        }
+
+        return changed;
     }
 
     public static ChainInteraction.ChainOperationResult applyWrench(
-            UseOnContext originalContext, ChainSelection selection) {
-        Player player = originalContext.getPlayer();
-        Level level = originalContext.getLevel();
+            UseOnContext originalContext,
+            ChainSelection selection
+    ) {
+        var player = originalContext.getPlayer();
+        var level = originalContext.getLevel();
         InteractionHand hand = originalContext.getHand();
-        Direction clickedFace = originalContext.getClickedFace();
 
-        if (player == null) {
-            return new ChainInteraction.ChainOperationResult(null, hand, selection, 0);
+        if (player == null || selection == null || selection.isEmpty()) {
+            return new ChainInteraction.ChainOperationResult(player, hand, selection, 0);
         }
 
+        Direction clickedFace = originalContext.getClickedFace();
         boolean sneaking = player.isShiftKeyDown();
 
         int changed = 0;
+
         for (BlockPos targetPos : selection.positions()) {
             if (!level.isLoaded(targetPos)) {
                 continue;
@@ -246,6 +363,22 @@ public final class ChainOperation {
         }
 
         return new ChainInteraction.ChainOperationResult(player, hand, selection, changed);
+    }
+
+    private enum PipeApplyResult {
+
+        PASS,
+        CONSUMED,
+        CHANGED;
+
+        boolean consumesAction() {
+            return this == CONSUMED || this == CHANGED;
+        }
+
+        boolean changed() {
+            return this == CHANGED;
+        }
+
     }
 
 }
