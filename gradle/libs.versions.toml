@@ -10,12 +10,16 @@ registrate = "MC1.21.1-1.4.6"
 create = "6.0.10-281"
 createRange = "[6.0.1,6.1)"
 ponder = "1.0.63"
+flywheel = "1.0.6"
 moddev = "2.0.141"
+foojayResolverConvention = "0.8.0"
 
 [libraries]
 create = { module = "com.simibubi.create:create-1.21.1", version.ref = "create" }
 ponder = { module = "net.createmod.ponder:Ponder-NeoForge-1.21.1", version.ref = "ponder" }
 registrate = { module = "com.tterrag.registrate:Registrate", version.ref = "registrate" }
+flywheel = { module = "dev.engine-room.flywheel:flywheel-neoforge-api-1.21.1", version.ref = "flywheel" }
 
 [plugins]
 moddev = { id = "net.neoforged.moddev", version.ref = "moddev" }
+foojayResolverConvention = { id = "org.gradle.toolchains.foojay-resolver-convention", version.ref = "foojayResolverConvention" }

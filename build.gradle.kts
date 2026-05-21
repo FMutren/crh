@@ -141,6 +141,7 @@ dependencies {
     }
     compileOnly(libs.registrate)
     compileOnly(libs.ponder)
+    compileOnly(libs.flywheel) { isTransitive = false }
 }
 
 publishing {
