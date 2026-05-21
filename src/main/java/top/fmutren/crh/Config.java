@@ -64,21 +64,21 @@ public final class Config {
         return MAX_EMPTY_HAND_PIPE_REACH.get();
     }
 
-    public static boolean compatFtbUltimine() {
-        return COMPAT_FTB_ULTIMINE.get();
-    }
-
-    public static boolean disableBuiltinChainWhenFtbUltimineCompatEnabled() {
-        return DISABLE_BUILTIN_CHAIN_WHEN_FTB_ULTIMINE_ENABLED.get();
+    public static boolean builtinChainAllowed() {
+        return !(ftbUltimineCompatActive()
+                && disableBuiltinChainWhenFtbUltimineCompatEnabled());
     }
 
     public static boolean ftbUltimineCompatActive() {
         return compatFtbUltimine() && ModList.get().isLoaded("ftbultimine");
     }
 
-    public static boolean builtinChainAllowed() {
-        return !(ftbUltimineCompatActive()
-                && disableBuiltinChainWhenFtbUltimineCompatEnabled());
+    public static boolean disableBuiltinChainWhenFtbUltimineCompatEnabled() {
+        return DISABLE_BUILTIN_CHAIN_WHEN_FTB_ULTIMINE_ENABLED.get();
+    }
+
+    public static boolean compatFtbUltimine() {
+        return COMPAT_FTB_ULTIMINE.get();
     }
 
 }
