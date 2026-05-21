@@ -6,5 +6,6 @@
   "key.categories.crh.encasing": "Create: Right Hand",
   "crh.message.chain_limit": "连锁操作已达到上限：{0} 个方块",
   "crh.config.compatFtbUltimine": "兼容 FTB Ultimine",
-  "crh.config.disableBuiltinChainWhenFtbUltimineCompatEnabled": "启用 FTB Ultimine 兼容时禁用模组自带连锁"
+  "crh.config.disableBuiltinChainWhenFtbUltimineCompatEnabled": "启用 FTB Ultimine 兼容时禁用模组自带连锁",
+  "ftbultimine.shape.crh.chain": "CRH 连锁"
 }

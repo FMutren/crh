@@ -6,5 +6,6 @@
   "key.categories.crh.encasing": "Create: Right Hand",
   "crh.message.chain_limit": "Chain operation limit reached: {0} blocks",
   "crh.config.compatFtbUltimine": "FTB Ultimine Compatibility",
-  "crh.config.disableBuiltinChainWhenFtbUltimineCompatEnabled": "Disable Built-in Chain When FTB Ultimine Compat Enabled"
+  "crh.config.disableBuiltinChainWhenFtbUltimineCompatEnabled": "Disable Built-in Chain When FTB Ultimine Compat Enabled",
+  "ftbultimine.shape.crh.chain": "CRH Chain"
 }
