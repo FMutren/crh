@@ -43,6 +43,15 @@ public enum CrhUltimineRightClickHandler implements RightClickHandler {
 
         var stack = player.getItemInHand(hand);
 
+        if (stack.isEmpty()) return ChainOperation.applyPipeSelectionFromUltimine(
+                player,
+                level,
+                positions,
+                shapeContext.face(),
+                hand,
+                player.isShiftKeyDown()
+        );
+
         if (isCreateWrench(stack)) {
             ChainSelection selection = UltimineSelectionAdapter.forWrench(level, positions);
             if (selection.isEmpty()) {

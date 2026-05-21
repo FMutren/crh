@@ -2,6 +2,7 @@ package top.fmutren.crh.interaction;
 
 import net.minecraft.core.BlockPos;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 
 public record ChainSelection(
@@ -10,7 +11,7 @@ public record ChainSelection(
 ) {
 
     public ChainSelection {
-        positions = List.copyOf(positions);
+        positions = List.copyOf(new LinkedHashSet<>(positions));
     }
 
     public static ChainSelection empty() {
