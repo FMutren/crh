@@ -4,5 +4,7 @@
   "crh.message.altdownwithcasing": "Hold to enable chain encasing",
   "key.crh.encasing": "Chain Encasing/Exposing",
   "key.categories.crh.encasing": "Create: Right Hand",
-  "crh.message.chain_limit": "Chain operation limit reached: {0} blocks"
+  "crh.message.chain_limit": "Chain operation limit reached: {0} blocks",
+  "crh.config.compatFtbUltimine": "FTB Ultimine Compatibility",
+  "crh.config.disableBuiltinChainWhenFtbUltimineCompatEnabled": "Disable Built-in Chain When FTB Ultimine Compat Enabled"
 }

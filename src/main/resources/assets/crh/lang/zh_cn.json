@@ -4,5 +4,7 @@
   "crh.message.altdownwithcasing": "按住以启用连锁套壳",
   "key.crh.encasing": "连锁套壳/拆壳",
   "key.categories.crh.encasing": "Create: Right Hand",
-  "crh.message.chain_limit": "连锁操作已达到上限：{0} 个方块"
+  "crh.message.chain_limit": "连锁操作已达到上限：{0} 个方块",
+  "crh.config.compatFtbUltimine": "兼容 FTB Ultimine",
+  "crh.config.disableBuiltinChainWhenFtbUltimineCompatEnabled": "启用 FTB Ultimine 兼容时禁用模组自带连锁"
 }
