@@ -157,7 +157,7 @@ dependencies {
     compileOnly(libs.registrate)
     compileOnly(libs.ponder)
     compileOnly(libs.flywheel) { isTransitive = false }
-    compileOnly(libs.ftbUltimine) { isTransitive = false }
+    compileOnly(libs.ftbUltimineNeoForge)
 
     runtimeOnly(libs.ftbUltimineNeoForge)
 }
