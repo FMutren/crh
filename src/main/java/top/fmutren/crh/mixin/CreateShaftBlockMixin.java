@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import top.fmutren.crh.interaction.ShaftSwitch;
+import top.fmutren.crh.interaction.StateSwitch;
 
 import static com.simibubi.create.content.kinetics.simpleRelays.ShaftBlock.placementHelperId;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isShaftCasing;
@@ -44,7 +44,7 @@ public class CreateShaftBlockMixin {
 
         ItemStack heldOffHandItem = player.getOffhandItem();
 
-        BlockState state = ShaftSwitch.ShaftSwitchToBlockState(heldOffHandItem, cir.getReturnValue());
+        BlockState state = StateSwitch.shaftSwitchToBlockState(heldOffHandItem, cir.getReturnValue());
 
         cir.setReturnValue(state);
     }

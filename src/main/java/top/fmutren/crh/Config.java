@@ -9,6 +9,8 @@ public final class Config {
     public static final ModConfigSpec.IntValue MAX_BELT_BLOCKS;
     public static final ModConfigSpec.DoubleValue MAX_EMPTY_HAND_PIPE_REACH;
     public static final ModConfigSpec SPEC;
+    public static final ModConfigSpec.BooleanValue ENABLE_VIEW;
+    public static final ModConfigSpec.BooleanValue ENABLE_EMPTY_HAND_MODIFY_PIPE;
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
     static {
@@ -29,6 +31,14 @@ public final class Config {
         MAX_EMPTY_HAND_PIPE_REACH = BUILDER
                 .comment("Maximum squared block reach allowed for the empty-hand pipe-connection packet.")
                 .defineInRange("maxEmptyHandPipeReachSqr", 64.0D, 1.0D, 1024.0D);
+
+        ENABLE_VIEW = BUILDER
+                .comment("Enable the chain interaction view overlay.")
+                .define("enableView", true);
+
+        ENABLE_EMPTY_HAND_MODIFY_PIPE = BUILDER
+                .comment("Enable empty hand can modify pipe.")
+                .define("enableEmptyHandPipe", true);
 
         BUILDER.pop();
         SPEC = BUILDER.build();
@@ -51,6 +61,14 @@ public final class Config {
 
     public static double maxEmptyHandPipeReachSqr() {
         return MAX_EMPTY_HAND_PIPE_REACH.get();
+    }
+
+    public static boolean enableView() {
+        return ENABLE_VIEW.get();
+    }
+
+    public static boolean enableEmptyHandModifyPipe() {
+        return ENABLE_EMPTY_HAND_MODIFY_PIPE.get();
     }
 
 }

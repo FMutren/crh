@@ -31,9 +31,7 @@ public final class KeyDown {
         Player player = event.getEntity();
         if (Minecraft.getInstance().player != player) return;
         Level level = event.getEntity().level();
-        if(!level.isClientSide) return;
-        BlockHitResult hit = (BlockHitResult) Minecraft.getInstance().hitResult;
-        BlockPos pos = hit.getBlockPos();
+
 
         syncChainKeyState(player);
 
@@ -48,11 +46,18 @@ public final class KeyDown {
 
             if (isCreateCasing(mainHand) || isCreateCasing(offHand)) {
                 result = "crh.message.altdownwithcasing";
-//                ChainRender instance = new ChainRender();
-//                instance.GetToRender(level, pos);
             }
             if (result == null) return;
             player.displayClientMessage(Component.translatable(result).withStyle(ChatFormatting.GREEN), true);
+        }
+
+        if(ENCASE_MAPPING.get().isDown()) {
+            if(!level.isClientSide) return;
+            BlockHitResult hit = (BlockHitResult) Minecraft.getInstance().hitResult;
+            BlockPos pos = hit.getBlockPos();
+            ItemStack mainHand = player.getItemInHand(InteractionHand.MAIN_HAND);
+            ChainRender instance = new ChainRender();
+            instance.getToRender(level, pos, mainHand);
         }
     }
 

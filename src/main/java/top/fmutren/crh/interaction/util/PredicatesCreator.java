@@ -71,4 +71,10 @@ public class PredicatesCreator {
         return null;
     }
 
+    public static boolean isCasing(ItemStack stack) {
+        return AllBlocks.ANDESITE_CASING.isIn(stack) ||
+                AllBlocks.BRASS_CASING.isIn(stack) ||
+                AllBlocks.COPPER_CASING.isIn(stack);
+    }
+
 }

@@ -16,6 +16,8 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 import top.fmutren.crh.network.ModMessages;
 
+import static top.fmutren.crh.Config.enableEmptyHandModifyPipe;
+
 public final class RightClick {
 
     public static final Lazy<KeyMapping> ENCASE_MAPPING = Lazy.of(() ->
@@ -31,6 +33,7 @@ public final class RightClick {
     }
 
     public static void rightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        if(!enableEmptyHandModifyPipe()) return;
         Level level = event.getLevel();
         if (!level.isClientSide) return;
 
