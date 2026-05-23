@@ -3,6 +3,7 @@ package top.fmutren.crh.interaction.util;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
+import fr.iglee42.createcasing.casings.CasingSets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -10,13 +11,18 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import top.fmutren.crh.interaction.StateSwitch;
+
+import static top.fmutren.crh.Crh.loadCreateCasing;
+import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.crhCreateCasingIsCasingPipe;
+import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.crhCreateCasingIsCasingShaft;
 
 public class PredicatesCreator {
 
     private static final Direction[] DIRECTIONS = Direction.values();
 
     public static boolean isManualPipe(BlockState state) {
-        return AllBlocks.FLUID_PIPE.has(state) || AllBlocks.ENCASED_FLUID_PIPE.has(state);
+        return AllBlocks.FLUID_PIPE.has(state) || isEncasedPipe(state);
     }
 
     public static int countOpenPipeFaces(BlockState state) {
@@ -39,7 +45,23 @@ public class PredicatesCreator {
     }
 
     public static boolean isEncasedShaft(BlockState state) {
-        return AllBlocks.ANDESITE_ENCASED_SHAFT.has(state) || AllBlocks.BRASS_ENCASED_SHAFT.has(state);
+
+        if(loadCreateCasing){
+            boolean isCreateCasingShaft = crhCreateCasingIsCasingShaft(state);
+            if(isCreateCasingShaft) return true;
+        }
+
+        if(AllBlocks.ANDESITE_ENCASED_SHAFT.has(state)) return true;
+        return AllBlocks.BRASS_ENCASED_SHAFT.has(state);
+    }
+
+    public static  boolean isEncasedPipe(BlockState state){
+        if(AllBlocks.ENCASED_FLUID_PIPE.has(state)) return true;
+        if(loadCreateCasing){
+            boolean isCreateCasingPipi = crhCreateCasingIsCasingPipe(state);
+            if(isCreateCasingPipi) return true;
+        }
+        return false;
     }
 
     public static boolean isBeltWithCasing(Level level, BlockPos pos, BlockState state) {
@@ -56,25 +78,30 @@ public class PredicatesCreator {
     }
 
     public static boolean isShaftCasing(ItemStack stack) {
-        return AllBlocks.ANDESITE_CASING.isIn(stack) || AllBlocks.BRASS_CASING.isIn(stack);
+        return StateSwitch.commonSwitchForHeldItem(stack) == 1;
     }
 
     public static BeltBlockEntity.CasingType beltCasingType(ItemStack stack) {
-        if (AllBlocks.ANDESITE_CASING.isIn(stack)) {
-            return BeltBlockEntity.CasingType.ANDESITE;
-        }
+        if (AllBlocks.ANDESITE_CASING.isIn(stack)) return BeltBlockEntity.CasingType.ANDESITE;
 
-        if (AllBlocks.BRASS_CASING.isIn(stack)) {
-            return BeltBlockEntity.CasingType.BRASS;
+        if (AllBlocks.BRASS_CASING.isIn(stack)) return BeltBlockEntity.CasingType.BRASS;
+
+        if(loadCreateCasing){
+            if(AllBlocks.COPPER_CASING.isIn(stack)) return CasingSets.COPPER.getBeltCasingType();
+
+            if(AllBlocks.RAILWAY_CASING.isIn(stack)) return CasingSets.RAILWAY.getBeltCasingType();
+
+            if(CasingSets.INDUSTRIAL_IRON.getCasing().asItem().equals(stack.getItem())) return CasingSets.INDUSTRIAL_IRON.getBeltCasingType();
+
+            if(CasingSets.SHADOW_STEEL.getCasing().asItem().equals(stack.getItem())) return CasingSets.SHADOW_STEEL.getBeltCasingType();
+
+            if(CasingSets.CREATIVE.getCasing().asItem().equals(stack.getItem())) return CasingSets.CREATIVE.getBeltCasingType();
+
+            if(CasingSets.WEATHERED_IRON.getCasing().asItem().equals(stack.getItem())) return CasingSets.WEATHERED_IRON.getBeltCasingType();
+
+            if(CasingSets.REFINED_RADIANCE.getCasing().asItem().equals(stack.getItem())) return CasingSets.REFINED_RADIANCE.getBeltCasingType();
         }
 
         return null;
     }
-
-    public static boolean isCasing(ItemStack stack) {
-        return AllBlocks.ANDESITE_CASING.isIn(stack) ||
-                AllBlocks.BRASS_CASING.isIn(stack) ||
-                AllBlocks.COPPER_CASING.isIn(stack);
-    }
-
 }

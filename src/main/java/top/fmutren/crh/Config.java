@@ -36,7 +36,7 @@ public final class Config {
                 .defineInRange("maxEmptyHandPipeReachSqr", 64.0D, 1.0D, 1024.0D);
 
         ENABLE_VIEW = BUILDER
-                .comment("Enable the chain interaction view overlay.")
+                .comment("Enable the chain interaction view overlay.(Will disable with FTB-Ultimine)")
                 .define("enableView", true);
 
         ENABLE_EMPTY_HAND_MODIFY_PIPE = BUILDER
@@ -75,7 +75,7 @@ public final class Config {
     }
 
     public static boolean enableView() {
-        return ENABLE_VIEW.get();
+        return ENABLE_VIEW.get() && !ModList.get().isLoaded("ftbultimine");
     }
 
     public static boolean enableEmptyHandModifyPipe() {

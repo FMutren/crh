@@ -27,6 +27,11 @@ repositories {
     mavenLocal()
 
     maven {
+        name = "igleeRepoReleases"
+        url = uri("https://maven.iglee.fr/releases")
+    }
+
+    maven {
         url = uri("https://www.cursemaven.com")
         content {
             includeGroup("curse.maven")
@@ -158,8 +163,7 @@ dependencies {
     compileOnly(libs.ponder)
     compileOnly(libs.flywheel) { isTransitive = false }
     compileOnly(libs.ftbUltimineNeoForge)
-
-    runtimeOnly(libs.ftbUltimineNeoForge)
+    compileOnly(libs.createCasing)
 }
 
 publishing {

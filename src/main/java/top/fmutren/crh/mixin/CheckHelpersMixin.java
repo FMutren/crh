@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import top.fmutren.crh.interaction.util.PredicatesCreator;
+import top.fmutren.crh.interaction.StateSwitch;
 
 import javax.annotation.Nullable;
 
@@ -46,7 +46,7 @@ public class CheckHelpersMixin {
         BlockPos pos = ray.getBlockPos();
 
         if(world.getBlockState(pos).getBlock() instanceof EncasableBlock && ENCASE_MAPPING.get().isDown() && enableView()) {
-            if (PredicatesCreator.isCasing(mc.player.getMainHandItem())) {
+            if (StateSwitch.commonSwitchForHeldItem(mc.player.getMainHandItem()) != -1) {
                 setTarget(pos);
             }
         }

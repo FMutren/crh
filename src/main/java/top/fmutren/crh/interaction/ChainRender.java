@@ -2,8 +2,6 @@ package top.fmutren.crh.interaction;
 
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.decoration.encasing.EncasableBlock;
-import com.simibubi.create.content.kinetics.belt.BeltBlock;
-import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import com.simibubi.create.content.kinetics.simpleRelays.ShaftBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
@@ -13,7 +11,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import top.fmutren.crh.Config;
 import top.fmutren.crh.interaction.util.ChainCollector;
 
-import static top.fmutren.crh.interaction.StateSwitch.*;
+import static top.fmutren.crh.interaction.StateSwitch.pipeSwitchToBlockState;
+import static top.fmutren.crh.interaction.StateSwitch.shaftSwitchToBlockState;
 import static top.fmutren.crh.render.OuterContourRender.renderGhostBlock;
 
 public class ChainRender {
@@ -26,7 +25,6 @@ public class ChainRender {
     public void getToRender(Level level, BlockPos pos, ItemStack item) {
         ChainSelection selection = chainSelectionToRender(level, pos);
         if (selection == null) return;
-        BlockState state = level.getBlockState(pos);
         renderChainGhostBlock(selection, item, level);
     }
 
@@ -37,9 +35,6 @@ public class ChainRender {
             }
             case PipeBlock pipe -> {
                 return pipeSwitchToBlockState(item, state);
-            }
-            case BeltBlock belt ->{
-                return beltSwitchToBlockState(item, state);
             }
             default -> {
                 return state;
@@ -80,15 +75,6 @@ public class ChainRender {
                                 pos,
                                 AllBlocks.FLUID_PIPE::has,
                                 Config.maxPipeBlocks()
-                        );
-                        return chainSelection;
-                    }
-                    case BeltBlock belt -> {
-                        chainSelection = ChainCollector.collectBelt(
-                                level,
-                                pos,
-                                Config.maxBeltBlocks(),
-                                b -> b.casing != BeltBlockEntity.CasingType.NONE
                         );
                         return chainSelection;
                     }

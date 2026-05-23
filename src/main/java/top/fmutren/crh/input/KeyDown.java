@@ -1,7 +1,5 @@
 package top.fmutren.crh.input;
 
-import com.simibubi.create.AllBlocks;
-import com.simibubi.create.content.equipment.wrench.WrenchItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -16,10 +14,11 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import top.fmutren.crh.Config;
 import top.fmutren.crh.interaction.ChainRender;
 import top.fmutren.crh.interaction.util.ChainKeyStateTracker;
-import top.fmutren.crh.interaction.util.PredicatesCreator;
 import top.fmutren.crh.network.ModMessages;
 
 import static top.fmutren.crh.input.RightClick.ENCASE_MAPPING;
+import static top.fmutren.crh.interaction.StateSwitch.isCasing;
+import static top.fmutren.crh.interaction.StateSwitch.isCreateWrench;
 
 public final class KeyDown {
 
@@ -47,7 +46,7 @@ public final class KeyDown {
                 result = "crh.message.altdownwithwrench";
             }
 
-            if (isCreateCasing(mainHand) || isCreateCasing(offHand)) {
+            if (isCasing(mainHand) || isCasing(offHand)) {
                 result = "crh.message.altdownwithcasing";
             }
             if (result == null) return;
@@ -59,8 +58,10 @@ public final class KeyDown {
             BlockHitResult hit = (BlockHitResult) Minecraft.getInstance().hitResult;
             BlockPos pos = hit.getBlockPos();
             ItemStack mainHand = player.getItemInHand(InteractionHand.MAIN_HAND);
-            ChainRender instance = new ChainRender();
-            instance.getToRender(level, pos, mainHand);
+            if(Config.enableView()) {
+                ChainRender instance = new ChainRender();
+                instance.getToRender(level, pos, mainHand);
+            }
         }
     }
 
@@ -81,14 +82,6 @@ public final class KeyDown {
 
         PacketDistributor.sendToServer(new ModMessages.ChainKeyStatePayload(chainKeyDown));
         lastSentChainKeyState = chainKeyDown;
-    }
-
-    private static boolean isCreateWrench(ItemStack stack) {
-        return stack.getItem() instanceof WrenchItem;
-    }
-
-    private static boolean isCreateCasing(ItemStack stack) {
-        return AllBlocks.COPPER_CASING.isIn(stack) || PredicatesCreator.isShaftCasing(stack);
     }
 
 }

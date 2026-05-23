@@ -1,7 +1,6 @@
 package top.fmutren.crh.mixin;
 
 import com.simibubi.create.AllBlocks;
-import com.simibubi.create.AllItems;
 import com.simibubi.create.content.decoration.encasing.EncasableBlock;
 import com.simibubi.create.content.fluids.pipes.AxisPipeBlock;
 import com.simibubi.create.content.fluids.pipes.FluidPipeBlock;
@@ -22,7 +21,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static top.fmutren.crh.interaction.PlayerLookOnFace.*;
+import static top.fmutren.crh.interaction.PlayerLookOnFace.FluidPipeFace;
+import static top.fmutren.crh.interaction.PlayerLookOnFace.getPlayerLookingFace;
+import static top.fmutren.crh.interaction.StateSwitch.isCreateWrench;
 import static top.fmutren.crh.interaction.util.ChainOperation.centerHit;
 
 
@@ -59,7 +60,7 @@ public abstract class CreateFluidPipeMixin {
                     InteractionHand.MAIN_HAND,
                     blockHit
             );
-        } else if (AllItems.WRENCH.isIn(heldOffHandItem)) {
+        } else if (isCreateWrench(heldOffHandItem)) {
             BlockState newState = BuiltInRegistries.BLOCK.get(ResourceLocation
                     .parse("create:glass_fluid_pipe"))
                     .defaultBlockState()

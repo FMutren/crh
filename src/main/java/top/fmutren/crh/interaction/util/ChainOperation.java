@@ -29,8 +29,6 @@ import top.fmutren.crh.Config;
 import top.fmutren.crh.interaction.ChainInteraction;
 import top.fmutren.crh.interaction.ChainSelection;
 
-import java.util.Collection;
-
 public final class ChainOperation {
 
     private ChainOperation() {
@@ -261,63 +259,6 @@ public final class ChainOperation {
         level.playSound(null, pos, SoundEvents.COPPER_PLACE, SoundSource.BLOCKS, 0.6f, 1.2f);
 
         return PipeApplyResult.CHANGED;
-    }
-
-    public static int applyPipeSelectionFromUltimine(
-            Player player,
-            Level level,
-            Collection<BlockPos> positions,
-            Direction face,
-            InteractionHand hand,
-            boolean shift
-    ) {
-        if (player == null || level == null || positions == null || positions.isEmpty()
-                || face == null || hand == null) {
-            return 0;
-        }
-
-        if (level.isClientSide || player.isSpectator() || !player.mayBuild()) {
-            return 0;
-        }
-
-        if (!player.getItemInHand(hand).isEmpty()) {
-            return 0;
-        }
-
-        int changed = 0;
-        boolean consumedAny = false;
-        boolean showedWarning = false;
-
-        for (BlockPos pos : positions) {
-            PipeApplyResult result = applyPipeInternal(
-                    player,
-                    level,
-                    pos,
-                    face,
-                    hand,
-                    shift,
-                    false,
-                    !showedWarning
-            );
-
-            if (result.consumesAction()) {
-                consumedAny = true;
-            }
-
-            if (result.changed()) {
-                changed++;
-            }
-
-            if (result == PipeApplyResult.CONSUMED) {
-                showedWarning = true;
-            }
-        }
-
-        if (consumedAny) {
-            player.swing(hand, true);
-        }
-
-        return changed;
     }
 
     public static ChainInteraction.ChainOperationResult applyWrench(

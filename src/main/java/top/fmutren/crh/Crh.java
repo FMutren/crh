@@ -19,6 +19,8 @@ public final class Crh {
 
     public static final String MODID = "crh";
 
+    public static boolean loadCreateCasing = false;
+
     public Crh(IEventBus modBus, ModContainer modContainer) {
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
         modBus.addListener(ModMessages::registerPayloads);
@@ -31,6 +33,8 @@ public final class Crh {
         if (FMLEnvironment.dist == Dist.CLIENT) {
             ClientEventRegister.register(modBus);
         }
+
+        if (ModList.get().isLoaded("createcasing")) loadCreateCasing = true;
     }
 
     public static ResourceLocation id(String path) {

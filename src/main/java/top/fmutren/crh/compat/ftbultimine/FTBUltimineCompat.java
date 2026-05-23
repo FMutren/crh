@@ -1,7 +1,6 @@
 package top.fmutren.crh.compat.ftbultimine;
 
-import dev.ftb.mods.ftbultimine.api.rightclick.RegisterRightClickHandlerEvent;
-import dev.ftb.mods.ftbultimine.api.shape.RegisterShapeEvent;
+import static top.fmutren.crh.compat.ftbultimine.FTBRightClickHandle.FTBRightClickEventHandler;
 
 public final class FTBUltimineCompat {
 
@@ -16,13 +15,7 @@ public final class FTBUltimineCompat {
         }
         registered = true;
 
-        RegisterRightClickHandlerEvent.REGISTER.register(registry ->
-                registry.registerHandler(CrhUltimineRightClickHandler.INSTANCE)
-        );
-
-        RegisterShapeEvent.REGISTER.register(registry ->
-                registry.register(CrhChainShape.INSTANCE)
-        );
+        FTBRightClickEventHandler();
     }
 
 }
