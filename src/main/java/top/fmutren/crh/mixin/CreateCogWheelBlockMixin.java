@@ -25,8 +25,7 @@ public class CreateCogWheelBlockMixin {
 
     @Inject(
             method = "setPlacedBy",
-            at = @At("TAIL"),
-            remap = false
+            at = @At("TAIL")
     )
     private void crh$EncaseAfterPlace(
             Level worldIn,

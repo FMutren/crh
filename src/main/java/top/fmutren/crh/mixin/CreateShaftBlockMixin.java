@@ -32,8 +32,7 @@ public class CreateShaftBlockMixin {
     @Inject(
             method = "getStateForPlacement",
             at = @At("RETURN"),
-            cancellable = true,
-            remap = false
+            cancellable = true
     )
     private void crh$EncaseAfterPlace(
             BlockPlaceContext context,
@@ -51,10 +50,9 @@ public class CreateShaftBlockMixin {
     }
 
     @Inject(
-            method = "use",
+            method = "m_6227_",
             at = @At("HEAD"),
-            cancellable = true,
-            remap = false
+            cancellable = true
     )
     private void crh$EncaseAfterPlaceInShaft(
             BlockState state,

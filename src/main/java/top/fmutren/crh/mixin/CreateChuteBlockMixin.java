@@ -21,8 +21,7 @@ public class CreateChuteBlockMixin {
 
     @Inject(
             method = "setPlacedBy",
-            at = @At("TAIL"),
-            remap = false
+            at = @At("TAIL")
     )
     private void crh$AfterPlace(
             Level pLevel,

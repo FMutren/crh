@@ -19,13 +19,9 @@ public class ShaftSwitch {
     }
 
     public static BlockState ShaftSwitchToBlockState(ItemStack itemStack, BlockState state) {
-        System.out.println(itemStack);
-        System.out.println(itemStack.getItem());
-        System.out.println(state);
         if(itemStack.isEmpty()) return state;
         if(!isShaftCasing(itemStack)) return state;
         String result = shaftCasingType.get(itemStack.getItem().toString());
-        System.out.println(result);
         if(result == null) return state;
         return BuiltInRegistries.BLOCK.get(ResourceLocation
                 .parse(result))

@@ -132,10 +132,6 @@ public final class ChainOperation {
             beltEntity.setChanged();
             level.sendBlockUpdated(targetPos, previousState, level.getBlockState(targetPos), Block.UPDATE_ALL);
 
-            if (!creative) {
-                stack.shrink(1);
-            }
-
             if (firstChanged == null) {
                 firstChanged = targetPos.immutable();
             }

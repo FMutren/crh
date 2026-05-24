@@ -16,10 +16,9 @@ import top.fmutren.crh.interaction.ChainInteraction;
 public abstract class CreateWrenchItemMixin {
 
     @Inject(
-            method = "useOn",
+            method = "m_6225_",
             at = @At("HEAD"),
-            cancellable = true,
-            remap = false
+            cancellable = true
     )
     private void crh$chainWrenchUse(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
         InteractionResult result = ChainInteraction.tryHandleWrench(context);

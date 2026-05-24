@@ -27,10 +27,9 @@ import top.fmutren.crh.interaction.ChainInteraction;
 public abstract class CreateEncasingBlockMixin {
 
     @Inject(
-            method = "use",
+            method = "m_6227_",
             at = @At("HEAD"),
-            cancellable = true,
-            remap = false
+            cancellable = true
     )
     private void crh$chainEncasingUse(
             BlockState state,

@@ -32,8 +32,7 @@ public abstract class CreateFluidPipeMixin {
 
     @Inject(
             method = "setPlacedBy",
-            at = @At("TAIL"),
-            remap = false
+            at = @At("TAIL")
     )
     private void crh$EncaseAfterPlace(
             Level pLevel,
