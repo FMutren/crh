@@ -43,6 +43,29 @@ public class CrhCreateCasingCompat {
         return CasingSets.COPPER.getShaft().equals(state.getBlock());
     }
 
+    public static boolean crhCreateCasingIsCasingCogwheel(BlockState state){
+        if(CasingSets.REFINED_RADIANCE.getCogwheel().equals(state.getBlock())) return true;
+        if(CasingSets.REFINED_RADIANCE.getLargeCogwheel().equals(state.getBlock())) return true;
+
+        if(CasingSets.CREATIVE.getCogwheel().equals(state.getBlock())) return true;
+        if(CasingSets.CREATIVE.getLargeCogwheel().equals(state.getBlock())) return true;
+
+        if(CasingSets.SHADOW_STEEL.getCogwheel().equals(state.getBlock())) return true;
+        if(CasingSets.SHADOW_STEEL.getLargeCogwheel().equals(state.getBlock())) return true;
+
+        if(CasingSets.WEATHERED_IRON.getCogwheel().equals(state.getBlock())) return true;
+        if(CasingSets.WEATHERED_IRON.getLargeCogwheel().equals(state.getBlock())) return true;
+
+        if(CasingSets.INDUSTRIAL_IRON.getCogwheel().equals(state.getBlock())) return true;
+        if(CasingSets.INDUSTRIAL_IRON.getLargeCogwheel().equals(state.getBlock())) return true;
+
+        if(CasingSets.RAILWAY.getCogwheel().equals(state.getBlock())) return true;
+        if(CasingSets.RAILWAY.getLargeCogwheel().equals(state.getBlock())) return true;
+
+        if(CasingSets.COPPER.getCogwheel().equals(state.getBlock())) return true;
+        return CasingSets.COPPER.getLargeCogwheel().equals(state.getBlock());
+    }
+
     public static  boolean crhCreateCasingIsCasingPipe(BlockState state){
         if(CasingSets.SHADOW_STEEL.getFluidPipe().equals(state.getBlock())) return true;
         if(CasingSets.ANDESITE.getFluidPipe().equals(state.getBlock())) return true;

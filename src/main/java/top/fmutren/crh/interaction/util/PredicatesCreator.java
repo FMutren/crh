@@ -14,8 +14,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import top.fmutren.crh.interaction.StateSwitch;
 
 import static top.fmutren.crh.Crh.loadCreateCasing;
-import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.crhCreateCasingIsCasingPipe;
-import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.crhCreateCasingIsCasingShaft;
+import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.*;
 
 public class PredicatesCreator {
 
@@ -53,6 +52,19 @@ public class PredicatesCreator {
 
         if(AllBlocks.ANDESITE_ENCASED_SHAFT.has(state)) return true;
         return AllBlocks.BRASS_ENCASED_SHAFT.has(state);
+    }
+
+    public static boolean isEncasedCogwheel(BlockState state) {
+
+        if(loadCreateCasing){
+            boolean isCreateCasingShaft = crhCreateCasingIsCasingCogwheel(state);
+            if(isCreateCasingShaft) return true;
+        }
+
+        if(AllBlocks.ANDESITE_ENCASED_COGWHEEL.has(state)) return true;
+        if(AllBlocks.ANDESITE_ENCASED_LARGE_COGWHEEL.has(state)) return true;
+        if(AllBlocks.BRASS_ENCASED_LARGE_COGWHEEL.has(state)) return true;
+        return AllBlocks.BRASS_ENCASED_COGWHEEL.has(state);
     }
 
     public static  boolean isEncasedPipe(BlockState state){
