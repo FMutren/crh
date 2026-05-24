@@ -14,7 +14,10 @@ public final class ChainKeyStateTracker {
     }
 
     public static void set(Player player, boolean down) {
-        if (player == null) return;
+        if (player == null) {
+            return;
+        }
+
         if (down) {
             KEY_STATES.put(player.getUUID(), true);
         } else {

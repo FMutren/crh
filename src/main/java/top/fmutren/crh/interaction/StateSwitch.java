@@ -16,78 +16,104 @@ import static top.fmutren.crh.Crh.loadCreateCasing;
 import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.*;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isShaftCasing;
 
-public class StateSwitch {
+public final class StateSwitch {
+
     public static final Map<String, String> shaftCasingType = new HashMap<>();
+    public static final Map<String, String> pipeCasingType = new HashMap<>();
+
     static {
         shaftCasingType.put("create:brass_casing", "create:brass_encased_shaft");
         shaftCasingType.put("create:andesite_casing", "create:andesite_encased_shaft");
 
-        if(loadCreateCasing){
-            crhCreateCasingShaftCasingType();
-        }
-    }
-
-    public static BlockState shaftSwitchToBlockState(ItemStack itemStack, BlockState state) {
-        if(itemStack.isEmpty()) return state;
-        if(!isShaftCasing(itemStack)) return state;
-        if(!(state.getBlock() instanceof ShaftBlock)) return state;
-        String result = shaftCasingType.get(itemStack.getItem().toString());
-        if(result == null) return state;
-        return BuiltInRegistries.BLOCK.get(ResourceLocation
-                .parse(result))
-                .defaultBlockState()
-                .setValue(ShaftBlock.AXIS, state.getValue(ShaftBlock.AXIS));
-    }
-
-    public static final Map<String, String> pipeCasingType = new HashMap<>();
-    static {
         pipeCasingType.put("create:copper_casing", "create:encased_fluid_pipe");
 
-        if(loadCreateCasing){
+        if (loadCreateCasing) {
+            crhCreateCasingShaftCasingType();
             crhCreatePipeCasingType();
         }
     }
 
-    public static BlockState pipeSwitchToBlockState(ItemStack itemStack, BlockState state) {
-        if(itemStack.isEmpty()) return state;
-        if(!AllBlocks.COPPER_CASING.isIn(itemStack) && !loadCreateCasing) return state;
-        if(loadCreateCasing && !isCasing(itemStack)) return state;
-        if(!(state.getBlock() instanceof PipeBlock)) return state;
-        String result = pipeCasingType.get(itemStack.getItem().toString());
-        if(result == null) return state;
-        return BuiltInRegistries.BLOCK.get(ResourceLocation
-                .parse(result))
-                .defaultBlockState()
-                .setValue(PipeBlock.UP , state.getValue(PipeBlock.UP))
-                .setValue(PipeBlock.DOWN , state.getValue(PipeBlock.DOWN))
-                .setValue(PipeBlock.WEST , state.getValue(PipeBlock.WEST))
-                .setValue(PipeBlock.EAST , state.getValue(PipeBlock.EAST))
-                .setValue(PipeBlock.NORTH , state.getValue(PipeBlock.NORTH))
-                .setValue(PipeBlock.SOUTH , state.getValue(PipeBlock.SOUTH));
+    private StateSwitch() {
     }
 
-    public static  int commonSwitchForHeldItem(ItemStack itemStack){
-        if(isCreateWrench(itemStack)) return 0;
-
-        if(AllBlocks.ANDESITE_CASING.isIn(itemStack)) return 1;
-        if(AllBlocks.BRASS_CASING.isIn(itemStack)) return 1;
-
-        if(loadCreateCasing) {
-            return CasingSwitch(itemStack);
+    public static BlockState shaftSwitchToBlockState(ItemStack itemStack, BlockState state) {
+        if (itemStack.isEmpty() || !isShaftCasing(itemStack) || !(state.getBlock() instanceof ShaftBlock)) {
+            return state;
         }
 
-        if(AllBlocks.COPPER_CASING.isIn(itemStack)) return 2;
+        String result = shaftCasingType.get(itemStack.getItem().toString());
+        if (result == null) {
+            return state;
+        }
 
-        if(AllBlocks.INDUSTRIAL_IRON_BLOCK.isIn(itemStack)) return 3;
+        return BuiltInRegistries.BLOCK.get(ResourceLocation.parse(result))
+                .defaultBlockState()
+                .setValue(ShaftBlock.AXIS, state.getValue(ShaftBlock.AXIS));
+    }
 
-        return -1;
+    public static BlockState pipeSwitchToBlockState(ItemStack itemStack, BlockState state) {
+        if (itemStack.isEmpty()) {
+            return state;
+        }
+
+        if (!AllBlocks.COPPER_CASING.isIn(itemStack) && !loadCreateCasing) {
+            return state;
+        }
+
+        if (loadCreateCasing && !isCasing(itemStack)) {
+            return state;
+        }
+
+        if (!(state.getBlock() instanceof PipeBlock)) {
+            return state;
+        }
+
+        String result = pipeCasingType.get(itemStack.getItem().toString());
+        if (result == null) {
+            return state;
+        }
+
+        return BuiltInRegistries.BLOCK.get(ResourceLocation.parse(result))
+                .defaultBlockState()
+                .setValue(PipeBlock.UP, state.getValue(PipeBlock.UP))
+                .setValue(PipeBlock.DOWN, state.getValue(PipeBlock.DOWN))
+                .setValue(PipeBlock.WEST, state.getValue(PipeBlock.WEST))
+                .setValue(PipeBlock.EAST, state.getValue(PipeBlock.EAST))
+                .setValue(PipeBlock.NORTH, state.getValue(PipeBlock.NORTH))
+                .setValue(PipeBlock.SOUTH, state.getValue(PipeBlock.SOUTH));
     }
 
     public static boolean isCasing(ItemStack itemStack) {
-        return(commonSwitchForHeldItem(itemStack) != 0 && commonSwitchForHeldItem(itemStack) != -1);
+        int switchResult = commonSwitchForHeldItem(itemStack);
+        return switchResult != 0 && switchResult != -1;
+    }
+
+    public static int commonSwitchForHeldItem(ItemStack itemStack) {
+        if (isCreateWrench(itemStack)) {
+            return 0;
+        }
+
+        if (AllBlocks.ANDESITE_CASING.isIn(itemStack) || AllBlocks.BRASS_CASING.isIn(itemStack)) {
+            return 1;
+        }
+
+        if (loadCreateCasing) {
+            return casingSwitch(itemStack);
+        }
+
+        if (AllBlocks.COPPER_CASING.isIn(itemStack)) {
+            return 2;
+        }
+
+        if (AllBlocks.INDUSTRIAL_IRON_BLOCK.isIn(itemStack)) {
+            return 3;
+        }
+
+        return -1;
     }
 
     public static boolean isCreateWrench(ItemStack stack) {
         return stack.getItem() instanceof WrenchItem;
     }
+
 }

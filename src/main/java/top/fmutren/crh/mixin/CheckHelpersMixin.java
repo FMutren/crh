@@ -20,35 +20,35 @@ import static top.fmutren.crh.input.RightClick.ENCASE_MAPPING;
 
 @Mixin(PlacementClient.class)
 public class CheckHelpersMixin {
-    @Shadow
-    static void setTarget(@Nullable BlockPos target){}
 
     @Inject(
             method = "checkHelpers",
             at = @At("HEAD")
     )
     private static void checkHelpers(CallbackInfo ci) {
-        Minecraft mc = Minecraft.getInstance();
-        ClientLevel world = mc.level;
+        var minecraft = Minecraft.getInstance();
+        ClientLevel world = minecraft.level;
 
-        if (world == null)
+        if (world == null || minecraft.player == null || minecraft.player.isShiftKeyDown()) {
             return;
+        }
 
-        if (!(mc.hitResult instanceof BlockHitResult ray))
+        if (!(minecraft.hitResult instanceof BlockHitResult ray)) {
             return;
+        }
 
-        if (mc.player == null)
-            return;
+        var pos = ray.getBlockPos();
+        boolean canShowView = world.getBlockState(pos).getBlock() instanceof EncasableBlock
+                && ENCASE_MAPPING.get().isDown()
+                && enableView();
 
-        if (mc.player.isShiftKeyDown())
-            return;
-
-        BlockPos pos = ray.getBlockPos();
-
-        if(world.getBlockState(pos).getBlock() instanceof EncasableBlock && ENCASE_MAPPING.get().isDown() && enableView()) {
-            if (StateSwitch.commonSwitchForHeldItem(mc.player.getMainHandItem()) != -1) {
-                setTarget(pos);
-            }
+        if (canShowView && StateSwitch.commonSwitchForHeldItem(minecraft.player.getMainHandItem()) != -1) {
+            setTarget(pos);
         }
     }
+
+    @Shadow
+    static void setTarget(@Nullable BlockPos target) {
+    }
+
 }

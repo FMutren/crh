@@ -12,14 +12,18 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import top.fmutren.crh.interaction.ChainSelection;
 
-import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.BeltCasingTypeToCasing;
+import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.beltCasingTypeToCasing;
 
 public final class InteractionFeedback {
 
     private InteractionFeedback() {
     }
 
-    public static void finish(Player player, InteractionHand hand, ChainSelection selection) {
+    public static void finish(
+            Player player,
+            InteractionHand hand,
+            ChainSelection selection
+    ) {
         if (player != null && hand != null) {
             player.swing(hand, true);
         }
@@ -27,13 +31,15 @@ public final class InteractionFeedback {
     }
 
     public static void notifyLimit(Player player, ChainSelection selection) {
-        if (player != null && selection.truncated()) {
-            player.displayClientMessage(
-                    Component.translatable("crh.message.chain_limit", selection.positions().size())
-                            .withStyle(ChatFormatting.YELLOW),
-                    true
-            );
+        if (player == null || selection == null || !selection.truncated()) {
+            return;
         }
+
+        player.displayClientMessage(
+                Component.translatable("crh.message.chain_limit", selection.positions().size())
+                        .withStyle(ChatFormatting.YELLOW),
+                true
+        );
     }
 
     public static void playBeltCasingSound(
@@ -42,14 +48,12 @@ public final class InteractionFeedback {
             BlockPos pos,
             BeltBlockEntity.CasingType casingType
     ) {
-
-        BlockState soundState = switch (casingType) {
+        var soundState = switch (casingType) {
             case ANDESITE -> AllBlocks.ANDESITE_CASING.getDefaultState();
             case BRASS -> AllBlocks.BRASS_CASING.getDefaultState();
             case NONE -> null;
-            default ->  BeltCasingTypeToCasing(casingType);
-
         };
+
         if (soundState == null) {
             return;
         }
@@ -64,4 +68,5 @@ public final class InteractionFeedback {
                 soundType.getPitch() * 0.8F
         );
     }
+
 }

@@ -6,9 +6,6 @@ import com.simibubi.create.content.fluids.pipes.FluidPipeBlock;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -34,19 +31,26 @@ public final class RightClick {
     }
 
     public static void rightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-        if(!enableEmptyHandModifyPipe()) return;
-        if (!Config.builtinChainAllowed()) return;
+        if (!enableEmptyHandModifyPipe() || !Config.builtinChainAllowed()) {
+            return;
+        }
 
-        Level level = event.getLevel();
-        if (!level.isClientSide) return;
+        var level = event.getLevel();
+        if (!level.isClientSide) {
+            return;
+        }
 
-        ItemStack stack = event.getItemStack();
-        if (!stack.isEmpty()) return;
+        var stack = event.getItemStack();
+        if (!stack.isEmpty()) {
+            return;
+        }
 
-        BlockState state = level.getBlockState(event.getPos());
-        if (!(state.getBlock() instanceof FluidPipeBlock) && !(state.getBlock() instanceof EncasedPipeBlock)) return;
+        var state = level.getBlockState(event.getPos());
+        if (!(state.getBlock() instanceof FluidPipeBlock) && !(state.getBlock() instanceof EncasedPipeBlock)) {
+            return;
+        }
 
-        InteractionHand hand = event.getHand();
+        var hand = event.getHand();
         PacketDistributor.sendToServer(new ModMessages.PipeConnectionPayload(
                 event.getPos(),
                 event.getFace(),

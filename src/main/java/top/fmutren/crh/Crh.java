@@ -19,22 +19,23 @@ public final class Crh {
 
     public static final String MODID = "crh";
 
-    public static boolean loadCreateCasing = false;
+    public static boolean loadCreateCasing;
 
     public Crh(IEventBus modBus, ModContainer modContainer) {
+        var modList = ModList.get();
+        loadCreateCasing = modList.isLoaded("createcasing");
+
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
         modBus.addListener(ModMessages::registerPayloads);
         NeoForge.EVENT_BUS.addListener(ServerEventHandlers::onPlayerLoggedOut);
 
-        if (ModList.get().isLoaded("ftbultimine")) {
+        if (modList.isLoaded("ftbultimine")) {
             FTBUltimineCompat.register();
         }
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             ClientEventRegister.register(modBus);
         }
-
-        if (ModList.get().isLoaded("createcasing")) loadCreateCasing = true;
     }
 
     public static ResourceLocation id(String path) {

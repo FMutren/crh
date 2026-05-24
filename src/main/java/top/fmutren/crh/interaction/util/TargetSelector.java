@@ -23,28 +23,56 @@ public final class TargetSelector {
     private TargetSelector() {
     }
 
-    public static ChainSelection selectEncasing(Level level, BlockPos pos, BlockState state, ItemStack stack) {
+    public static ChainSelection selectEncasing(
+            Level level,
+            BlockPos pos,
+            BlockState state,
+            ItemStack stack
+    ) {
         if (isCasing(stack) && AllBlocks.FLUID_PIPE.has(state)) {
-            if(AllBlocks.COPPER_CASING.has(state) || loadCreateCasing) return ChainCollector.collectPipe(level, pos, AllBlocks.FLUID_PIPE::has, Config.maxPipeBlocks());
+            if (AllBlocks.COPPER_CASING.isIn(stack) || loadCreateCasing) {
+                return ChainCollector.collectPipe(
+                        level,
+                        pos,
+                        AllBlocks.FLUID_PIPE::has,
+                        Config.maxPipeBlocks()
+                );
+            }
         }
 
         if (PredicatesCreator.isShaftCasing(stack) && AllBlocks.SHAFT.has(state)) {
-            Direction.Axis axis = state.getValue(ShaftBlock.AXIS);
-            return ChainCollector.collectShaft(level, pos, axis, AllBlocks.SHAFT::has, Config.maxShaftBlocks());
+            var axis = state.getValue(ShaftBlock.AXIS);
+            return ChainCollector.collectShaft(
+                    level,
+                    pos,
+                    axis,
+                    AllBlocks.SHAFT::has,
+                    Config.maxShaftBlocks()
+            );
         }
 
-        BeltBlockEntity.CasingType casingType = PredicatesCreator.beltCasingType(stack);
+        var casingType = PredicatesCreator.beltCasingType(stack);
         if (casingType != null && AllBlocks.BELT.has(state)) {
-            return ChainCollector.collectBelt(level, pos, Config.maxBeltBlocks(), belt -> belt.casing != casingType);
+            return ChainCollector.collectBelt(
+                    level,
+                    pos,
+                    Config.maxBeltBlocks(),
+                    belt -> belt.casing != casingType
+            );
         }
 
         return ChainSelection.empty();
     }
 
-    public static ChainSelection select(Level level, BlockPos pos, BlockState state, boolean sneaking) {
+    public static ChainSelection select(
+            Level level,
+            BlockPos pos,
+            BlockState state,
+            boolean sneaking
+    ) {
         if (!sneaking && isEncasedPipe(state)) {
             Predicate<BlockState> predicate = AllBlocks.ENCASED_FLUID_PIPE::has;
-            if(loadCreateCasing && !AllBlocks.ENCASED_FLUID_PIPE.has(state)) {
+            if (loadCreateCasing && !AllBlocks.ENCASED_FLUID_PIPE.has(state)) {
                 predicate = crhCreateCasingPredicate(state);
             }
             return ChainCollector.collectPipe(level, pos, predicate, Config.maxPipeBlocks());
@@ -60,7 +88,7 @@ public final class TargetSelector {
         }
 
         if (sneaking && PredicatesCreator.isEncasedShaft(state)) {
-            Direction.Axis axis = state.getValue(ShaftBlock.AXIS);
+            var axis = state.getValue(ShaftBlock.AXIS);
             return ChainCollector.collectShaft(
                     level,
                     pos,

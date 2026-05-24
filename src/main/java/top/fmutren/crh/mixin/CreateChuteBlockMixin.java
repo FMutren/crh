@@ -23,27 +23,32 @@ public class CreateChuteBlockMixin {
             method = "setPlacedBy",
             at = @At("TAIL")
     )
-    private void crh$AfterPlace(
-            Level pLevel,
-            BlockPos pPos,
-            BlockState pState,
-            LivingEntity pPlacer,
-            ItemStack pStack,
+    private void crh$afterPlace(
+            Level level,
+            BlockPos pos,
+            BlockState state,
+            LivingEntity placer,
+            ItemStack stack,
             CallbackInfo ci
-    )
-    {
-        if (!(pPlacer instanceof Player player)) return;
+    ) {
+        if (!(placer instanceof Player player)) {
+            return;
+        }
 
-        ItemStack heldOffHandItem = player.getOffhandItem();
-        AbstractChuteBlock block = (AbstractChuteBlock) pState.getBlock();
-        Direction facing = block.getFacing(pState);
+        var heldOffHandItem = player.getOffhandItem();
+        AbstractChuteBlock block = (AbstractChuteBlock) state.getBlock();
+        var facing = block.getFacing(state);
 
         if (AllBlocks.INDUSTRIAL_IRON_BLOCK.isIn(heldOffHandItem)) {
-            BlockState newState = pState.setValue(ChuteBlock.SHAPE, ChuteBlock.Shape.ENCASED);
-            pLevel.setBlockAndUpdate(pPos, newState);
-        } else if (AllItems.WRENCH.isIn(heldOffHandItem) && facing == Direction.DOWN) {
-            BlockState newState = pState.setValue(ChuteBlock.SHAPE, ChuteBlock.Shape.WINDOW);
-            pLevel.setBlockAndUpdate(pPos, newState);
+            BlockState newState = state.setValue(ChuteBlock.SHAPE, ChuteBlock.Shape.ENCASED);
+            level.setBlockAndUpdate(pos, newState);
+            return;
+        }
+
+        if (AllItems.WRENCH.isIn(heldOffHandItem) && facing == Direction.DOWN) {
+            BlockState newState = state.setValue(ChuteBlock.SHAPE, ChuteBlock.Shape.WINDOW);
+            level.setBlockAndUpdate(pos, newState);
         }
     }
+
 }

@@ -15,78 +15,88 @@ import static top.fmutren.crh.interaction.StateSwitch.pipeSwitchToBlockState;
 import static top.fmutren.crh.interaction.StateSwitch.shaftSwitchToBlockState;
 import static top.fmutren.crh.render.OuterContourRender.renderGhostBlock;
 
-public class ChainRender {
-    private boolean isLookFirst = false;
-    private ChainSelection chainSelection;
+public final class ChainRender {
 
-    public ChainRender() {
-    }
+    private BlockPos lastOrigin;
+    private ChainSelection chainSelection = ChainSelection.empty();
 
-    public void getToRender(Level level, BlockPos pos, ItemStack item) {
-        ChainSelection selection = chainSelectionToRender(level, pos);
-        if (selection == null) return;
+    public void getToRender(
+            Level level,
+            BlockPos pos,
+            ItemStack item
+    ) {
+        var selection = chainSelectionToRender(level, pos);
+        if (selection.isEmpty()) {
+            return;
+        }
+
         renderChainGhostBlock(selection, item, level);
     }
 
-    private BlockState stateSwitch(BlockState state, ItemStack item) {
-        switch (state.getBlock()) {
-            case ShaftBlock shaft -> {
-                return shaftSwitchToBlockState(item, state);
-            }
-            case PipeBlock pipe -> {
-                return pipeSwitchToBlockState(item, state);
-            }
-            default -> {
-                return state;
-            }
+    private ChainSelection chainSelectionToRender(Level level, BlockPos pos) {
+        var state = level.getBlockState(pos);
+        if (!(state.getBlock() instanceof EncasableBlock)) {
+            lastOrigin = null;
+            chainSelection = ChainSelection.empty();
+            return chainSelection;
         }
+
+        if (pos.equals(lastOrigin)) {
+            return chainSelection;
+        }
+
+        lastOrigin = pos.immutable();
+
+        if (state.getBlock() instanceof ShaftBlock) {
+            chainSelection = ChainCollector.collectShaft(
+                    level,
+                    pos,
+                    state.getValue(ShaftBlock.AXIS),
+                    AllBlocks.SHAFT::has,
+                    Config.maxShaftBlocks()
+            );
+            return chainSelection;
+        }
+
+        if (state.getBlock() instanceof PipeBlock) {
+            chainSelection = ChainCollector.collectPipe(
+                    level,
+                    pos,
+                    AllBlocks.FLUID_PIPE::has,
+                    Config.maxPipeBlocks()
+            );
+            return chainSelection;
+        }
+
+        chainSelection = ChainSelection.empty();
+        return chainSelection;
     }
 
-    private void renderChainGhostBlock(ChainSelection selection, ItemStack itemStack, Level level) {
-        if(selection.isEmpty()) return;
-        for(BlockPos pos : selection.positions()){
-            BlockState blockState = level.getBlockState(pos);
-            BlockState state = stateSwitch(blockState, itemStack);
-            if(blockState == state) return;
+    private void renderChainGhostBlock(
+            ChainSelection selection,
+            ItemStack itemStack,
+            Level level
+    ) {
+        for (var pos : selection.positions()) {
+            var blockState = level.getBlockState(pos);
+            var state = stateSwitch(blockState, itemStack);
+            if (blockState == state) {
+                continue;
+            }
             renderGhostBlock(pos, state);
         }
     }
 
-    private ChainSelection chainSelectionToRender(Level level, BlockPos pos){
-        BlockState state = level.getBlockState(pos);
-        boolean isEncasableBlock = (state.getBlock() instanceof EncasableBlock);
-        if(isEncasableBlock != isLookFirst){
-            isLookFirst = isEncasableBlock;
-            if(isLookFirst){
-                switch (state.getBlock()) {
-                    case ShaftBlock shaft -> {
-                        chainSelection = ChainCollector.collectShaft(
-                                level,
-                                pos,
-                                state.getValue(ShaftBlock.AXIS),
-                                AllBlocks.SHAFT::has,
-                                Config.maxShaftBlocks()
-                        );
-                        return chainSelection;
-                    }
-                    case PipeBlock pipe -> {
-                        chainSelection = ChainCollector.collectPipe(
-                                level,
-                                pos,
-                                AllBlocks.FLUID_PIPE::has,
-                                Config.maxPipeBlocks()
-                        );
-                        return chainSelection;
-                    }
-                    default -> {
-                        return ChainSelection.empty();
-                    }
-                }
-            }
+    private BlockState stateSwitch(BlockState state, ItemStack item) {
+        if (state.getBlock() instanceof ShaftBlock) {
+            return shaftSwitchToBlockState(item, state);
         }
-        if(isEncasableBlock) {
-            return chainSelection;
+
+        if (state.getBlock() instanceof PipeBlock) {
+            return pipeSwitchToBlockState(item, state);
         }
-        else return ChainSelection.empty();
+
+        return state;
     }
+
 }

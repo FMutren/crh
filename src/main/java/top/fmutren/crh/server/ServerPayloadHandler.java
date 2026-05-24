@@ -1,7 +1,6 @@
 package top.fmutren.crh.server;
 
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import top.fmutren.crh.interaction.ChainInteraction;
 import top.fmutren.crh.interaction.util.ChainKeyStateTracker;
@@ -16,8 +15,8 @@ public final class ServerPayloadHandler {
             final ModMessages.PipeConnectionPayload packet,
             final IPayloadContext context
     ) {
-        Player player = context.player();
-        InteractionHand hand = packet.offHand() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+        var player = context.player();
+        var hand = packet.offHand() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         ChainInteraction.tryTogglePipeConnection(
                 player,
                 player.level(),
