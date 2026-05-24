@@ -4,66 +4,67 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.simibubi.create.content.fluids.pipes.EncasedPipeBlock;
 import com.simibubi.create.content.fluids.pipes.FluidPipeBlock;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.common.util.Lazy;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.lwjgl.glfw.GLFW;
 import top.fmutren.crh.Config;
-import top.fmutren.crh.network.ModMessages;
+import top.fmutren.crh.api.CrhServices;
+import top.fmutren.crh.network.PipeConnectionMessage;
 
 import static top.fmutren.crh.Config.enableEmptyHandModifyPipe;
 
 public final class RightClick {
 
-    public static final Lazy<KeyMapping> ENCASE_MAPPING = Lazy.of(() ->
-            new KeyMapping(
-                    "key.crh.encasing",
-                    InputConstants.Type.KEYSYM,
-                    GLFW.GLFW_KEY_LEFT_ALT,
-                    "key.categories.crh.encasing"
-            )
+    public static final KeyMapping ENCASE_MAPPING = new KeyMapping(
+            "key.crh.encasing",
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_LEFT_ALT,
+            "key.categories.crh.encasing"
     );
 
     private RightClick() {
     }
 
-    public static void rightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+    public static boolean handleRightClickBlock(
+            Level level,
+            BlockPos pos,
+            Direction face,
+            InteractionHand hand,
+            Player player,
+            ItemStack stack
+    ) {
         if (!enableEmptyHandModifyPipe() || !Config.builtinChainAllowed()) {
-            return;
+            return false;
         }
 
-        var level = event.getLevel();
+        if (level == null || pos == null || face == null || hand == null || player == null || stack == null) {
+            return false;
+        }
+
         if (!level.isClientSide) {
-            return;
+            return false;
         }
 
-        var stack = event.getItemStack();
         if (!stack.isEmpty()) {
-            return;
+            return false;
         }
 
-        var state = level.getBlockState(event.getPos());
+        var state = level.getBlockState(pos);
         if (!(state.getBlock() instanceof FluidPipeBlock) && !(state.getBlock() instanceof EncasedPipeBlock)) {
-            return;
+            return false;
         }
 
-        var hand = event.getHand();
-        PacketDistributor.sendToServer(new ModMessages.PipeConnectionPayload(
-                event.getPos(),
-                event.getFace(),
+        CrhServices.network().sendToServer(new PipeConnectionMessage(
+                pos,
+                face,
                 hand == InteractionHand.OFF_HAND,
-                event.getEntity().isShiftKeyDown()
+                player.isShiftKeyDown()
         ));
-
-        event.setCancellationResult(InteractionResult.SUCCESS);
-        event.setCanceled(true);
-    }
-
-    public static void registerBindings(RegisterKeyMappingsEvent event) {
-        event.register(ENCASE_MAPPING.get());
+        return true;
     }
 
 }

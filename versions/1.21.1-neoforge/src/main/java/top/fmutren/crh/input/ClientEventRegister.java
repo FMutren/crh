@@ -9,9 +9,9 @@ public final class ClientEventRegister {
     }
 
     public static void register(IEventBus modBus) {
-        modBus.addListener(RightClick::registerBindings);
-        NeoForge.EVENT_BUS.addListener(KeyDown::tick);
-        NeoForge.EVENT_BUS.addListener(RightClick::rightClickBlock);
+        modBus.addListener(RightClickEvents::registerBindings);
+        NeoForge.EVENT_BUS.addListener(KeyDownEvents::tick);
+        NeoForge.EVENT_BUS.addListener(RightClickEvents::rightClickBlock);
     }
 
 }

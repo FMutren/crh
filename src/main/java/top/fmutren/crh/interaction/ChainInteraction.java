@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -13,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import top.fmutren.crh.Config;
+import top.fmutren.crh.api.ChainActionResult;
 import top.fmutren.crh.interaction.util.*;
 
 public final class ChainInteraction {
@@ -20,7 +20,7 @@ public final class ChainInteraction {
     private ChainInteraction() {
     }
 
-    public static ItemInteractionResult tryHandleEncasing(
+    public static ChainActionResult tryHandleEncasing(
             ItemStack stack,
             BlockState state,
             Level level,
@@ -30,23 +30,23 @@ public final class ChainInteraction {
             BlockHitResult hitResult
     ) {
         if (!canUseChain(player) || player.isShiftKeyDown()) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return ChainActionResult.PASS;
         }
 
         ChainSelection selection = TargetSelector.selectEncasing(level, pos, state, stack);
         if (selection.isEmpty()) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return ChainActionResult.PASS;
         }
 
         if (level.isClientSide) {
             if (AllBlocks.BELT.has(state) && PredicatesCreator.beltCasingType(stack) != null) {
-                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+                return ChainActionResult.PASS;
             }
-            return ItemInteractionResult.SUCCESS;
+            return ChainActionResult.SUCCESS;
         }
 
         return ChainOperation.applyEncasing(level, player, hand, hitResult, stack, selection)
-                .toItemInteractionResult();
+                .toActionResult();
     }
 
     public static boolean canUseChain(Player player) {
@@ -98,12 +98,12 @@ public final class ChainInteraction {
             int changed
     ) {
 
-        public ItemInteractionResult toItemInteractionResult() {
+        public ChainActionResult toActionResult() {
             if (!changedAny()) {
-                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+                return ChainActionResult.PASS;
             }
             InteractionFeedback.finish(player, hand, selection);
-            return ItemInteractionResult.SUCCESS;
+            return ChainActionResult.SUCCESS;
         }
 
         public boolean changedAny() {

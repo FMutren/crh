@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static top.fmutren.crh.Crh.loadCreateCasing;
+import static top.fmutren.crh.CrhCommon.loadCreateCasing;
 import static top.fmutren.crh.interaction.StateSwitch.pipeCasingType;
 import static top.fmutren.crh.interaction.StateSwitch.shaftCasingType;
 

@@ -1,0 +1,51 @@
+modLoader = "javafml" #mandatory
+loaderVersion = "[47,)" #mandatory
+license = "${mod_license}"
+issueTrackerURL = "https://github.com/FMutren/crh/issues"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+logoFile = "crh_logo.jpg"
+authors = "${mod_authors}"
+
+description = '''${mod_description}'''
+
+[[mixins]]
+config = "${mod_id}.mixins.json"
+
+[[dependencies."${mod_id}"]]
+modId = "forge"
+mandatory = true
+versionRange = "[47,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies."${mod_id}"]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.1,1.21)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies."${mod_id}"]]
+modId = "create"
+mandatory = true
+versionRange = "${create_version_range}"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies."${mod_id}"]]
+modId = "ftbultimine"
+mandatory = false
+versionRange = "[2001.1.0,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies."${mod_id}"]]
+modId = "createcasing"
+mandatory = false
+versionRange = "[1.8.0,)"
+ordering = "AFTER"
+side = "BOTH"

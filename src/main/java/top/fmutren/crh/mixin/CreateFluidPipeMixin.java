@@ -6,7 +6,6 @@ import com.simibubi.create.content.fluids.pipes.AxisPipeBlock;
 import com.simibubi.create.content.fluids.pipes.FluidPipeBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -18,6 +17,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import top.fmutren.crh.platform.ResourceLocations;
 
 import static top.fmutren.crh.interaction.PlayerLookOnFace.fluidPipeFace;
 import static top.fmutren.crh.interaction.PlayerLookOnFace.getPlayerLookingFace;
@@ -65,7 +65,7 @@ public abstract class CreateFluidPipeMixin {
         }
 
         if (isCreateWrench(heldOffHandItem)) {
-            BlockState newState = BuiltInRegistries.BLOCK.get(ResourceLocation.parse("create:glass_fluid_pipe"))
+            BlockState newState = BuiltInRegistries.BLOCK.get(ResourceLocations.parse("create:glass_fluid_pipe"))
                     .defaultBlockState()
                     .setValue(BlockStateProperties.WATERLOGGED, state.getValue(BlockStateProperties.WATERLOGGED))
                     .setValue(AxisPipeBlock.AXIS, fluidPipeFace(player, state));

@@ -4,7 +4,6 @@ import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import com.simibubi.create.content.kinetics.simpleRelays.ShaftBlock;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -13,7 +12,7 @@ import top.fmutren.crh.interaction.ChainSelection;
 
 import java.util.function.Predicate;
 
-import static top.fmutren.crh.Crh.loadCreateCasing;
+import static top.fmutren.crh.CrhCommon.loadCreateCasing;
 import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.crhCreateCasingPredicate;
 import static top.fmutren.crh.interaction.StateSwitch.isCasing;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isEncasedPipe;

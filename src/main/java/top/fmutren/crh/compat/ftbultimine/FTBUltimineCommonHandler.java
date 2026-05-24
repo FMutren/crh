@@ -1,13 +1,11 @@
 package top.fmutren.crh.compat.ftbultimine;
 
 import com.simibubi.create.AllBlocks;
-import com.simibubi.create.content.decoration.encasing.EncasableBlock;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.fluids.pipes.EncasedPipeBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
 import com.simibubi.create.content.logistics.chute.ChuteBlock;
 import com.tterrag.registrate.util.entry.BlockEntry;
-import dev.ftb.mods.ftbultimine.api.rightclick.RegisterRightClickHandlerEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
@@ -19,42 +17,45 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import top.fmutren.crh.api.CrhServices;
 import top.fmutren.crh.interaction.util.PredicatesCreator;
 
-import static top.fmutren.crh.Crh.loadCreateCasing;
+import static top.fmutren.crh.CrhCommon.loadCreateCasing;
 import static top.fmutren.crh.interaction.StateSwitch.commonSwitchForHeldItem;
 import static top.fmutren.crh.interaction.util.ChainOperation.centerHit;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isEncasedCogwheel;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isEncasedShaft;
 
-public final class FTBRightClickHandle {
+public final class FTBUltimineCommonHandler {
 
-    private FTBRightClickHandle() {
+    private FTBUltimineCommonHandler() {
     }
 
-    public static void ftbRightClickEventHandler() {
-        RegisterRightClickHandlerEvent.REGISTER.register(registry ->
-                registry.registerHandler((context, hand, positions) -> {
-                    var player = context.player();
+    public static int handle(
+            Player player,
+            InteractionHand hand,
+            Iterable<BlockPos> positions,
+            BlockPos originPos
+    ) {
+        if (player == null || hand == null || positions == null || originPos == null) {
+            return 0;
+        }
 
-                    if (player.isSpectator() || !player.mayBuild()) {
-                        return 0;
-                    }
+        if (player.isSpectator() || !player.mayBuild()) {
+            return 0;
+        }
 
-                    var level = player.level();
-                    var originPos = context.origPos();
-                    var originState = level.getBlockState(originPos);
-                    var heldItem = player.getItemInHand(hand);
-                    boolean isShift = player.isShiftKeyDown();
+        var level = player.level();
+        var originState = level.getBlockState(originPos);
+        var heldItem = player.getItemInHand(hand);
+        boolean isShift = player.isShiftKeyDown();
 
-                    return switch (commonSwitchForHeldItem(heldItem)) {
-                        case 0 -> handleWrench(level, player, hand, heldItem, positions, originState, isShift);
-                        case 1, 2 -> isShift ? 0 : handleEncasing(level, player, hand, heldItem, positions);
-                        case 3 -> isShift ? 0 : handleChuteEncasing(level, player, positions);
-                        default -> 0;
-                    };
-                })
-        );
+        return switch (commonSwitchForHeldItem(heldItem)) {
+            case 0 -> handleWrench(level, player, hand, heldItem, positions, originState, isShift);
+            case 1, 2 -> isShift ? 0 : handleEncasing(level, player, hand, heldItem, positions);
+            case 3 -> isShift ? 0 : handleChuteEncasing(level, player, positions);
+            default -> 0;
+        };
     }
 
     private static int handleWrench(
@@ -117,35 +118,29 @@ public final class FTBRightClickHandle {
             var state = level.getBlockState(pos);
             var block = state.getBlock();
 
-            switch (block) {
-                case EncasableBlock encasableBlock -> {
-                    var result = encasableBlock.tryEncase(
-                            state,
-                            level,
-                            pos,
-                            heldItem,
-                            player,
-                            hand,
-                            centerHit(pos, Direction.UP)
-                    );
+            var result = CrhServices.create().tryEncase(
+                    state,
+                    level,
+                    pos,
+                    heldItem,
+                    player,
+                    hand,
+                    centerHit(pos, Direction.UP)
+            );
+            if (result.consumesAction()) {
+                count++;
+                continue;
+            }
 
-                    if (result.consumesAction()) {
-                        count++;
-                    }
+            if (block instanceof BeltBlock beltBlock) {
+                if (tryEncaseBelt(heldItem, pos, level, beltBlock, player)) {
+                    count++;
                 }
-                case BeltBlock beltBlock -> {
-                    if (tryEncaseBelt(heldItem, pos, level, beltBlock, player)) {
-                        count++;
-                    }
-                }
-                case ChuteBlock ignored -> {
-                    if (AllBlocks.INDUSTRIAL_IRON_BLOCK.isIn(heldItem)
-                            && loadCreateCasing
-                            && tryEncaseChute(level, pos, state, player)) {
-                        count++;
-                    }
-                }
-                default -> {
+            } else if (block instanceof ChuteBlock) {
+                if (AllBlocks.INDUSTRIAL_IRON_BLOCK.isIn(heldItem)
+                        && loadCreateCasing
+                        && tryEncaseChute(level, pos, state, player)) {
+                    count++;
                 }
             }
         }
@@ -220,7 +215,7 @@ public final class FTBRightClickHandle {
 
     private static Item getReturnItem(BlockState originState) {
         if (originState.getBlock() instanceof EncasedPipeBlock) {
-            return AllBlocks.FLUID_PIPE.asItem();
+            return CrhServices.create().fluidPipeItem();
         }
 
         return originState.getBlock().asItem();
