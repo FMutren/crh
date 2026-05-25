@@ -1,10 +1,10 @@
 package top.fmutren.crh.compat.ftbultimine;
 
-public final class FTBUltimineCompat {
+public final class FtbUltimineCompat {
 
     private static boolean registered;
 
-    private FTBUltimineCompat() {
+    private FtbUltimineCompat() {
     }
 
     public static void register() {
@@ -12,7 +12,7 @@ public final class FTBUltimineCompat {
             return;
         }
         registered = true;
-        FTBRightClickHandle.register();
+        FtbRightClickHandle.register();
     }
 
 }

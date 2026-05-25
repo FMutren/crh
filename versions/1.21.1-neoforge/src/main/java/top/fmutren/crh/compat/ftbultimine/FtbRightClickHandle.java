@@ -2,15 +2,15 @@ package top.fmutren.crh.compat.ftbultimine;
 
 import dev.ftb.mods.ftbultimine.api.rightclick.RegisterRightClickHandlerEvent;
 
-public final class FTBRightClickHandle {
+public final class FtbRightClickHandle {
 
-    private FTBRightClickHandle() {
+    private FtbRightClickHandle() {
     }
 
     public static void register() {
         RegisterRightClickHandlerEvent.REGISTER.register(registry ->
                 registry.registerHandler((context, hand, positions) ->
-                        FTBUltimineCommonHandler.handle(
+                        FtbUltimineCommonHandler.handle(
                                 context.player(),
                                 hand,
                                 positions,

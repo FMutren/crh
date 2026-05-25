@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLLoader;
 import top.fmutren.crh.api.CrhServices;
-import top.fmutren.crh.compat.ftbultimine.FTBUltimineCompat;
+import top.fmutren.crh.compat.ftbultimine.FtbUltimineCompat;
 import top.fmutren.crh.input.ClientEventRegister;
 import top.fmutren.crh.platform.CreateBridgeImpl;
 import top.fmutren.crh.platform.NetworkBridgeImpl;
@@ -31,7 +31,7 @@ public final class Crh {
         MinecraftForge.EVENT_BUS.addListener(ServerEventHandlersForge::onPlayerLoggedOut);
 
         if (modList.isLoaded("ftbultimine")) {
-            FTBUltimineCompat.register();
+            FtbUltimineCompat.register();
         }
 
         if (FMLLoader.getDist().isClient()) {

@@ -10,7 +10,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import top.fmutren.crh.api.CrhServices;
-import top.fmutren.crh.compat.ftbultimine.FTBUltimineCompat;
+import top.fmutren.crh.compat.ftbultimine.FtbUltimineCompat;
 import top.fmutren.crh.input.ClientEventRegister;
 import top.fmutren.crh.platform.CreateBridgeImpl;
 import top.fmutren.crh.platform.NetworkBridgeImpl;
@@ -32,7 +32,7 @@ public final class Crh {
         NeoForge.EVENT_BUS.addListener(ServerEventHandlersNeoForge::onPlayerLoggedOut);
 
         if (modList.isLoaded("ftbultimine")) {
-            FTBUltimineCompat.register();
+            FtbUltimineCompat.register();
         }
 
         if (FMLEnvironment.dist == Dist.CLIENT) {

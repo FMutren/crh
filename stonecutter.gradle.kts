@@ -17,6 +17,14 @@ tasks.register("runActiveServer") {
     dependsOn(stonecutter.current!!.project + ":runServer")
 }
 
+tasks.register("buildAllVersions") {
+    group = "stonecutter"
+    dependsOn(
+        ":1.20.1-forge:build",
+        ":1.21.1-neoforge:build"
+    )
+}
+
 stonecutter parameters {
     constants.match(current.project.substringAfterLast("-"), "forge", "neoforge")
 }

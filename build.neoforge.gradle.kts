@@ -52,47 +52,14 @@ java {
     }
 }
 
+apply(from = rootProject.file("gradle/crh-repositories.gradle.kts"))
+
 repositories {
-    mavenLocal()
     maven {
-        name = "igleeRepoReleases"
-        url = uri("https://maven.iglee.fr/releases")
-    }
-    maven {
-        url = uri("https://www.cursemaven.com")
-        content {
-            includeGroup("curse.maven")
-        }
-    }
-    maven {
-        url = uri("https://api.modrinth.com/maven")
-        content {
-            includeGroup("maven.modrinth")
-        }
-    }
-    maven {
-        url = uri("https://maven.createmod.net")
-    }
-    maven {
+        name = "tterragRegistrate"
         url = uri("https://maven.ithundxr.dev/snapshots")
         content {
             includeGroup("com.tterrag.registrate")
-        }
-    }
-    maven {
-        url = uri("https://maven.gegy.dev/releases")
-    }
-    maven {
-        url = uri("https://maven.ftb.dev/releases")
-        content {
-            includeGroup("dev.ftb.mods")
-            includeGroup("dev.architectury")
-        }
-    }
-    maven {
-        url = uri("https://maven.architectury.dev")
-        content {
-            includeGroup("dev.architectury")
         }
     }
 }
@@ -120,6 +87,7 @@ val generateModMetadata by tasks.registering(ProcessResources::class) {
 
 
 tasks.named<ProcessResources>("processResources") {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     inputs.property("mixin_compatibility", "JAVA_21")
     inputs.property("pack_format", 34)
 

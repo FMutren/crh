@@ -2,9 +2,9 @@ package top.fmutren.crh.compat.ftbultimine;
 
 import dev.ftb.mods.ftbultimine.api.rightclick.RegisterRightClickHandlerEvent;
 
-public final class FTBRightClickHandle {
+public final class FtbRightClickHandle {
 
-    private FTBRightClickHandle() {
+    private FtbRightClickHandle() {
     }
 
     public static void register() {
