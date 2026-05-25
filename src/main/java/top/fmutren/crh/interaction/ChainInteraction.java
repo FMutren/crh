@@ -11,8 +11,8 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import top.fmutren.crh.Config;
 import top.fmutren.crh.api.ChainActionResult;
+import top.fmutren.crh.api.CrhServices;
 import top.fmutren.crh.interaction.util.*;
 
 public final class ChainInteraction {
@@ -50,7 +50,7 @@ public final class ChainInteraction {
     }
 
     public static boolean canUseChain(Player player) {
-        return Config.builtinChainAllowed()
+        return CrhServices.platform().builtinChainEnabled()
                 && player != null
                 && !player.isSpectator()
                 && player.mayBuild()

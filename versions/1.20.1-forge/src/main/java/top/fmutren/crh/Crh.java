@@ -12,6 +12,7 @@ import top.fmutren.crh.compat.ftbultimine.FTBUltimineCompat;
 import top.fmutren.crh.input.ClientEventRegister;
 import top.fmutren.crh.platform.CreateBridgeImpl;
 import top.fmutren.crh.platform.NetworkBridgeImpl;
+import top.fmutren.crh.platform.PlatformBridgeImpl;
 import top.fmutren.crh.server.ServerEventHandlersForge;
 
 @SuppressWarnings("removal")
@@ -20,7 +21,7 @@ public final class Crh {
 
     public Crh() {
         var network = new NetworkBridgeImpl();
-        CrhServices.bootstrap(network, new CreateBridgeImpl());
+        CrhServices.bootstrap(network, new CreateBridgeImpl(), new PlatformBridgeImpl());
 
         var modList = ModList.get();
         CrhCommon.setCreateCasingLoaded(modList.isLoaded("createcasing"));

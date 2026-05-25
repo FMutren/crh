@@ -11,11 +11,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.lwjgl.glfw.GLFW;
-import top.fmutren.crh.Config;
 import top.fmutren.crh.api.CrhServices;
 import top.fmutren.crh.network.PipeConnectionMessage;
-
-import static top.fmutren.crh.Config.enableEmptyHandModifyPipe;
 
 public final class RightClick {
 
@@ -37,7 +34,7 @@ public final class RightClick {
             Player player,
             ItemStack stack
     ) {
-        if (!enableEmptyHandModifyPipe() || !Config.builtinChainAllowed()) {
+        if (!CrhServices.platform().enableEmptyHandModifyPipe() || !CrhServices.platform().builtinChainEnabled()) {
             return false;
         }
 

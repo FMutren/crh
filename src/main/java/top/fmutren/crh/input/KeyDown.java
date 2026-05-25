@@ -6,7 +6,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
-import top.fmutren.crh.Config;
 import top.fmutren.crh.api.CrhServices;
 import top.fmutren.crh.interaction.ChainRender;
 import top.fmutren.crh.interaction.util.ChainKeyStateTracker;
@@ -34,7 +33,7 @@ public final class KeyDown {
         var level = player.level();
         syncChainKeyState(player);
 
-        if (!Config.builtinChainAllowed()) {
+        if (!CrhServices.platform().builtinChainEnabled()) {
             return;
         }
 
@@ -42,7 +41,7 @@ public final class KeyDown {
             displayKeyFeedback(player);
         }
 
-        if (!ENCASE_MAPPING.isDown() || !level.isClientSide || !Config.enableView()) {
+        if (!ENCASE_MAPPING.isDown() || !level.isClientSide || !CrhServices.platform().enableView()) {
             return;
         }
 
@@ -56,7 +55,7 @@ public final class KeyDown {
     }
 
     public static void syncChainKeyState(Player player) {
-        if (!Config.builtinChainAllowed()) {
+        if (!CrhServices.platform().builtinChainEnabled()) {
             ChainKeyStateTracker.set(player, false);
             if (lastSentChainKeyState) {
                 CrhServices.network().sendChainKeyState(new ChainKeyStateMessage(false));

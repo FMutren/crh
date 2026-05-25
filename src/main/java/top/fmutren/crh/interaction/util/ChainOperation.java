@@ -23,7 +23,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.ticks.TickPriority;
-import top.fmutren.crh.Config;
 import top.fmutren.crh.api.CrhServices;
 import top.fmutren.crh.interaction.ChainInteraction;
 import top.fmutren.crh.interaction.ChainSelection;
@@ -218,7 +217,8 @@ public final class ChainOperation {
             return PipeApplyResult.PASS;
         }
 
-        if (checkReach && player.distanceToSqr(Vec3.atCenterOf(pos)) > Config.maxEmptyHandPipeReachSqr()) {
+        if (checkReach && player.distanceToSqr(Vec3.atCenterOf(pos)) > CrhServices.platform()
+                .maxEmptyHandPipeReachSqr()) {
             return PipeApplyResult.PASS;
         }
 

@@ -11,11 +11,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import top.fmutren.crh.api.CrhServices;
 import top.fmutren.crh.interaction.StateSwitch;
 
 import javax.annotation.Nullable;
 
-import static top.fmutren.crh.Config.enableView;
 import static top.fmutren.crh.input.RightClick.ENCASE_MAPPING;
 
 @Mixin(PlacementClient.class)
@@ -41,7 +41,7 @@ public class CheckHelpersMixin {
         var pos = ray.getBlockPos();
         boolean canShowView = world.getBlockState(pos).getBlock() instanceof EncasableBlock
                 && ENCASE_MAPPING.isDown()
-                && enableView();
+                && CrhServices.platform().enableView();
 
         if (canShowView && StateSwitch.commonSwitchForHeldItem(minecraft.player.getMainHandItem()) != -1) {
             setTarget(pos);

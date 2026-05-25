@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import top.fmutren.crh.Config;
+import top.fmutren.crh.api.CrhServices;
 import top.fmutren.crh.interaction.util.ChainCollector;
 
 import static top.fmutren.crh.interaction.StateSwitch.pipeSwitchToBlockState;
@@ -53,7 +53,7 @@ public final class ChainRender {
                     pos,
                     state.getValue(ShaftBlock.AXIS),
                     AllBlocks.SHAFT::has,
-                    Config.maxShaftBlocks()
+                    CrhServices.platform().maxShaftBlocks()
             );
             return chainSelection;
         }
@@ -63,7 +63,7 @@ public final class ChainRender {
                     level,
                     pos,
                     AllBlocks.FLUID_PIPE::has,
-                    Config.maxPipeBlocks()
+                    CrhServices.platform().maxPipeBlocks()
             );
             return chainSelection;
         }

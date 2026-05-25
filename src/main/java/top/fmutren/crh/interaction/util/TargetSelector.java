@@ -7,7 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import top.fmutren.crh.Config;
+import top.fmutren.crh.api.CrhServices;
 import top.fmutren.crh.interaction.ChainSelection;
 
 import java.util.function.Predicate;
@@ -34,7 +34,7 @@ public final class TargetSelector {
                         level,
                         pos,
                         AllBlocks.FLUID_PIPE::has,
-                        Config.maxPipeBlocks()
+                        CrhServices.platform().maxPipeBlocks()
                 );
             }
         }
@@ -46,7 +46,7 @@ public final class TargetSelector {
                     pos,
                     axis,
                     AllBlocks.SHAFT::has,
-                    Config.maxShaftBlocks()
+                    CrhServices.platform().maxShaftBlocks()
             );
         }
 
@@ -55,7 +55,7 @@ public final class TargetSelector {
             return ChainCollector.collectBelt(
                     level,
                     pos,
-                    Config.maxBeltBlocks(),
+                    CrhServices.platform().maxBeltBlocks(),
                     belt -> belt.casing != casingType
             );
         }
@@ -74,14 +74,14 @@ public final class TargetSelector {
             if (loadCreateCasing && !AllBlocks.ENCASED_FLUID_PIPE.has(state)) {
                 predicate = crhCreateCasingPredicate(state);
             }
-            return ChainCollector.collectPipe(level, pos, predicate, Config.maxPipeBlocks());
+            return ChainCollector.collectPipe(level, pos, predicate, CrhServices.platform().maxPipeBlocks());
         }
 
         if (!sneaking && PredicatesCreator.isBeltWithCasing(level, pos, state)) {
             return ChainCollector.collectBelt(
                     level,
                     pos,
-                    Config.maxBeltBlocks(),
+                    CrhServices.platform().maxBeltBlocks(),
                     belt -> belt.casing != BeltBlockEntity.CasingType.NONE
             );
         }
@@ -93,7 +93,7 @@ public final class TargetSelector {
                     pos,
                     axis,
                     PredicatesCreator::isEncasedShaft,
-                    Config.maxShaftBlocks()
+                    CrhServices.platform().maxShaftBlocks()
             );
         }
 
