@@ -23,7 +23,8 @@ public class CheckHelpersMixin {
 
     @Inject(
             method = "checkHelpers",
-            at = @At("HEAD")
+            at = @At("HEAD"),
+            remap = false
     )
     private static void checkHelpers(CallbackInfo ci) {
         var minecraft = Minecraft.getInstance();
@@ -39,7 +40,7 @@ public class CheckHelpersMixin {
 
         var pos = ray.getBlockPos();
         boolean canShowView = world.getBlockState(pos).getBlock() instanceof EncasableBlock
-                && ENCASE_MAPPING.get().isDown()
+                && ENCASE_MAPPING.isDown()
                 && enableView();
 
         if (canShowView && StateSwitch.commonSwitchForHeldItem(minecraft.player.getMainHandItem()) != -1) {
@@ -47,7 +48,7 @@ public class CheckHelpersMixin {
         }
     }
 
-    @Shadow
+    @Shadow(remap = false)
     static void setTarget(@Nullable BlockPos target) {
     }
 

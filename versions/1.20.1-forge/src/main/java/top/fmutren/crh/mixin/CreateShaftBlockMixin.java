@@ -1,13 +1,12 @@
 package top.fmutren.crh.mixin;
 
 import com.simibubi.create.AllBlocks;
-import com.simibubi.create.content.decoration.encasing.EncasableBlock;
 import com.simibubi.create.content.kinetics.simpleRelays.ShaftBlock;
 import net.createmod.catnip.placement.IPlacementHelper;
 import net.createmod.catnip.placement.PlacementHelpers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -19,20 +18,35 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import top.fmutren.crh.api.CrhServices;
 import top.fmutren.crh.interaction.StateSwitch;
 
 import static com.simibubi.create.content.kinetics.simpleRelays.ShaftBlock.placementHelperId;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isShaftCasing;
 
-@Mixin(ShaftBlock.class)
+@Mixin(value = ShaftBlock.class, remap = false)
 public class CreateShaftBlockMixin {
 
     @Inject(
-            method = "useItemOn",
+            method = "use",
             at = @At("HEAD"),
-            cancellable = true
+            cancellable = true,
+            remap = false
     )
-    private static void crh$encaseAfterPlaceInShaft(
+    private void crh$encaseAfterPlaceInShaft(
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hitResult,
+            CallbackInfoReturnable<InteractionResult> cir
+    ) {
+        ItemStack stack = player.getItemInHand(hand);
+        crh$tryEncaseAfterPlaceInShaft(stack, state, level, pos, player, hand, hitResult, cir);
+    }
+
+    private void crh$tryEncaseAfterPlaceInShaft(
             ItemStack stack,
             BlockState state,
             Level level,
@@ -40,7 +54,7 @@ public class CreateShaftBlockMixin {
             Player player,
             InteractionHand hand,
             BlockHitResult hitResult,
-            CallbackInfoReturnable<ItemInteractionResult> cir
+            CallbackInfoReturnable<InteractionResult> cir
     ) {
         var heldOffHandItem = player.getOffhandItem();
 
@@ -55,19 +69,16 @@ public class CreateShaftBlockMixin {
 
         offset.placeInWorld(level, (BlockItem) stack.getItem(), player, hand, hitResult);
 
-        if (!(state.getBlock() instanceof EncasableBlock encasableBlock)) {
-            return;
-        }
-
         var newState = level.getBlockState(newPos);
-        encasableBlock.tryEncase(newState, level, newPos, heldOffHandItem, player, hand, hitResult);
-        cir.setReturnValue(ItemInteractionResult.SUCCESS);
+        CrhServices.create().tryEncase(newState, level, newPos, heldOffHandItem, player, hand, hitResult);
+        cir.setReturnValue(InteractionResult.SUCCESS);
     }
 
     @Inject(
             method = "getStateForPlacement",
             at = @At("RETURN"),
-            cancellable = true
+            cancellable = true,
+            remap = false
     )
     private void crh$encaseAfterPlace(
             BlockPlaceContext context,

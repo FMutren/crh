@@ -6,12 +6,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 import top.fmutren.crh.Config;
+import top.fmutren.crh.api.CrhServices;
 import top.fmutren.crh.interaction.ChainRender;
 import top.fmutren.crh.interaction.util.ChainKeyStateTracker;
-import top.fmutren.crh.network.ModMessages;
+import top.fmutren.crh.network.ChainKeyStateMessage;
 
 import static top.fmutren.crh.input.RightClick.ENCASE_MAPPING;
 import static top.fmutren.crh.interaction.StateSwitch.isCasing;
@@ -26,9 +25,8 @@ public final class KeyDown {
     private KeyDown() {
     }
 
-    public static void tick(PlayerTickEvent.Post event) {
+    public static void tickEnd(Player player) {
         var minecraft = Minecraft.getInstance();
-        var player = event.getEntity();
         if (minecraft.player != player) {
             return;
         }
@@ -40,11 +38,11 @@ public final class KeyDown {
             return;
         }
 
-        if (ENCASE_MAPPING.get().consumeClick()) {
+        if (ENCASE_MAPPING.consumeClick()) {
             displayKeyFeedback(player);
         }
 
-        if (!ENCASE_MAPPING.get().isDown() || !level.isClientSide || !Config.enableView()) {
+        if (!ENCASE_MAPPING.isDown() || !level.isClientSide || !Config.enableView()) {
             return;
         }
 
@@ -61,20 +59,20 @@ public final class KeyDown {
         if (!Config.builtinChainAllowed()) {
             ChainKeyStateTracker.set(player, false);
             if (lastSentChainKeyState) {
-                PacketDistributor.sendToServer(new ModMessages.ChainKeyStatePayload(false));
+                CrhServices.network().sendToServer(new ChainKeyStateMessage(false));
                 lastSentChainKeyState = false;
             }
             return;
         }
 
-        boolean chainKeyDown = ENCASE_MAPPING.get().isDown();
+        boolean chainKeyDown = ENCASE_MAPPING.isDown();
         ChainKeyStateTracker.set(player, chainKeyDown);
 
         if (chainKeyDown == lastSentChainKeyState) {
             return;
         }
 
-        PacketDistributor.sendToServer(new ModMessages.ChainKeyStatePayload(chainKeyDown));
+        CrhServices.network().sendToServer(new ChainKeyStateMessage(chainKeyDown));
         lastSentChainKeyState = chainKeyDown;
     }
 

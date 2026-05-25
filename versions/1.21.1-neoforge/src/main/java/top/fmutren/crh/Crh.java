@@ -9,25 +9,26 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
+import top.fmutren.crh.api.CrhServices;
 import top.fmutren.crh.compat.ftbultimine.FTBUltimineCompat;
 import top.fmutren.crh.input.ClientEventRegister;
-import top.fmutren.crh.network.ModMessages;
-import top.fmutren.crh.server.ServerEventHandlers;
+import top.fmutren.crh.platform.CreateBridgeImpl;
+import top.fmutren.crh.platform.NetworkBridgeImpl;
+import top.fmutren.crh.server.ServerEventHandlersNeoForge;
 
-@Mod(Crh.MODID)
+@Mod(CrhCommon.MODID)
 public final class Crh {
 
-    public static final String MODID = "crh";
-
-    public static boolean loadCreateCasing;
-
     public Crh(IEventBus modBus, ModContainer modContainer) {
+        var network = new NetworkBridgeImpl();
+        CrhServices.bootstrap(network, new CreateBridgeImpl());
+
         var modList = ModList.get();
-        loadCreateCasing = modList.isLoaded("createcasing");
+        CrhCommon.setCreateCasingLoaded(modList.isLoaded("createcasing"));
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
-        modBus.addListener(ModMessages::registerPayloads);
-        NeoForge.EVENT_BUS.addListener(ServerEventHandlers::onPlayerLoggedOut);
+        modBus.addListener(network::registerPayloads);
+        NeoForge.EVENT_BUS.addListener(ServerEventHandlersNeoForge::onPlayerLoggedOut);
 
         if (modList.isLoaded("ftbultimine")) {
             FTBUltimineCompat.register();
@@ -39,7 +40,7 @@ public final class Crh {
     }
 
     public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MODID, path);
+        return ResourceLocation.fromNamespaceAndPath(CrhCommon.MODID, path);
     }
 
 }

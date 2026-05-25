@@ -4,15 +4,15 @@ import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.equipment.wrench.WrenchItem;
 import com.simibubi.create.content.kinetics.simpleRelays.ShaftBlock;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import top.fmutren.crh.platform.ResourceLocations;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static top.fmutren.crh.Crh.loadCreateCasing;
+import static top.fmutren.crh.CrhCommon.loadCreateCasing;
 import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.*;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isShaftCasing;
 
@@ -46,7 +46,7 @@ public final class StateSwitch {
             return state;
         }
 
-        return BuiltInRegistries.BLOCK.get(ResourceLocation.parse(result))
+        return BuiltInRegistries.BLOCK.get(ResourceLocations.parse(result))
                 .defaultBlockState()
                 .setValue(ShaftBlock.AXIS, state.getValue(ShaftBlock.AXIS));
     }
@@ -73,7 +73,7 @@ public final class StateSwitch {
             return state;
         }
 
-        return BuiltInRegistries.BLOCK.get(ResourceLocation.parse(result))
+        return BuiltInRegistries.BLOCK.get(ResourceLocations.parse(result))
                 .defaultBlockState()
                 .setValue(PipeBlock.UP, state.getValue(PipeBlock.UP))
                 .setValue(PipeBlock.DOWN, state.getValue(PipeBlock.DOWN))

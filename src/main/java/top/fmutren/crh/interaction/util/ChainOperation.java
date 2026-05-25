@@ -1,7 +1,6 @@
 package top.fmutren.crh.interaction.util;
 
 import com.simibubi.create.AllBlocks;
-import com.simibubi.create.content.decoration.encasing.EncasableBlock;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.fluids.FluidTransportBehaviour;
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
@@ -14,7 +13,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -26,6 +24,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.ticks.TickPriority;
 import top.fmutren.crh.Config;
+import top.fmutren.crh.api.CrhServices;
 import top.fmutren.crh.interaction.ChainInteraction;
 import top.fmutren.crh.interaction.ChainSelection;
 
@@ -74,11 +73,7 @@ public final class ChainOperation {
                 continue;
             }
 
-            if (!(current.getBlock() instanceof EncasableBlock encasableBlock)) {
-                continue;
-            }
-
-            ItemInteractionResult result = encasableBlock.tryEncase(
+            var result = CrhServices.create().tryEncase(
                     current,
                     level,
                     targetPos,

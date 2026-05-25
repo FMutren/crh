@@ -9,13 +9,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import top.fmutren.crh.interaction.StateSwitch;
 
-import static top.fmutren.crh.Crh.loadCreateCasing;
+import static top.fmutren.crh.CrhCommon.loadCreateCasing;
 import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.*;
 
 public final class PredicatesCreator {
@@ -27,6 +26,11 @@ public final class PredicatesCreator {
 
     public static boolean isManualPipe(BlockState state) {
         return AllBlocks.FLUID_PIPE.has(state) || isEncasedPipe(state);
+    }
+
+    public static boolean isEncasedPipe(BlockState state) {
+        return AllBlocks.ENCASED_FLUID_PIPE.has(state)
+                || (loadCreateCasing && crhCreateCasingIsCasingPipe(state));
     }
 
     public static int countOpenPipeFaces(BlockState state) {
@@ -56,20 +60,15 @@ public final class PredicatesCreator {
 
     public static boolean isEncasedCogwheel(BlockState state) {
 
-        if(loadCreateCasing){
+        if (loadCreateCasing) {
             boolean isCreateCasingShaft = crhCreateCasingIsCasingCogwheel(state);
-            if(isCreateCasingShaft) return true;
+            if (isCreateCasingShaft) return true;
         }
 
-        if(AllBlocks.ANDESITE_ENCASED_COGWHEEL.has(state)) return true;
-        if(AllBlocks.ANDESITE_ENCASED_LARGE_COGWHEEL.has(state)) return true;
-        if(AllBlocks.BRASS_ENCASED_LARGE_COGWHEEL.has(state)) return true;
+        if (AllBlocks.ANDESITE_ENCASED_COGWHEEL.has(state)) return true;
+        if (AllBlocks.ANDESITE_ENCASED_LARGE_COGWHEEL.has(state)) return true;
+        if (AllBlocks.BRASS_ENCASED_LARGE_COGWHEEL.has(state)) return true;
         return AllBlocks.BRASS_ENCASED_COGWHEEL.has(state);
-    }
-
-    public static boolean isEncasedPipe(BlockState state) {
-        return AllBlocks.ENCASED_FLUID_PIPE.has(state)
-                || (loadCreateCasing && crhCreateCasingIsCasingPipe(state));
     }
 
     public static boolean isBeltWithCasing(

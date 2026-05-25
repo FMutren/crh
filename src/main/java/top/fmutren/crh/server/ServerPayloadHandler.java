@@ -1,21 +1,21 @@
 package top.fmutren.crh.server;
 
 import net.minecraft.world.InteractionHand;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraft.world.entity.player.Player;
 import top.fmutren.crh.interaction.ChainInteraction;
 import top.fmutren.crh.interaction.util.ChainKeyStateTracker;
-import top.fmutren.crh.network.ModMessages;
+import top.fmutren.crh.network.ChainKeyStateMessage;
+import top.fmutren.crh.network.PipeConnectionMessage;
 
 public final class ServerPayloadHandler {
 
     private ServerPayloadHandler() {
     }
 
-    public static void handlePipeConnection(
-            final ModMessages.PipeConnectionPayload packet,
-            final IPayloadContext context
-    ) {
-        var player = context.player();
+    public static void handlePipeConnection(PipeConnectionMessage packet, Player player) {
+        if (packet == null || player == null) {
+            return;
+        }
         var hand = packet.offHand() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         ChainInteraction.tryTogglePipeConnection(
                 player,
@@ -27,11 +27,11 @@ public final class ServerPayloadHandler {
         );
     }
 
-    public static void handleChainKeyState(
-            final ModMessages.ChainKeyStatePayload packet,
-            final IPayloadContext context
-    ) {
-        ChainKeyStateTracker.set(context.player(), packet.down());
+    public static void handleChainKeyState(ChainKeyStateMessage packet, Player player) {
+        if (packet == null || player == null) {
+            return;
+        }
+        ChainKeyStateTracker.set(player, packet.down());
     }
 
 }

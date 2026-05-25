@@ -1,6 +1,6 @@
 package top.fmutren.crh.server;
 
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.minecraft.world.entity.player.Player;
 import top.fmutren.crh.interaction.util.ChainKeyStateTracker;
 
 public final class ServerEventHandlers {
@@ -8,8 +8,8 @@ public final class ServerEventHandlers {
     private ServerEventHandlers() {
     }
 
-    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        ChainKeyStateTracker.clear(event.getEntity());
+    public static void onPlayerLoggedOut(Player player) {
+        ChainKeyStateTracker.clear(player);
     }
 
 }

@@ -19,36 +19,21 @@ public final class Config {
     static {
         BUILDER.push("chain_interaction");
 
-        MAX_PIPE_BLOCKS = BUILDER
-                .comment("Maximum connected fluid/encased fluid pipe blocks affected by one chain operation.")
+        MAX_PIPE_BLOCKS = BUILDER.comment("Maximum connected fluid/encased fluid pipe blocks affected by one chain operation.")
                 .defineInRange("maxPipeBlocks", 64, 1, 4096);
-
-        MAX_SHAFT_BLOCKS = BUILDER
-                .comment("Maximum shaft or encased shaft blocks affected by one chain operation.")
+        MAX_SHAFT_BLOCKS = BUILDER.comment("Maximum shaft or encased shaft blocks affected by one chain operation.")
                 .defineInRange("maxShaftBlocks", 128, 1, 4096);
-
-        MAX_BELT_BLOCKS = BUILDER
-                .comment("Maximum belt segments affected by one chain operation.")
+        MAX_BELT_BLOCKS = BUILDER.comment("Maximum belt segments affected by one chain operation.")
                 .defineInRange("maxBeltBlocks", 128, 1, 4096);
-
-        MAX_EMPTY_HAND_PIPE_REACH = BUILDER
-                .comment("Maximum squared block reach allowed for the empty-hand pipe-connection packet.")
+        MAX_EMPTY_HAND_PIPE_REACH = BUILDER.comment("Maximum squared block reach allowed for the empty-hand pipe-connection packet.")
                 .defineInRange("maxEmptyHandPipeReachSqr", 64.0D, 1.0D, 1024.0D);
-
-        ENABLE_VIEW = BUILDER
-                .comment("Enable the chain interaction view overlay.(Will disable with FTB-Ultimine)")
+        ENABLE_VIEW = BUILDER.comment("Enable the chain interaction view overlay.(Will disable with FTB-Ultimine)")
                 .define("enableView", true);
-
-        ENABLE_EMPTY_HAND_MODIFY_PIPE = BUILDER
-                .comment("Enable empty hand can modify pipe.")
+        ENABLE_EMPTY_HAND_MODIFY_PIPE = BUILDER.comment("Enable empty hand can modify pipe.")
                 .define("enableEmptyHandPipe", true);
-
-        COMPAT_FTB_ULTIMINE = BUILDER
-                .comment("Enable FTB Ultimine compatibility. When FTB Ultimine is installed, CRH will use Ultimine-selected blocks for chain operations.")
+        COMPAT_FTB_ULTIMINE = BUILDER.comment("Enable FTB Ultimine compatibility. When FTB Ultimine is installed, CRH will use Ultimine-selected blocks for chain operations.")
                 .define("compatFtbUltimine", true);
-
-        DISABLE_BUILTIN_CHAIN_WHEN_FTB_ULTIMINE_ENABLED = BUILDER
-                .comment("Disable CRH built-in chain selection when FTB Ultimine compatibility is active.")
+        DISABLE_BUILTIN_CHAIN_WHEN_FTB_ULTIMINE_ENABLED = BUILDER.comment("Disable CRH built-in chain selection when FTB Ultimine compatibility is active.")
                 .define("disableBuiltinChainWhenFtbUltimineCompatEnabled", true);
 
         BUILDER.pop();
@@ -83,8 +68,7 @@ public final class Config {
     }
 
     public static boolean builtinChainAllowed() {
-        return !(ftbUltimineCompatActive()
-                && disableBuiltinChainWhenFtbUltimineCompatEnabled());
+        return !(ftbUltimineCompatActive() && disableBuiltinChainWhenFtbUltimineCompatEnabled());
     }
 
     public static boolean ftbUltimineCompatActive() {

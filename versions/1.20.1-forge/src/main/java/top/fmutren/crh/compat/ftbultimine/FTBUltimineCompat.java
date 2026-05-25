@@ -1,7 +1,5 @@
 package top.fmutren.crh.compat.ftbultimine;
 
-import static top.fmutren.crh.compat.ftbultimine.FTBRightClickHandle.ftbRightClickEventHandler;
-
 public final class FTBUltimineCompat {
 
     private static boolean registered;
@@ -14,8 +12,7 @@ public final class FTBUltimineCompat {
             return;
         }
         registered = true;
-
-        ftbRightClickEventHandler();
+        FTBRightClickHandle.register();
     }
 
 }

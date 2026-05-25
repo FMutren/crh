@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import top.fmutren.crh.api.ChainActionResult;
 import top.fmutren.crh.interaction.ChainInteraction;
 
 @Mixin(
@@ -30,7 +31,8 @@ public abstract class CreateEncasingBlockMixin {
     @Inject(
             method = "useItemOn",
             at = @At("HEAD"),
-            cancellable = true
+            cancellable = true,
+            remap = false
     )
     private void crh$chainEncasingUse(
             ItemStack stack,
@@ -42,10 +44,18 @@ public abstract class CreateEncasingBlockMixin {
             BlockHitResult hitResult,
             CallbackInfoReturnable<ItemInteractionResult> cir
     ) {
-        ItemInteractionResult result = ChainInteraction.tryHandleEncasing(stack, state, level, pos, player, hand, hitResult);
+        ChainActionResult result = ChainInteraction.tryHandleEncasing(stack, state, level, pos, player, hand, hitResult);
         if (result.consumesAction()) {
-            cir.setReturnValue(result);
+            cir.setReturnValue(crh$toItemInteractionResult(result));
         }
+    }
+
+    private ItemInteractionResult crh$toItemInteractionResult(ChainActionResult result) {
+        return switch (result) {
+            case PASS -> ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            case SUCCESS -> ItemInteractionResult.SUCCESS;
+            case CONSUME -> ItemInteractionResult.CONSUME;
+        };
     }
 
 }
