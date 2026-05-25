@@ -10,27 +10,24 @@ stonecutter {
     properties.tags(version, loader)
 }
 
-fun rootProp(key: String): String {
-    val text = rootProject.file("gradle.properties").readText().replace("\r", "")
-    val pattern = Regex("""(?m)^\s*${Regex.escape(key)}\s*=\s*(.+)\s*$""")
-    return pattern.find(text)?.groupValues?.get(1)?.trim()
-        ?: error("Missing property '$key' in gradle.properties")
-}
+fun prop(key: String): Provider<String> = providers.gradleProperty(key)
+
+fun propString(key: String): String = prop(key).get()
 
 val minecraftVersion = project.name.substringBeforeLast("-")
 val minecraftVersionRange = libs.versions.minecraftRange.get()
 val neoForgeVersion = libs.versions.neoForge.get()
 val neoForgeVersionRange = libs.versions.neoForgeRange.get()
 val loaderVersionRange = libs.versions.loaderRange.get()
-val createVersionRange = libs.versions.createRange.get()
+val createVersionRange = propString("create_range_1_21_1")
 
-val modId = rootProp("mod_id")
-val modName = rootProp("mod_name")
-val modLicense = rootProp("mod_license")
-val modGroupId = rootProp("mod_group_id")
-val modAuthors = rootProp("mod_authors")
-val modDescription = rootProp("mod_description")
-val modVersion = rootProp("mod_version")
+val modId = propString("mod_id")
+val modName = propString("mod_name")
+val modLicense = propString("mod_license")
+val modGroupId = propString("mod_group_id")
+val modAuthors = propString("mod_authors")
+val modDescription = propString("mod_description")
+val modVersion = propString("mod_version")
 
 version = modVersion
 group = modGroupId
@@ -201,28 +198,28 @@ tasks.named("compileJava") {
 
 dependencies {
     // Create Mod & Registrate Core
-    compileOnly(variantOf(libs.create) { classifier("slim") }) { isTransitive = false }
-    add("localRuntime", "com.simibubi.create:create-1.21.1:${rootProp("create_1_21_1")}:slim") { isTransitive = false }
+    compileOnly("com.simibubi.create:create-1.21.1:${propString("create_1_21_1")}:slim") { isTransitive = false }
+    add("localRuntime", "com.simibubi.create:create-1.21.1:${propString("create_1_21_1")}:slim") { isTransitive = false }
 
-    compileOnly(libs.registrate)
-    add("localRuntime", "com.tterrag.registrate:Registrate:${rootProp("registrate_1_21_1")}")
+    compileOnly("com.tterrag.registrate:Registrate:${propString("registrate_1_21_1")}")
+    add("localRuntime", "com.tterrag.registrate:Registrate:${propString("registrate_1_21_1")}")
 
     // Ponder & Flywheel Rendering
-    compileOnly("net.createmod.ponder:ponder-neoforge:${rootProp("ponder_1_21_1")}+mc$minecraftVersion")
-    add("localRuntime", "net.createmod.ponder:ponder-neoforge:${rootProp("ponder_1_21_1")}+mc$minecraftVersion")
+    compileOnly("net.createmod.ponder:ponder-neoforge:${propString("ponder_1_21_1")}+mc$minecraftVersion")
+    add("localRuntime", "net.createmod.ponder:ponder-neoforge:${propString("ponder_1_21_1")}+mc$minecraftVersion")
 
-    compileOnly(libs.flywheel) { isTransitive = false }
-    add("localRuntime", "dev.engine-room.flywheel:flywheel-neoforge-1.21.1:${rootProp("flywheel_1_21_1")}") { isTransitive = false }
+    compileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-1.21.1:${propString("flywheel_1_21_1")}") { isTransitive = false }
+    add("localRuntime", "dev.engine-room.flywheel:flywheel-neoforge-1.21.1:${propString("flywheel_1_21_1")}") { isTransitive = false }
 
     // Create Casing
-    compileOnly(libs.createCasing)
-    add("localRuntime", "fr.iglee42:CreateCasing:${rootProp("create_encased_1_21_1")}")
+    compileOnly("fr.iglee42:CreateCasing:${propString("create_encased_1_21_1")}")
+    add("localRuntime", "fr.iglee42:CreateCasing:${propString("create_encased_1_21_1")}")
 
     // FTB Ultimine
-    compileOnly(libs.ftbUltimineNeoForge)
-    add("localRuntime", "dev.ftb.mods:ftb-ultimine-neoforge:${rootProp("ftb_ultimine_1_21_1")}") { isTransitive = false }
-    add("localRuntime", "dev.ftb.mods:ftb-library-neoforge:${rootProp("ftb_library_1_21_1")}") { isTransitive = false }
-    add("localRuntime", "dev.architectury:architectury-neoforge:${rootProp("architectury_neoforge_1_21_1")}")
+    compileOnly("dev.ftb.mods:ftb-ultimine-neoforge:${propString("ftb_ultimine_1_21_1")}")
+    add("localRuntime", "dev.ftb.mods:ftb-ultimine-neoforge:${propString("ftb_ultimine_1_21_1")}") { isTransitive = false }
+    add("localRuntime", "dev.ftb.mods:ftb-library-neoforge:${propString("ftb_library_1_21_1")}") { isTransitive = false }
+    add("localRuntime", "dev.architectury:architectury-neoforge:${propString("architectury_neoforge_1_21_1")}")
 }
 
 publishing {

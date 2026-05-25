@@ -18,24 +18,21 @@ stonecutter {
     }
 }
 
-fun rootProp(key: String): String {
-    val text = rootProject.file("gradle.properties").readText().replace("\r", "")
-    val pattern = Regex("""(?m)^\s*${Regex.escape(key)}\s*=\s*(.+)\s*$""")
-    return pattern.find(text)?.groupValues?.get(1)?.trim()
-        ?: error("Missing property '$key' in gradle.properties")
-}
+fun prop(key: String): Provider<String> = providers.gradleProperty(key)
+
+fun propString(key: String): String = prop(key).get()
 
 val minecraftVersion = project.name.substringBeforeLast("-")
-val forgeVersion = rootProp("forge_1_20_1")
+val forgeVersion = propString("forge_1_20_1")
 
-val modId = rootProp("mod_id")
-val modName = rootProp("mod_name")
-val modLicense = rootProp("mod_license")
-val modGroupId = rootProp("mod_group_id")
-val modAuthors = rootProp("mod_authors")
-val modDescription = rootProp("mod_description")
-val modVersion = rootProp("mod_version")
-val createVersionRange = rootProp("create_range_1_20_1")
+val modId = propString("mod_id")
+val modName = propString("mod_name")
+val modLicense = propString("mod_license")
+val modGroupId = propString("mod_group_id")
+val modAuthors = propString("mod_authors")
+val modDescription = propString("mod_description")
+val modVersion = propString("mod_version")
+val createVersionRange = propString("create_range_1_20_1")
 
 version = modVersion
 group = modGroupId
@@ -197,15 +194,15 @@ tasks.named("reobfJar") {
 
 dependencies {
     // Core Create Mod Framework & Core Dependencies
-    modImplementation("com.simibubi.create:create-1.20.1:${rootProp("create_1_20_1")}:slim") {
+    modImplementation("com.simibubi.create:create-1.20.1:${propString("create_1_20_1")}:slim") {
         isTransitive = false
     }
-    modImplementation("net.createmod.ponder:Ponder-Forge-1.20.1:${rootProp("ponder_1_20_1")}")
-    modImplementation("com.tterrag.registrate:Registrate:${rootProp("registrate_1_20_1")}")
+    modImplementation("net.createmod.ponder:Ponder-Forge-1.20.1:${propString("ponder_1_20_1")}")
+    modImplementation("com.tterrag.registrate:Registrate:${propString("registrate_1_20_1")}")
 
     // Flywheel Rendering Engine
-    modCompileOnly("dev.engine-room.flywheel:flywheel-forge-api-1.20.1:${rootProp("flywheel_1_20_1")}")
-    modRuntimeOnly("dev.engine-room.flywheel:flywheel-forge-1.20.1:${rootProp("flywheel_1_20_1")}") {
+    modCompileOnly("dev.engine-room.flywheel:flywheel-forge-api-1.20.1:${propString("flywheel_1_20_1")}")
+    modRuntimeOnly("dev.engine-room.flywheel:flywheel-forge-1.20.1:${propString("flywheel_1_20_1")}") {
         isTransitive = false
     }
 
@@ -215,18 +212,16 @@ dependencies {
     implementation("io.github.llamalad7:mixinextras-forge:0.4.1")
 
     // Create Casing
-    modImplementation("fr.iglee42:CreateCasing:${rootProp("create_encased_1_20_1")}")
+    modImplementation("fr.iglee42:CreateCasing:${propString("create_encased_1_20_1")}")
 
     // FTB Ultimine
-    modImplementation("dev.ftb.mods:ftb-ultimine-forge:${rootProp("ftb_ultimine_1_20_1")}") {
+    modImplementation("dev.ftb.mods:ftb-ultimine-forge:${propString("ftb_ultimine_1_20_1")}") {
         isTransitive = false
     }
-    modRuntimeOnly("dev.ftb.mods:ftb-library-forge:${rootProp("ftb_library_1_20_1")}") {
+    modRuntimeOnly("dev.ftb.mods:ftb-library-forge:${propString("ftb_library_1_20_1")}") {
         isTransitive = false
     }
-    modImplementation("dev.architectury:architectury-forge:${rootProp("architectury_forge_1_20_1")}") {
-        isTransitive = false
-    }
+    modImplementation("dev.architectury:architectury-forge:${propString("architectury_forge_1_20_1")}")
 }
 
 publishing {
