@@ -59,7 +59,7 @@ public final class KeyDown {
         if (!Config.builtinChainAllowed()) {
             ChainKeyStateTracker.set(player, false);
             if (lastSentChainKeyState) {
-                CrhServices.network().sendToServer(new ChainKeyStateMessage(false));
+                CrhServices.network().sendChainKeyState(new ChainKeyStateMessage(false));
                 lastSentChainKeyState = false;
             }
             return;
@@ -72,7 +72,7 @@ public final class KeyDown {
             return;
         }
 
-        CrhServices.network().sendToServer(new ChainKeyStateMessage(chainKeyDown));
+        CrhServices.network().sendChainKeyState(new ChainKeyStateMessage(chainKeyDown));
         lastSentChainKeyState = chainKeyDown;
     }
 

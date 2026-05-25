@@ -41,14 +41,19 @@ public final class NetworkBridgeImpl implements NetworkBridge {
                 .add();
     }
 
-    private static void encodePipeConnection(PipeConnectionMessage packet, FriendlyByteBuf buf) {
+    private static void encodePipeConnection(
+            PipeConnectionMessage packet,
+            FriendlyByteBuf buf
+    ) {
         buf.writeBlockPos(packet.pos());
         buf.writeEnum(packet.face());
         buf.writeBoolean(packet.offHand());
         buf.writeBoolean(packet.shift());
     }
 
-    private static PipeConnectionMessage decodePipeConnection(FriendlyByteBuf buf) {
+    private static PipeConnectionMessage decodePipeConnection(
+            FriendlyByteBuf buf
+    ) {
         BlockPos pos = buf.readBlockPos();
         Direction face = buf.readEnum(Direction.class);
         boolean offHand = buf.readBoolean();
@@ -57,7 +62,9 @@ public final class NetworkBridgeImpl implements NetworkBridge {
     }
 
     private static void handlePipeConnection(
-            PipeConnectionMessage packet, Supplier<NetworkEvent.Context> contextSupplier) {
+            PipeConnectionMessage packet,
+            Supplier<NetworkEvent.Context> contextSupplier
+    ) {
         var context = contextSupplier.get();
         var player = context.getSender();
         if (player != null) {
@@ -66,16 +73,23 @@ public final class NetworkBridgeImpl implements NetworkBridge {
         context.setPacketHandled(true);
     }
 
-    private static void encodeChainKeyState(ChainKeyStateMessage packet, FriendlyByteBuf buf) {
+    private static void encodeChainKeyState(
+            ChainKeyStateMessage packet,
+            FriendlyByteBuf buf
+    ) {
         buf.writeBoolean(packet.down());
     }
 
-    private static ChainKeyStateMessage decodeChainKeyState(FriendlyByteBuf buf) {
+    private static ChainKeyStateMessage decodeChainKeyState(
+            FriendlyByteBuf buf
+    ) {
         return new ChainKeyStateMessage(buf.readBoolean());
     }
 
     private static void handleChainKeyState(
-            ChainKeyStateMessage packet, Supplier<NetworkEvent.Context> contextSupplier) {
+            ChainKeyStateMessage packet,
+            Supplier<NetworkEvent.Context> contextSupplier
+    ) {
         var context = contextSupplier.get();
         var player = context.getSender();
         if (player != null) {
@@ -85,8 +99,13 @@ public final class NetworkBridgeImpl implements NetworkBridge {
     }
 
     @Override
-    public void sendToServer(Object payload) {
-        CHANNEL.sendToServer(payload);
+    public void sendPipeConnection(PipeConnectionMessage message) {
+        CHANNEL.sendToServer(message);
+    }
+
+    @Override
+    public void sendChainKeyState(ChainKeyStateMessage message) {
+        CHANNEL.sendToServer(message);
     }
 
 }

@@ -46,14 +46,18 @@ public final class NetworkBridgeImpl implements NetworkBridge {
     }
 
     @Override
-    public void sendToServer(Object payload) {
-        if (payload instanceof PipeConnectionMessage(BlockPos pos, Direction face, boolean offHand, boolean shift)) {
-            PacketDistributor.sendToServer(new PipeConnectionPayload(pos, face, offHand, shift));
-            return;
-        }
-        if (payload instanceof ChainKeyStateMessage(boolean down)) {
-            PacketDistributor.sendToServer(new ChainKeyStatePayload(down));
-        }
+    public void sendPipeConnection(PipeConnectionMessage message) {
+        PacketDistributor.sendToServer(new PipeConnectionPayload(
+                message.pos(),
+                message.face(),
+                message.offHand(),
+                message.shift()
+        ));
+    }
+
+    @Override
+    public void sendChainKeyState(ChainKeyStateMessage message) {
+        PacketDistributor.sendToServer(new ChainKeyStatePayload(message.down()));
     }
 
     private record PipeConnectionPayload(

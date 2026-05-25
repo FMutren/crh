@@ -58,7 +58,7 @@ public final class RightClick {
             return false;
         }
 
-        CrhServices.network().sendToServer(new PipeConnectionMessage(
+        CrhServices.network().sendPipeConnection(new PipeConnectionMessage(
                 pos,
                 face,
                 hand == InteractionHand.OFF_HAND,
