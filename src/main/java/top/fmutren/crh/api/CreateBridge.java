@@ -26,6 +26,8 @@ public interface CreateBridge {
 
     BeltCasingKind beltCasingKind(ItemStack stack);
 
+    boolean isBeltCasingItem(ItemStack stack);
+
     boolean isBelt(BlockState state);
 
     boolean applyBeltCasing(

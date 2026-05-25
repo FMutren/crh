@@ -1,8 +1,6 @@
 package top.fmutren.crh.input;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.simibubi.create.content.fluids.pipes.EncasedPipeBlock;
-import com.simibubi.create.content.fluids.pipes.FluidPipeBlock;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -51,7 +49,7 @@ public final class RightClick {
         }
 
         var state = level.getBlockState(pos);
-        if (!(state.getBlock() instanceof FluidPipeBlock) && !(state.getBlock() instanceof EncasedPipeBlock)) {
+        if (!CrhServices.create().isManualPipe(state)) {
             return false;
         }
 

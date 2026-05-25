@@ -10,6 +10,8 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import top.fmutren.crh.api.CrhServices;
+import top.fmutren.crh.compat.createcasing.CreateCasingBridge;
+import top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat;
 import top.fmutren.crh.compat.ftbultimine.FtbUltimineCompat;
 import top.fmutren.crh.input.ClientEventRegister;
 import top.fmutren.crh.platform.CreateBridgeImpl;
@@ -25,7 +27,7 @@ public final class Crh {
         CrhServices.bootstrap(network, new CreateBridgeImpl(), new PlatformBridgeImpl());
 
         var modList = ModList.get();
-        CrhCommon.setCreateCasingLoaded(modList.isLoaded("createcasing"));
+        bootstrapCreateCasing(modList.isLoaded("createcasing"));
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
         modBus.addListener(network::registerPayloads);
@@ -37,6 +39,24 @@ public final class Crh {
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             ClientEventRegister.register(modBus);
+        }
+    }
+
+    private static void bootstrapCreateCasing(boolean createCasingLoaded) {
+        if (!createCasingLoaded) {
+            CrhCreateCasingCompat.bootstrap(null);
+            CrhCommon.setCreateCasingLoaded(false);
+            return;
+        }
+
+        try {
+            var clazz = Class.forName("top.fmutren.crh.compat.createcasing.CreateCasingBridgeImpl");
+            var bridge = (CreateCasingBridge) clazz.getDeclaredConstructor().newInstance();
+            CrhCreateCasingCompat.bootstrap(bridge);
+            CrhCommon.setCreateCasingLoaded(bridge.isLoaded());
+        } catch (ReflectiveOperationException | LinkageError error) {
+            CrhCreateCasingCompat.bootstrap(null);
+            CrhCommon.setCreateCasingLoaded(false);
         }
     }
 

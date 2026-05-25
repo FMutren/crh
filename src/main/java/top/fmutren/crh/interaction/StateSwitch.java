@@ -21,22 +21,20 @@ public final class StateSwitch {
     public static final Map<String, String> shaftCasingType = new HashMap<>();
     public static final Map<String, String> pipeCasingType = new HashMap<>();
 
+    private static boolean createCasingMappingsLoaded;
+
     static {
         shaftCasingType.put("create:brass_casing", "create:brass_encased_shaft");
         shaftCasingType.put("create:andesite_casing", "create:andesite_encased_shaft");
 
         pipeCasingType.put("create:copper_casing", "create:encased_fluid_pipe");
-
-        if (loadCreateCasing) {
-            crhCreateCasingShaftCasingType();
-            crhCreatePipeCasingType();
-        }
     }
 
     private StateSwitch() {
     }
 
     public static BlockState shaftSwitchToBlockState(ItemStack itemStack, BlockState state) {
+        ensureCreateCasingMappings();
         if (itemStack.isEmpty() || !isShaftCasing(itemStack) || !(state.getBlock() instanceof ShaftBlock)) {
             return state;
         }
@@ -51,7 +49,19 @@ public final class StateSwitch {
                 .setValue(ShaftBlock.AXIS, state.getValue(ShaftBlock.AXIS));
     }
 
+    private static void ensureCreateCasingMappings() {
+        if (!loadCreateCasing || createCasingMappingsLoaded) {
+            return;
+        }
+
+        crhCreateCasingShaftCasingType(shaftCasingType);
+        crhCreatePipeCasingType(pipeCasingType);
+        createCasingMappingsLoaded = true;
+    }
+
     public static BlockState pipeSwitchToBlockState(ItemStack itemStack, BlockState state) {
+        ensureCreateCasingMappings();
+
         if (itemStack.isEmpty()) {
             return state;
         }
@@ -84,11 +94,15 @@ public final class StateSwitch {
     }
 
     public static boolean isCasing(ItemStack itemStack) {
+        ensureCreateCasingMappings();
+
         int switchResult = commonSwitchForHeldItem(itemStack);
         return switchResult != 0 && switchResult != -1;
     }
 
     public static int commonSwitchForHeldItem(ItemStack itemStack) {
+        ensureCreateCasingMappings();
+
         if (isCreateWrench(itemStack)) {
             return 0;
         }

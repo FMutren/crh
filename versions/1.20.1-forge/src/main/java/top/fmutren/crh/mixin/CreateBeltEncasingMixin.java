@@ -24,9 +24,13 @@ import top.fmutren.crh.interaction.ChainInteraction;
 public abstract class CreateBeltEncasingMixin {
 
     @Inject(
-            method = "use",
+            method = {
+                    "use(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;",
+                    "m_6227_(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"
+            },
             at = @At("HEAD"),
             cancellable = true,
+            require = 0,
             remap = false
     )
     private void crh$chainEncasingUse(

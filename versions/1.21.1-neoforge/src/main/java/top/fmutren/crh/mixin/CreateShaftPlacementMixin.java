@@ -1,7 +1,6 @@
 package top.fmutren.crh.mixin;
 
 import com.simibubi.create.content.kinetics.simpleRelays.ShaftBlock;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,9 +16,13 @@ import top.fmutren.crh.interaction.StateSwitch;
 public abstract class CreateShaftPlacementMixin {
 
     @Inject(
-            method = "getStateForPlacement",
+            method = {
+                    "getStateForPlacement(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;",
+                    "m_5573_(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;"
+            },
             at = @At("RETURN"),
             cancellable = true,
+            require = 0,
             remap = false
     )
     private void crh$encaseAfterPlace(

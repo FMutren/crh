@@ -7,7 +7,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import top.fmutren.crh.api.BeltCasingKind;
 import top.fmutren.crh.api.CrhServices;
 import top.fmutren.crh.interaction.ChainSelection;
 
@@ -51,8 +50,7 @@ public final class TargetSelector {
             );
         }
 
-        var casingKind = CrhServices.create().beltCasingKind(stack);
-        if (casingKind != BeltCasingKind.NONE && AllBlocks.BELT.has(state)) {
+        if (CrhServices.create().isBeltCasingItem(stack) && AllBlocks.BELT.has(state)) {
             return ChainCollector.collectBelt(
                     level,
                     pos,

@@ -16,12 +16,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(AbstractChuteBlock.class)
+@Mixin(value = AbstractChuteBlock.class, remap = false)
 public class CreateChuteBlockMixin {
 
     @Inject(
-            method = "setPlacedBy",
-            at = @At("TAIL")
+            method = {
+                    "setPlacedBy(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V",
+                    "m_6402_(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V"
+            },
+            at = @At("TAIL"),
+            require = 0,
+            remap = false
     )
     private void crh$afterPlace(
             Level level,

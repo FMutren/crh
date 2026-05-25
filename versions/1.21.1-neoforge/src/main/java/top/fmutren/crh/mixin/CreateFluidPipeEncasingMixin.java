@@ -24,9 +24,13 @@ import top.fmutren.crh.interaction.ChainInteraction;
 public abstract class CreateFluidPipeEncasingMixin {
 
     @Inject(
-            method = "useItemOn",
+            method = {
+                    "useItemOn(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/ItemInteractionResult;",
+                    "m_6227_(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/ItemInteractionResult;"
+            },
             at = @At("HEAD"),
             cancellable = true,
+            require = 0,
             remap = false
     )
     private void crh$chainEncasingUse(

@@ -18,12 +18,17 @@ import static top.fmutren.crh.interaction.PlayerLookOnFace.getPlayerLookingFace;
 import static top.fmutren.crh.interaction.util.ChainOperation.centerHit;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isShaftCasing;
 
-@Mixin(CogWheelBlock.class)
+@Mixin(value = CogWheelBlock.class, remap = false)
 public class CreateCogWheelBlockMixin {
 
     @Inject(
-            method = "setPlacedBy",
-            at = @At("TAIL")
+            method = {
+                    "setPlacedBy(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V",
+                    "m_6402_(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V"
+            },
+            at = @At("TAIL"),
+            require = 0,
+            remap = false
     )
     private void crh$encaseAfterPlace(
             Level level,

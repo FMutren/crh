@@ -8,8 +8,6 @@ import com.simibubi.create.content.fluids.pipes.EncasedPipeBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import com.simibubi.create.content.logistics.chute.ChuteBlock;
-import fr.iglee42.createcasing.casings.CasingSet;
-import fr.iglee42.createcasing.casings.CasingSets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -55,24 +53,24 @@ public final class CreateBridgeImpl implements CreateBridge {
 
     @Override
     public BeltCasingKind beltCasingKind(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) {
+            return BeltCasingKind.NONE;
+        }
         if (AllBlocks.ANDESITE_CASING.isIn(stack)) {
             return BeltCasingKind.ANDESITE;
         }
         if (AllBlocks.BRASS_CASING.isIn(stack)) {
             return BeltCasingKind.BRASS;
         }
-        if (AllBlocks.COPPER_CASING.isIn(stack)) {
-            return BeltCasingKind.COPPER;
-        }
-        if (AllBlocks.RAILWAY_CASING.isIn(stack)
-                || hasCasingKind(stack, CasingSets.INDUSTRIAL_IRON)
-                || hasCasingKind(stack, CasingSets.SHADOW_STEEL)
-                || hasCasingKind(stack, CasingSets.CREATIVE)
-                || hasCasingKind(stack, CasingSets.WEATHERED_IRON)
-                || hasCasingKind(stack, CasingSets.REFINED_RADIANCE)) {
+        if (CrhCommon.loadCreateCasing && CrhCreateCasingCompat.beltCasingType(stack) != null) {
             return BeltCasingKind.COPPER;
         }
         return BeltCasingKind.NONE;
+    }
+
+    @Override
+    public boolean isBeltCasingItem(ItemStack stack) {
+        return beltCasingKind(stack) != BeltCasingKind.NONE;
     }
 
     @Override
@@ -88,6 +86,21 @@ public final class CreateBridgeImpl implements CreateBridge {
             BeltCasingKind kind,
             Player player
     ) {
+        BeltBlockEntity.CasingType createCasingType = switch (kind) {
+            case ANDESITE -> BeltBlockEntity.CasingType.ANDESITE;
+            case BRASS -> BeltBlockEntity.CasingType.BRASS;
+            default -> null;
+        };
+
+        return createCasingType != null && applyBeltCasingType(level, pos, state, createCasingType);
+    }
+
+    private static boolean applyBeltCasingType(
+            Level level,
+            BlockPos pos,
+            BlockState state,
+            BeltBlockEntity.CasingType createCasingType
+    ) {
         if (!(state.getBlock() instanceof BeltBlock beltBlock)) {
             return false;
         }
@@ -95,12 +108,6 @@ public final class CreateBridgeImpl implements CreateBridge {
         if (!(level.getBlockEntity(pos) instanceof BeltBlockEntity beltEntity)) {
             return false;
         }
-
-        BeltBlockEntity.CasingType createCasingType = switch (kind) {
-            case ANDESITE -> BeltBlockEntity.CasingType.ANDESITE;
-            case BRASS -> BeltBlockEntity.CasingType.BRASS;
-            default -> BeltBlockEntity.CasingType.NONE;
-        };
 
         if (beltEntity.casing == createCasingType) {
             return false;
@@ -117,7 +124,9 @@ public final class CreateBridgeImpl implements CreateBridge {
 
     @Override
     public boolean isManualPipe(BlockState state) {
-        return AllBlocks.FLUID_PIPE.has(state) || AllBlocks.ENCASED_FLUID_PIPE.has(state);
+        return AllBlocks.FLUID_PIPE.has(state)
+                || AllBlocks.ENCASED_FLUID_PIPE.has(state)
+                || (CrhCommon.loadCreateCasing && CrhCreateCasingCompat.crhCreateCasingIsCasingPipe(state));
     }
 
     @Override
@@ -173,7 +182,8 @@ public final class CreateBridgeImpl implements CreateBridge {
 
     @Override
     public Item returnItemForState(BlockState state) {
-        if (state.getBlock() instanceof EncasedPipeBlock) {
+        if (state.getBlock() instanceof EncasedPipeBlock
+                || (CrhCommon.loadCreateCasing && CrhCreateCasingCompat.crhCreateCasingIsCasingPipe(state))) {
             return fluidPipeItem();
         }
         return state.getBlock().asItem();
@@ -187,18 +197,72 @@ public final class CreateBridgeImpl implements CreateBridge {
             BlockState state,
             Player player
     ) {
-        if (AllBlocks.COPPER_CASING.isIn(heldItem) && !CrhCommon.loadCreateCasing) {
+        BeltBlockEntity.CasingType casingType = beltCasingType(heldItem);
+        if (casingType == null) {
             return false;
         }
-        var kind = beltCasingKind(heldItem);
-        if (kind == BeltCasingKind.NONE) {
+
+        if (!applyBeltCasingType(level, pos, state, casingType)) {
             return false;
         }
-        if (!applyBeltCasing(level, pos, state, kind, player)) {
-            return false;
-        }
+
         playCasingSound(casingSoundBlock(heldItem), pos, level, player);
         return true;
+    }
+
+    private static BeltBlockEntity.CasingType beltCasingType(ItemStack heldItem) {
+        if (heldItem == null || heldItem.isEmpty()) {
+            return null;
+        }
+        if (AllBlocks.ANDESITE_CASING.isIn(heldItem)) {
+            return BeltBlockEntity.CasingType.ANDESITE;
+        }
+        if (AllBlocks.BRASS_CASING.isIn(heldItem)) {
+            return BeltBlockEntity.CasingType.BRASS;
+        }
+        if (!CrhCommon.loadCreateCasing) {
+            return null;
+        }
+        return CrhCreateCasingCompat.beltCasingType(heldItem);
+    }
+
+    private static void playCasingSound(
+            Block casingBlock,
+            BlockPos pos,
+            Level level,
+            Player player
+    ) {
+        var soundType = casingBlock.defaultBlockState().getSoundType(level, pos, player);
+        level.playSound(
+                null,
+                pos,
+                soundType.getPlaceSound(),
+                SoundSource.BLOCKS,
+                (soundType.getVolume() + 1.0F) / 2.0F,
+                soundType.getPitch() * 0.8F
+        );
+    }
+
+    private static Block casingSoundBlock(ItemStack heldItem) {
+        if (heldItem == null || heldItem.isEmpty()) {
+            return AllBlocks.ANDESITE_CASING.get();
+        }
+        if (AllBlocks.COPPER_CASING.isIn(heldItem)) {
+            return AllBlocks.COPPER_CASING.get();
+        }
+        if (AllBlocks.BRASS_CASING.isIn(heldItem)) {
+            return AllBlocks.BRASS_CASING.get();
+        }
+        if (AllBlocks.ANDESITE_CASING.isIn(heldItem)) {
+            return AllBlocks.ANDESITE_CASING.get();
+        }
+        if (CrhCommon.loadCreateCasing) {
+            var casingBlock = CrhCreateCasingCompat.casingSoundBlock(heldItem);
+            if (casingBlock != null) {
+                return casingBlock;
+            }
+        }
+        return AllBlocks.ANDESITE_CASING.get();
     }
 
     @Override
@@ -238,38 +302,6 @@ public final class CreateBridgeImpl implements CreateBridge {
     @Override
     public boolean isChute(BlockState state) {
         return state.getBlock() instanceof ChuteBlock;
-    }
-
-    private static void playCasingSound(
-            Block casingBlock,
-            BlockPos pos,
-            Level level,
-            Player player
-    ) {
-        var soundType = casingBlock.defaultBlockState().getSoundType(level, pos, player);
-        level.playSound(
-                null,
-                pos,
-                soundType.getPlaceSound(),
-                SoundSource.BLOCKS,
-                (soundType.getVolume() + 1.0F) / 2.0F,
-                soundType.getPitch() * 0.8F
-        );
-    }
-
-    private static Block casingSoundBlock(ItemStack heldItem) {
-        if (AllBlocks.COPPER_CASING.isIn(heldItem)) {
-            return AllBlocks.COPPER_CASING.get();
-        }
-        if (AllBlocks.BRASS_CASING.isIn(heldItem)) {
-            return AllBlocks.BRASS_CASING.get();
-        }
-        return AllBlocks.ANDESITE_CASING.get();
-    }
-
-    private static boolean hasCasingKind(ItemStack stack, CasingSet casingSet) {
-        var casing = casingSet.getCasing();
-        return casing != null && stack.is(casing.asItem());
     }
 
 }

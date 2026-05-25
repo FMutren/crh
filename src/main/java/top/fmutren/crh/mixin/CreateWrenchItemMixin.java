@@ -16,9 +16,14 @@ import top.fmutren.crh.interaction.ChainInteraction;
 public abstract class CreateWrenchItemMixin {
 
     @Inject(
-            method = "useOn",
+            method = {
+                    "useOn(Lnet/minecraft/world/item/context/UseOnContext;)Lnet/minecraft/world/InteractionResult;",
+                    "m_6225_(Lnet/minecraft/world/item/context/UseOnContext;)Lnet/minecraft/world/InteractionResult;"
+            },
             at = @At("HEAD"),
-            cancellable = true
+            cancellable = true,
+            require = 0,
+            remap = false
     )
     private void crh$chainWrenchUse(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
         InteractionResult result = ChainInteraction.tryHandleWrench(context);

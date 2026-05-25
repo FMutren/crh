@@ -24,12 +24,17 @@ import static top.fmutren.crh.interaction.PlayerLookOnFace.getPlayerLookingFace;
 import static top.fmutren.crh.interaction.StateSwitch.isCreateWrench;
 import static top.fmutren.crh.interaction.util.ChainOperation.centerHit;
 
-@Mixin(FluidPipeBlock.class)
+@Mixin(value = FluidPipeBlock.class, remap = false)
 public abstract class CreateFluidPipeMixin {
 
     @Inject(
-            method = "setPlacedBy",
-            at = @At("TAIL")
+            method = {
+                    "setPlacedBy(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V",
+                    "m_6402_(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V"
+            },
+            at = @At("TAIL"),
+            require = 0,
+            remap = false
     )
     private void crh$encaseAfterPlace(
             Level level,

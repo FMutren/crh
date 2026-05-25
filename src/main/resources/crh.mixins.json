@@ -3,6 +3,7 @@
   "minVersion": "0.8",
   "package": "top.fmutren.crh.mixin",
   "compatibilityLevel": "${mixin_compatibility}",
+  "refmap": "${mod_id}.refmap.json",
   "mixins": [
     "CheckHelpersMixin",
     "CreateBeltBlockMixin",

@@ -3,8 +3,6 @@ package top.fmutren.crh.interaction.util;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
-import fr.iglee42.createcasing.casings.CasingSet;
-import fr.iglee42.createcasing.casings.CasingSets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -12,6 +10,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat;
 import top.fmutren.crh.interaction.StateSwitch;
 
 import static top.fmutren.crh.CrhCommon.loadCreateCasing;
@@ -105,40 +104,7 @@ public final class PredicatesCreator {
             return null;
         }
 
-        if (AllBlocks.COPPER_CASING.isIn(stack)) {
-            return CasingSets.COPPER.getBeltCasingType();
-        }
-
-        if (AllBlocks.RAILWAY_CASING.isIn(stack)) {
-            return CasingSets.RAILWAY.getBeltCasingType();
-        }
-
-        if (isCasingItem(stack, CasingSets.INDUSTRIAL_IRON)) {
-            return CasingSets.INDUSTRIAL_IRON.getBeltCasingType();
-        }
-
-        if (isCasingItem(stack, CasingSets.SHADOW_STEEL)) {
-            return CasingSets.SHADOW_STEEL.getBeltCasingType();
-        }
-
-        if (isCasingItem(stack, CasingSets.CREATIVE)) {
-            return CasingSets.CREATIVE.getBeltCasingType();
-        }
-
-        if (isCasingItem(stack, CasingSets.WEATHERED_IRON)) {
-            return CasingSets.WEATHERED_IRON.getBeltCasingType();
-        }
-
-        if (isCasingItem(stack, CasingSets.REFINED_RADIANCE)) {
-            return CasingSets.REFINED_RADIANCE.getBeltCasingType();
-        }
-
-        return null;
-    }
-
-    private static boolean isCasingItem(ItemStack stack, CasingSet casingSet) {
-        var casing = casingSet.getCasing();
-        return casing != null && stack.is(casing.asItem());
+        return CrhCreateCasingCompat.beltCasingType(stack);
     }
 
 }

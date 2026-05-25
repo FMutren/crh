@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.ticks.TickPriority;
-import top.fmutren.crh.api.BeltCasingKind;
 import top.fmutren.crh.api.CrhServices;
 import top.fmutren.crh.interaction.ChainInteraction;
 import top.fmutren.crh.interaction.ChainSelection;
@@ -41,8 +40,7 @@ public final class ChainOperation {
         }
 
         int changed = 0;
-        BlockPos firstBeltChanged = null;
-        BeltCasingKind beltCasingKind = CrhServices.create().beltCasingKind(stack);
+        boolean beltCasingItem = CrhServices.create().isBeltCasingItem(stack);
         boolean creative = player.getAbilities().instabuild;
         Direction face = originalHit.getDirection();
 
@@ -57,11 +55,8 @@ public final class ChainOperation {
 
             BlockState current = level.getBlockState(targetPos);
 
-            if (beltCasingKind != BeltCasingKind.NONE && CrhServices.create().isBelt(current)) {
-                if (CrhServices.create().applyBeltCasing(level, targetPos, current, beltCasingKind, player)) {
-                    if (firstBeltChanged == null) {
-                        firstBeltChanged = targetPos.immutable();
-                    }
+            if (beltCasingItem && CrhServices.create().isBelt(current)) {
+                if (CrhServices.create().tryBeltCasingFromItem(stack, level, targetPos, current, player)) {
                     changed++;
                 }
                 continue;
@@ -82,10 +77,6 @@ public final class ChainOperation {
             }
         }
 
-        if (firstBeltChanged != null) {
-            InteractionFeedback.playBeltCasingSound(level, player, firstBeltChanged, beltCasingKind);
-        }
-
         return new ChainInteraction.ChainOperationResult(player, hand, selection, changed);
     }
 
@@ -100,13 +91,11 @@ public final class ChainOperation {
             ItemStack stack,
             ChainSelection selection
     ) {
-        BeltCasingKind casingKind = CrhServices.create().beltCasingKind(stack);
-        if (casingKind == BeltCasingKind.NONE || selection == null || selection.isEmpty()) {
+        if (!CrhServices.create().isBeltCasingItem(stack) || selection == null || selection.isEmpty()) {
             return new ChainInteraction.ChainOperationResult(player, hand, selection, 0);
         }
 
         int changed = 0;
-        BlockPos firstChanged = null;
         boolean creative = player.getAbilities().instabuild;
 
         for (BlockPos targetPos : selection.positions()) {
@@ -124,16 +113,9 @@ public final class ChainOperation {
                 continue;
             }
 
-            if (CrhServices.create().applyBeltCasing(level, targetPos, current, casingKind, player)) {
-                if (firstChanged == null) {
-                    firstChanged = targetPos.immutable();
-                }
+            if (CrhServices.create().tryBeltCasingFromItem(stack, level, targetPos, current, player)) {
                 changed++;
             }
-        }
-
-        if (firstChanged != null) {
-            InteractionFeedback.playBeltCasingSound(level, player, firstChanged, casingKind);
         }
 
         return new ChainInteraction.ChainOperationResult(player, hand, selection, changed);
