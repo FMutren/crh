@@ -6,11 +6,14 @@
   "mixins": [
     "CheckHelpersMixin",
     "CreateBeltBlockMixin",
+    "CreateBeltEncasingMixin",
     "CreateChuteBlockMixin",
     "CreateCogWheelBlockMixin",
-    "CreateEncasingBlockMixin",
+    "CreateFluidPipeEncasingMixin",
     "CreateFluidPipeMixin",
     "CreateShaftBlockMixin",
+    "CreateShaftEncasingUseMixin",
+    "CreateShaftPlacementMixin",
     "CreateWrenchItemMixin"
   ],
   "client": [
