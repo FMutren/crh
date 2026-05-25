@@ -2,16 +2,16 @@ package top.fmutren.crh;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLLoader;
 import top.fmutren.crh.api.CrhServices;
-import top.fmutren.crh.compat.createcasing.CreateCasingBridge;
+import top.fmutren.crh.compat.createcasing.CreateCasingCompatLoader;
 import top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat;
 import top.fmutren.crh.compat.ftbultimine.FtbUltimineCompat;
 import top.fmutren.crh.input.ClientEventRegister;
+import top.fmutren.crh.input.RightClickEvents;
 import top.fmutren.crh.platform.CreateBridgeImpl;
 import top.fmutren.crh.platform.NetworkBridgeImpl;
 import top.fmutren.crh.platform.PlatformBridgeImpl;
@@ -23,16 +23,18 @@ public final class Crh {
 
     public Crh() {
         var network = new NetworkBridgeImpl();
-        CrhServices.bootstrap(network, new CreateBridgeImpl(), new PlatformBridgeImpl());
+        var platform = new PlatformBridgeImpl();
+        CrhServices.bootstrap(network, new CreateBridgeImpl(), platform);
 
-        var modList = ModList.get();
-        bootstrapCreateCasing(modList.isLoaded("createcasing"));
+        bootstrapCreateCasing(platform.isModLoaded("createcasing"));
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
         network.registerPayloads();
         MinecraftForge.EVENT_BUS.addListener(ServerEventHandlersForge::onPlayerLoggedOut);
+        MinecraftForge.EVENT_BUS.addListener(ServerEventHandlersForge::onEntityPlace);
+        MinecraftForge.EVENT_BUS.addListener(RightClickEvents::rightClickBlock);
 
-        if (modList.isLoaded("ftbultimine")) {
+        if (platform.isModLoaded("ftbultimine")) {
             FtbUltimineCompat.register();
         }
 
@@ -42,21 +44,9 @@ public final class Crh {
     }
 
     private static void bootstrapCreateCasing(boolean createCasingLoaded) {
-        if (!createCasingLoaded) {
-            CrhCreateCasingCompat.bootstrap(null);
-            CrhCommon.setCreateCasingLoaded(false);
-            return;
-        }
-
-        try {
-            var clazz = Class.forName("top.fmutren.crh.compat.createcasing.CreateCasingBridgeImpl");
-            var bridge = (CreateCasingBridge) clazz.getDeclaredConstructor().newInstance();
-            CrhCreateCasingCompat.bootstrap(bridge);
-            CrhCommon.setCreateCasingLoaded(bridge.isLoaded());
-        } catch (ReflectiveOperationException | LinkageError error) {
-            CrhCreateCasingCompat.bootstrap(null);
-            CrhCommon.setCreateCasingLoaded(false);
-        }
+        var bridge = CreateCasingCompatLoader.load(createCasingLoaded);
+        CrhCreateCasingCompat.bootstrap(bridge);
+        CrhCommon.setCreateCasingLoaded(bridge.isLoaded());
     }
 
     public static ResourceLocation id(String path) {

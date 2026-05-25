@@ -16,4 +16,6 @@ public interface PlatformBridge {
 
     boolean builtinChainEnabled();
 
+    boolean isModLoaded(String modId);
+
 }

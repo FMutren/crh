@@ -5,17 +5,7 @@
   "compatibilityLevel": "${mixin_compatibility}",
   "refmap": "${mod_id}.refmap.json",
   "mixins": [
-    "CheckHelpersMixin",
-    "CreateBeltBlockMixin",
-    "CreateBeltEncasingMixin",
-    "CreateChuteBlockMixin",
-    "CreateCogWheelBlockMixin",
-    "CreateFluidPipeEncasingMixin",
-    "CreateFluidPipeMixin",
-    "CreateShaftBlockMixin",
-    "CreateShaftEncasingUseMixin",
-    "CreateShaftPlacementMixin",
-    "CreateWrenchItemMixin"
+    "CheckHelpersMixin"
   ],
   "client": [
   ],

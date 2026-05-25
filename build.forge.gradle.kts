@@ -8,14 +8,6 @@ plugins {
 stonecutter {
     val (version, loader) = current.project.split('-', limit = 2)
     properties.tags(version, loader)
-    replacements.string(loader == "forge") {
-        replace("net.neoforged.neoforge.common.ModConfigSpec", "net.minecraftforge.common.ForgeConfigSpec")
-        replace("ModConfigSpec", "ForgeConfigSpec")
-        replace("net.neoforged.fml.ModList", "net.minecraftforge.fml.ModList")
-        replace("net.minecraft.world.ItemInteractionResult", "net.minecraft.world.InteractionResult")
-        replace("ItemInteractionResult", "InteractionResult")
-        replace("PASS_TO_DEFAULT_BLOCK_INTERACTION", "PASS")
-    }
 }
 
 fun prop(key: String): Provider<String> = providers.gradleProperty(key)

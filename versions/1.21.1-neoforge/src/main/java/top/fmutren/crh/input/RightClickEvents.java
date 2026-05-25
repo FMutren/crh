@@ -16,7 +16,8 @@ public final class RightClickEvents {
                 event.getFace(),
                 event.getHand(),
                 event.getEntity(),
-                event.getItemStack()
+                event.getItemStack(),
+                event.getHitVec()
         );
 
         if (handled) {

@@ -9,7 +9,6 @@ public final class ClientEventRegister {
 
     public static void register() {
         MinecraftForge.EVENT_BUS.addListener(KeyDownEvents::tick);
-        MinecraftForge.EVENT_BUS.addListener(RightClickEvents::rightClickBlock);
     }
 
 }
