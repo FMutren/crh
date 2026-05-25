@@ -86,18 +86,28 @@ val generateModMetadata by tasks.registering(ProcessResources::class) {
 }
 
 
+val commonResourceProperties = mapOf(
+    "mixin_compatibility" to "JAVA_21",
+    "mod_id" to modId,
+    "pack_format" to 34
+)
+
+val generateExpandedCommonResources by tasks.registering(ProcessResources::class) {
+    inputs.properties(commonResourceProperties)
+    filteringCharset = "UTF-8"
+    expand(commonResourceProperties)
+    from(
+        rootProject.file("src/main/resources/crh.mixins.json"),
+        rootProject.file("src/main/resources/pack.mcmeta")
+    )
+    into(layout.buildDirectory.dir("generated/sources/commonResources"))
+}
+
+
 tasks.named<ProcessResources>("processResources") {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    inputs.property("mixin_compatibility", "JAVA_21")
-    inputs.property("pack_format", 34)
-
-    filesMatching("crh.mixins.json") {
-        expand("mixin_compatibility" to "JAVA_21")
-    }
-    filesMatching("pack.mcmeta") {
-        expand("pack_format" to 34)
-    }
 }
+
 
 sourceSets.named("main") {
     // Common code/resources stay in the original root src tree so Git history stays on src/**.
@@ -110,11 +120,12 @@ sourceSets.named("main") {
     )
     resources.setSrcDirs(
         listOf(
+            generateExpandedCommonResources,
+            rootProject.file("versions/${project.name}/src/main/resources"),
             rootProject.file("src/main/resources"),
-            rootProject.file("versions/${project.name}/src/main/resources")
+            generateModMetadata
         )
     )
-    resources.srcDir(generateModMetadata)
 }
 
 neoForge {
@@ -167,7 +178,9 @@ tasks.named("compileJava") {
 dependencies {
     // Create Mod & Registrate Core
     compileOnly("com.simibubi.create:create-1.21.1:${propString("create_1_21_1")}:slim") { isTransitive = false }
-    add("localRuntime", "com.simibubi.create:create-1.21.1:${propString("create_1_21_1")}:slim") { isTransitive = false }
+    add("localRuntime", "com.simibubi.create:create-1.21.1:${propString("create_1_21_1")}:slim") {
+        isTransitive = false
+    }
 
     compileOnly("com.tterrag.registrate:Registrate:${propString("registrate_1_21_1")}")
     add("localRuntime", "com.tterrag.registrate:Registrate:${propString("registrate_1_21_1")}")
@@ -176,8 +189,13 @@ dependencies {
     compileOnly("net.createmod.ponder:ponder-neoforge:${propString("ponder_1_21_1")}+mc$minecraftVersion")
     add("localRuntime", "net.createmod.ponder:ponder-neoforge:${propString("ponder_1_21_1")}+mc$minecraftVersion")
 
-    compileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-1.21.1:${propString("flywheel_1_21_1")}") { isTransitive = false }
-    add("localRuntime", "dev.engine-room.flywheel:flywheel-neoforge-1.21.1:${propString("flywheel_1_21_1")}") { isTransitive = false }
+    compileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-1.21.1:${propString("flywheel_1_21_1")}") {
+        isTransitive = false
+    }
+    add(
+        "localRuntime",
+        "dev.engine-room.flywheel:flywheel-neoforge-1.21.1:${propString("flywheel_1_21_1")}"
+    ) { isTransitive = false }
 
     // Create Casing
     compileOnly("fr.iglee42:CreateCasing:${propString("create_encased_1_21_1")}")
@@ -185,8 +203,12 @@ dependencies {
 
     // FTB Ultimine
     compileOnly("dev.ftb.mods:ftb-ultimine-neoforge:${propString("ftb_ultimine_1_21_1")}")
-    add("localRuntime", "dev.ftb.mods:ftb-ultimine-neoforge:${propString("ftb_ultimine_1_21_1")}") { isTransitive = false }
-    add("localRuntime", "dev.ftb.mods:ftb-library-neoforge:${propString("ftb_library_1_21_1")}") { isTransitive = false }
+    add("localRuntime", "dev.ftb.mods:ftb-ultimine-neoforge:${propString("ftb_ultimine_1_21_1")}") {
+        isTransitive = false
+    }
+    add("localRuntime", "dev.ftb.mods:ftb-library-neoforge:${propString("ftb_library_1_21_1")}") {
+        isTransitive = false
+    }
     add("localRuntime", "dev.architectury:architectury-neoforge:${propString("architectury_neoforge_1_21_1")}")
 }
 

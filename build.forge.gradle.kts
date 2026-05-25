@@ -76,18 +76,30 @@ val generateModMetadata by tasks.registering(ProcessResources::class) {
 }
 
 
-tasks.named<ProcessResources>("processResources") {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    inputs.property("mixin_compatibility", "JAVA_17")
-    inputs.property("pack_format", 15)
+val commonResourceProperties = mapOf(
+    "mixin_compatibility" to "JAVA_17",
+    "mod_id" to modId,
+    "pack_format" to 15
+)
 
-    filesMatching("crh.mixins.json") {
-        expand("mixin_compatibility" to "JAVA_17")
-    }
-    filesMatching("pack.mcmeta") {
-        expand("pack_format" to 15)
-    }
+val generateExpandedCommonResources by tasks.registering(ProcessResources::class) {
+    inputs.properties(commonResourceProperties)
+    filteringCharset = "UTF-8"
+    expand(commonResourceProperties)
+    from(
+        rootProject.file("src/main/resources/crh.mixins.json"),
+        rootProject.file("src/main/resources/pack.mcmeta")
+    )
+    into(layout.buildDirectory.dir("generated/sources/commonResources"))
 }
+
+
+tasks.named<ProcessResources>("processResources") {
+    // The expanded generated resources are added before raw resources below.
+    // EXCLUDE makes generated crh.mixins.json/pack.mcmeta win without failing on the raw templates.
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 
 sourceSets.named("main") {
     // Common code/resources stay in the original root src tree so Git history stays on src/**.
@@ -100,11 +112,12 @@ sourceSets.named("main") {
     )
     resources.setSrcDirs(
         listOf(
+            generateExpandedCommonResources,
+            rootProject.file("versions/${project.name}/src/main/resources"),
             rootProject.file("src/main/resources"),
-            rootProject.file("versions/${project.name}/src/main/resources")
+            generateModMetadata
         )
     )
-    resources.srcDir(generateModMetadata)
 }
 
 legacyForge {
@@ -151,7 +164,11 @@ mixin {
 }
 
 tasks.named<Jar>("jar") {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest.attributes("MixinConfigs" to "$modId.mixins.json")
+    from(layout.buildDirectory.dir("mixin")) {
+        include("$modId.refmap.json")
+    }
 }
 
 tasks.named("reobfJar") {
@@ -177,8 +194,9 @@ dependencies {
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1")!!)
     implementation("io.github.llamalad7:mixinextras-forge:0.4.1")
 
-    // Create Casing
-    modImplementation("fr.iglee42:CreateCasing:${propString("create_encased_1_20_1")}")
+    // Optional Create Casing compatibility. Keep it compile-only for production, but load it in dev runs.
+    modCompileOnly("fr.iglee42:CreateCasing:${propString("create_encased_1_20_1")}")
+    modRuntimeOnly("fr.iglee42:CreateCasing:${propString("create_encased_1_20_1")}")
 
     // FTB Ultimine
     modImplementation("dev.ftb.mods:ftb-ultimine-forge:${propString("ftb_ultimine_1_20_1")}") {
@@ -187,7 +205,8 @@ dependencies {
     modRuntimeOnly("dev.ftb.mods:ftb-library-forge:${propString("ftb_library_1_20_1")}") {
         isTransitive = false
     }
-    modImplementation("dev.architectury:architectury-forge:${propString("architectury_forge_1_20_1")}")
+    compileOnly("dev.architectury:architectury-forge:${propString("architectury_forge_1_20_1")}")
+    modRuntimeOnly("dev.architectury:architectury-forge:${propString("architectury_forge_1_20_1")}")
 }
 
 publishing {
