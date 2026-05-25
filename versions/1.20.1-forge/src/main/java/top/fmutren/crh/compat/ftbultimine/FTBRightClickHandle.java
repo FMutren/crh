@@ -10,7 +10,7 @@ public final class FTBRightClickHandle {
     public static void register() {
         RegisterRightClickHandlerEvent.REGISTER.register(registry ->
                 registry.registerHandler((context, hand, positions) ->
-                        FTBUltimineCommonHandler.handle(
+                        FtbUltimineCommonHandler.handle(
                                 context.player(),
                                 hand,
                                 positions,

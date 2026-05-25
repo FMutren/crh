@@ -50,4 +50,33 @@ public interface CreateBridge {
             boolean sneaking
     );
 
+    boolean isEncasedShaftOrCogwheel(BlockState state);
+
+    Item returnItemForState(BlockState state);
+
+    boolean tryBeltCasingFromItem(
+            ItemStack heldItem,
+            Level level,
+            BlockPos pos,
+            BlockState state,
+            Player player
+    );
+
+    boolean tryChuteEncasingWithItem(
+            ItemStack heldItem,
+            Level level,
+            BlockPos pos,
+            BlockState state,
+            Player player
+    );
+
+    boolean tryApplyChuteEncasing(
+            Level level,
+            BlockPos pos,
+            BlockState state,
+            Player player
+    );
+
+    boolean isChute(BlockState state);
+
 }

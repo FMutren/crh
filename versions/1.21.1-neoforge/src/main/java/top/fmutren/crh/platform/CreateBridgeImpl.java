@@ -4,11 +4,14 @@ import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.decoration.encasing.EncasableBlock;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.fluids.FluidTransportBehaviour;
+import com.simibubi.create.content.fluids.pipes.EncasedPipeBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
+import com.simibubi.create.content.logistics.chute.ChuteBlock;
 import fr.iglee42.createcasing.casings.CasingSet;
 import fr.iglee42.createcasing.casings.CasingSets;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -19,9 +22,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import top.fmutren.crh.CrhCommon;
 import top.fmutren.crh.api.BeltCasingKind;
 import top.fmutren.crh.api.ChainActionResult;
 import top.fmutren.crh.api.CreateBridge;
+import top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat;
 
 public final class CreateBridgeImpl implements CreateBridge {
 
@@ -68,11 +73,6 @@ public final class CreateBridgeImpl implements CreateBridge {
             return BeltCasingKind.COPPER;
         }
         return BeltCasingKind.NONE;
-    }
-
-    private static boolean hasCasingKind(ItemStack stack, CasingSet casingSet) {
-        var casing = casingSet.getCasing();
-        return casing != null && stack.is(casing.asItem());
     }
 
     @Override
@@ -150,6 +150,126 @@ public final class CreateBridgeImpl implements CreateBridge {
                 : wrenchable.onWrenched(state, context);
 
         return result.consumesAction() ? ChainActionResult.SUCCESS : ChainActionResult.PASS;
+    }
+
+    @Override
+    public boolean isEncasedShaftOrCogwheel(BlockState state) {
+        if (AllBlocks.ANDESITE_ENCASED_SHAFT.has(state)
+                || AllBlocks.BRASS_ENCASED_SHAFT.has(state)) {
+            return true;
+        }
+        if (AllBlocks.ANDESITE_ENCASED_COGWHEEL.has(state)
+                || AllBlocks.ANDESITE_ENCASED_LARGE_COGWHEEL.has(state)
+                || AllBlocks.BRASS_ENCASED_LARGE_COGWHEEL.has(state)
+                || AllBlocks.BRASS_ENCASED_COGWHEEL.has(state)) {
+            return true;
+        }
+        if (CrhCommon.loadCreateCasing) {
+            return CrhCreateCasingCompat.crhCreateCasingIsCasingShaft(state)
+                    || CrhCreateCasingCompat.crhCreateCasingIsCasingCogwheel(state);
+        }
+        return false;
+    }
+
+    @Override
+    public Item returnItemForState(BlockState state) {
+        if (state.getBlock() instanceof EncasedPipeBlock) {
+            return fluidPipeItem();
+        }
+        return state.getBlock().asItem();
+    }
+
+    @Override
+    public boolean tryBeltCasingFromItem(
+            ItemStack heldItem,
+            Level level,
+            BlockPos pos,
+            BlockState state,
+            Player player
+    ) {
+        if (AllBlocks.COPPER_CASING.isIn(heldItem) && !CrhCommon.loadCreateCasing) {
+            return false;
+        }
+        var kind = beltCasingKind(heldItem);
+        if (kind == BeltCasingKind.NONE) {
+            return false;
+        }
+        if (!applyBeltCasing(level, pos, state, kind, player)) {
+            return false;
+        }
+        playCasingSound(casingSoundBlock(heldItem), pos, level, player);
+        return true;
+    }
+
+    @Override
+    public boolean tryChuteEncasingWithItem(
+            ItemStack heldItem,
+            Level level,
+            BlockPos pos,
+            BlockState state,
+            Player player
+    ) {
+        if (!AllBlocks.INDUSTRIAL_IRON_BLOCK.isIn(heldItem) || !CrhCommon.loadCreateCasing) {
+            return false;
+        }
+        return tryApplyChuteEncasing(level, pos, state, player);
+    }
+
+    @Override
+    public boolean tryApplyChuteEncasing(
+            Level level,
+            BlockPos pos,
+            BlockState state,
+            Player player
+    ) {
+        if (!(state.getBlock() instanceof ChuteBlock)) {
+            return false;
+        }
+        var shape = state.getValue(ChuteBlock.SHAPE);
+        if (shape == ChuteBlock.Shape.ENCASED || shape == ChuteBlock.Shape.INTERSECTION) {
+            return false;
+        }
+        var newState = state.setValue(ChuteBlock.SHAPE, ChuteBlock.Shape.ENCASED);
+        level.setBlockAndUpdate(pos, newState);
+        playCasingSound(AllBlocks.INDUSTRIAL_IRON_BLOCK.get(), pos, level, player);
+        return true;
+    }
+
+    @Override
+    public boolean isChute(BlockState state) {
+        return state.getBlock() instanceof ChuteBlock;
+    }
+
+    private static void playCasingSound(
+            Block casingBlock,
+            BlockPos pos,
+            Level level,
+            Player player
+    ) {
+        var soundType = casingBlock.defaultBlockState().getSoundType(level, pos, player);
+        level.playSound(
+                null,
+                pos,
+                soundType.getPlaceSound(),
+                SoundSource.BLOCKS,
+                (soundType.getVolume() + 1.0F) / 2.0F,
+                soundType.getPitch() * 0.8F
+        );
+    }
+
+    private static Block casingSoundBlock(ItemStack heldItem) {
+        if (AllBlocks.COPPER_CASING.isIn(heldItem)) {
+            return AllBlocks.COPPER_CASING.get();
+        }
+        if (AllBlocks.BRASS_CASING.isIn(heldItem)) {
+            return AllBlocks.BRASS_CASING.get();
+        }
+        return AllBlocks.ANDESITE_CASING.get();
+    }
+
+    private static boolean hasCasingKind(ItemStack stack, CasingSet casingSet) {
+        var casing = casingSet.getCasing();
+        return casing != null && stack.is(casing.asItem());
     }
 
 }
