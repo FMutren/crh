@@ -1,10 +1,5 @@
 package top.fmutren.crh.interaction.util;
 
-import com.simibubi.create.AllBlocks;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.content.fluids.FluidTransportBehaviour;
-import com.simibubi.create.content.kinetics.belt.BeltBlock;
-import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -12,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -23,6 +17,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.ticks.TickPriority;
+import top.fmutren.crh.api.BeltCasingKind;
 import top.fmutren.crh.api.CrhServices;
 import top.fmutren.crh.interaction.ChainInteraction;
 import top.fmutren.crh.interaction.ChainSelection;
@@ -47,7 +42,7 @@ public final class ChainOperation {
 
         int changed = 0;
         BlockPos firstBeltChanged = null;
-        BeltBlockEntity.CasingType beltCasingType = PredicatesCreator.beltCasingType(stack);
+        BeltCasingKind beltCasingKind = CrhServices.create().beltCasingKind(stack);
         boolean creative = player.getAbilities().instabuild;
         Direction face = originalHit.getDirection();
 
@@ -62,8 +57,8 @@ public final class ChainOperation {
 
             BlockState current = level.getBlockState(targetPos);
 
-            if (beltCasingType != null && AllBlocks.BELT.has(current)) {
-                if (applySingleBeltCasing(level, targetPos, current, beltCasingType)) {
+            if (beltCasingKind != BeltCasingKind.NONE && CrhServices.create().isBelt(current)) {
+                if (CrhServices.create().applyBeltCasing(level, targetPos, current, beltCasingKind, player)) {
                     if (firstBeltChanged == null) {
                         firstBeltChanged = targetPos.immutable();
                     }
@@ -88,39 +83,10 @@ public final class ChainOperation {
         }
 
         if (firstBeltChanged != null) {
-            InteractionFeedback.playBeltCasingSound(level, player, firstBeltChanged, beltCasingType);
+            InteractionFeedback.playBeltCasingSound(level, player, firstBeltChanged, beltCasingKind);
         }
 
         return new ChainInteraction.ChainOperationResult(player, hand, selection, changed);
-    }
-
-    private static boolean applySingleBeltCasing(
-            Level level,
-            BlockPos targetPos,
-            BlockState current,
-            BeltBlockEntity.CasingType casingType
-    ) {
-        if (!(current.getBlock() instanceof BeltBlock beltBlock)) {
-            return false;
-        }
-
-        if (!(level.getBlockEntity(targetPos) instanceof BeltBlockEntity beltEntity)) {
-            return false;
-        }
-
-        if (beltEntity.casing == casingType) {
-            return false;
-        }
-
-        BlockState previousState = current;
-
-        beltEntity.setCasingType(casingType);
-        beltBlock.updateCoverProperty(level, targetPos, level.getBlockState(targetPos));
-        beltEntity.setChanged();
-
-        BlockState updatedState = level.getBlockState(targetPos);
-        level.sendBlockUpdated(targetPos, previousState, updatedState, Block.UPDATE_ALL);
-        return true;
     }
 
     public static BlockHitResult centerHit(BlockPos pos, Direction face) {
@@ -134,8 +100,8 @@ public final class ChainOperation {
             ItemStack stack,
             ChainSelection selection
     ) {
-        BeltBlockEntity.CasingType casingType = PredicatesCreator.beltCasingType(stack);
-        if (casingType == null || selection == null || selection.isEmpty()) {
+        BeltCasingKind casingKind = CrhServices.create().beltCasingKind(stack);
+        if (casingKind == BeltCasingKind.NONE || selection == null || selection.isEmpty()) {
             return new ChainInteraction.ChainOperationResult(player, hand, selection, 0);
         }
 
@@ -154,11 +120,11 @@ public final class ChainOperation {
 
             BlockState current = level.getBlockState(targetPos);
 
-            if (!AllBlocks.BELT.has(current)) {
+            if (!CrhServices.create().isBelt(current)) {
                 continue;
             }
 
-            if (applySingleBeltCasing(level, targetPos, current, casingType)) {
+            if (CrhServices.create().applyBeltCasing(level, targetPos, current, casingKind, player)) {
                 if (firstChanged == null) {
                     firstChanged = targetPos.immutable();
                 }
@@ -167,7 +133,7 @@ public final class ChainOperation {
         }
 
         if (firstChanged != null) {
-            InteractionFeedback.playBeltCasingSound(level, player, firstChanged, casingType);
+            InteractionFeedback.playBeltCasingSound(level, player, firstChanged, casingKind);
         }
 
         return new ChainInteraction.ChainOperationResult(player, hand, selection, changed);
@@ -235,7 +201,8 @@ public final class ChainOperation {
 
         boolean current = state.getValue(property);
 
-        if (current && AllBlocks.FLUID_PIPE.has(state) && PredicatesCreator.countOpenPipeFaces(state) <= 2) {
+        if (current && CrhServices.create().isPlainFluidPipe(state)
+                && PredicatesCreator.countOpenPipeFaces(state) <= 2) {
             if (showMessage) {
                 player.displayClientMessage(Component.translatable("crh.message.pipelowerthantwo")
                         .withStyle(ChatFormatting.RED), true);
@@ -246,10 +213,10 @@ public final class ChainOperation {
 
         BlockState updated = state.setValue(property, !current);
 
-        FluidTransportBehaviour.cacheFlows(level, pos);
+        CrhServices.create().beforePipeStateChange(level, pos);
         level.setBlock(pos, updated, Block.UPDATE_ALL);
         level.scheduleTick(pos, updated.getBlock(), 1, TickPriority.HIGH);
-        FluidTransportBehaviour.loadFlows(level, pos);
+        CrhServices.create().afterPipeStateChange(level, pos);
 
         level.playSound(null, pos, SoundEvents.COPPER_PLACE, SoundSource.BLOCKS, 0.6f, 1.2f);
 
@@ -279,20 +246,14 @@ public final class ChainOperation {
             }
 
             BlockState current = level.getBlockState(targetPos);
-            if (!(current.getBlock() instanceof IWrenchable wrenchable)) {
-                continue;
-            }
 
-            UseOnContext targetContext = new UseOnContext(
+            var targetContext = new UseOnContext(
                     player,
                     hand,
                     centerHit(targetPos, clickedFace)
             );
 
-            InteractionResult result = sneaking
-                    ? wrenchable.onSneakWrenched(current, targetContext)
-                    : wrenchable.onWrenched(current, targetContext);
-
+            var result = CrhServices.create().applyWrench(current, targetContext, sneaking);
             if (result.consumesAction()) {
                 changed++;
             }

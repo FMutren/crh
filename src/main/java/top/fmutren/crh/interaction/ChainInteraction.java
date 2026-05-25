@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import top.fmutren.crh.api.ChainActionResult;
+import top.fmutren.crh.api.BeltCasingKind;
 import top.fmutren.crh.api.CrhServices;
 import top.fmutren.crh.interaction.util.*;
 
@@ -39,7 +40,7 @@ public final class ChainInteraction {
         }
 
         if (level.isClientSide) {
-            if (AllBlocks.BELT.has(state) && PredicatesCreator.beltCasingType(stack) != null) {
+            if (AllBlocks.BELT.has(state) && CrhServices.create().beltCasingKind(stack) != BeltCasingKind.NONE) {
                 return ChainActionResult.PASS;
             }
             return ChainActionResult.SUCCESS;

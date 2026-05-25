@@ -1,7 +1,6 @@
 package top.fmutren.crh.interaction.util;
 
 import com.simibubi.create.AllBlocks;
-import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -9,10 +8,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
+import top.fmutren.crh.api.BeltCasingKind;
 import top.fmutren.crh.interaction.ChainSelection;
-
-import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.beltCasingTypeToCasing;
 
 public final class InteractionFeedback {
 
@@ -46,11 +43,12 @@ public final class InteractionFeedback {
             Level level,
             Player player,
             BlockPos pos,
-            BeltBlockEntity.CasingType casingType
+            BeltCasingKind casingType
     ) {
         var soundState = switch (casingType) {
             case ANDESITE -> AllBlocks.ANDESITE_CASING.getDefaultState();
             case BRASS -> AllBlocks.BRASS_CASING.getDefaultState();
+            case COPPER -> AllBlocks.COPPER_CASING.getDefaultState();
             case NONE -> null;
         };
 
