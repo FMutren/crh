@@ -5,12 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "CheckHelpersMixin",
-    "CreateBeltBlockMixin",
-    "CreateChuteBlockMixin",
-    "CreateCogWheelBlockMixin",
     "CreateEncasingBlockMixin",
-    "CreateFluidPipeMixin",
-    "CreateShaftBlockMixin",
     "CreateWrenchItemMixin"
   ],
   "client": [

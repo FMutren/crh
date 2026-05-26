@@ -17,8 +17,9 @@ import top.fmutren.crh.interaction.util.ChainKeyStateTracker;
 import top.fmutren.crh.network.ModMessages;
 
 import static top.fmutren.crh.input.RightClick.ENCASE_MAPPING;
-import static top.fmutren.crh.interaction.StateSwitch.isCasing;
-import static top.fmutren.crh.interaction.StateSwitch.isCreateWrench;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.isCasing;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.isWrench;
+
 
 public final class KeyDown {
 
@@ -27,43 +28,7 @@ public final class KeyDown {
     private KeyDown() {
     }
 
-    public static void tick(PlayerTickEvent.Post event) {
-        Player player = event.getEntity();
-        if (Minecraft.getInstance().player != player) return;
-        Level level = event.getEntity().level();
 
-
-        syncChainKeyState(player);
-
-        if (!Config.builtinChainAllowed()) return;
-
-        if (ENCASE_MAPPING.get().consumeClick()) {
-            String result = null;
-            ItemStack mainHand = player.getItemInHand(InteractionHand.MAIN_HAND);
-            ItemStack offHand = player.getItemInHand(InteractionHand.OFF_HAND);
-
-            if (isCreateWrench(mainHand) || isCreateWrench(offHand)) {
-                result = "crh.message.altdownwithwrench";
-            }
-
-            if (isCasing(mainHand) || isCasing(offHand)) {
-                result = "crh.message.altdownwithcasing";
-            }
-            if (result == null) return;
-            player.displayClientMessage(Component.translatable(result).withStyle(ChatFormatting.GREEN), true);
-        }
-
-        if(ENCASE_MAPPING.get().isDown()) {
-            if(!level.isClientSide) return;
-            BlockHitResult hit = (BlockHitResult) Minecraft.getInstance().hitResult;
-            BlockPos pos = hit.getBlockPos();
-            ItemStack mainHand = player.getItemInHand(InteractionHand.MAIN_HAND);
-            if(Config.enableView()) {
-                ChainRender instance = new ChainRender();
-                instance.getToRender(level, pos, mainHand);
-            }
-        }
-    }
 
     public static void syncChainKeyState(Player player) {
         if (!Config.builtinChainAllowed()) {

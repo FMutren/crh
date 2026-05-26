@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 
 import static top.fmutren.crh.Crh.loadCreateCasing;
 import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.crhCreateCasingPredicate;
-import static top.fmutren.crh.interaction.StateSwitch.isCasing;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.isCasing;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isEncasedPipe;
 
 public final class TargetSelector {
@@ -28,7 +28,7 @@ public final class TargetSelector {
             if(AllBlocks.COPPER_CASING.has(state) || loadCreateCasing) return ChainCollector.collectPipe(level, pos, AllBlocks.FLUID_PIPE::has, Config.maxPipeBlocks());
         }
 
-        if (PredicatesCreator.isShaftCasing(stack) && AllBlocks.SHAFT.has(state)) {
+        if (PredicatesCreator.isCommonCasing(stack) && AllBlocks.SHAFT.has(state)) {
             Direction.Axis axis = state.getValue(ShaftBlock.AXIS);
             return ChainCollector.collectShaft(level, pos, axis, AllBlocks.SHAFT::has, Config.maxShaftBlocks());
         }
@@ -46,11 +46,12 @@ public final class TargetSelector {
             Predicate<BlockState> predicate = AllBlocks.ENCASED_FLUID_PIPE::has;
             if(loadCreateCasing && !AllBlocks.ENCASED_FLUID_PIPE.has(state)) {
                 predicate = crhCreateCasingPredicate(state);
+                if (predicate == null) return ChainSelection.empty();
             }
             return ChainCollector.collectPipe(level, pos, predicate, Config.maxPipeBlocks());
         }
 
-        if (!sneaking && PredicatesCreator.isBeltWithCasing(level, pos, state)) {
+        if (!sneaking && PredicatesCreator.isEncasedBelt(level, pos, state)) {
             return ChainCollector.collectBelt(
                     level,
                     pos,

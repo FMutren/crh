@@ -29,6 +29,8 @@ import top.fmutren.crh.Config;
 import top.fmutren.crh.interaction.ChainInteraction;
 import top.fmutren.crh.interaction.ChainSelection;
 
+import static top.fmutren.crh.interaction.TryToEncase.tryToEncaseBelt;
+
 public final class ChainOperation {
 
     private ChainOperation() {
@@ -48,7 +50,6 @@ public final class ChainOperation {
         }
 
         int changed = 0;
-        BlockPos firstBeltChanged = null;
         BeltBlockEntity.CasingType beltCasingType = PredicatesCreator.beltCasingType(stack);
         boolean creative = player.getAbilities().instabuild;
         Direction face = originalHit.getDirection();
@@ -65,10 +66,8 @@ public final class ChainOperation {
             BlockState current = level.getBlockState(targetPos);
 
             if (beltCasingType != null && AllBlocks.BELT.has(current)) {
-                if (applySingleBeltCasing(level, targetPos, current, beltCasingType)) {
-                    if (firstBeltChanged == null) {
-                        firstBeltChanged = targetPos.immutable();
-                    }
+                if (tryToEncaseBelt(stack, targetPos, level)) {
+                    InteractionFeedback.playBeltCasingSound(level, player, targetPos, beltCasingType);
                     changed++;
                 }
                 continue;
@@ -92,11 +91,6 @@ public final class ChainOperation {
                 changed++;
             }
         }
-
-        if (firstBeltChanged != null) {
-            InteractionFeedback.playBeltCasingSound(level, player, firstBeltChanged, beltCasingType);
-        }
-
         return new ChainInteraction.ChainOperationResult(player, hand, selection, changed);
     }
 
@@ -118,14 +112,12 @@ public final class ChainOperation {
             return false;
         }
 
-        BlockState previousState = current;
-
         beltEntity.setCasingType(casingType);
         beltBlock.updateCoverProperty(level, targetPos, level.getBlockState(targetPos));
         beltEntity.setChanged();
 
         BlockState updatedState = level.getBlockState(targetPos);
-        level.sendBlockUpdated(targetPos, previousState, updatedState, Block.UPDATE_ALL);
+        level.sendBlockUpdated(targetPos, current, updatedState, Block.UPDATE_ALL);
         return true;
     }
 

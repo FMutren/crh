@@ -13,6 +13,8 @@ import top.fmutren.crh.interaction.util.ChainCollector;
 
 import static top.fmutren.crh.interaction.StateSwitch.pipeSwitchToBlockState;
 import static top.fmutren.crh.interaction.StateSwitch.shaftSwitchToBlockState;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.isCommonCasing;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.isPipeCasing;
 import static top.fmutren.crh.render.OuterContourRender.renderGhostBlock;
 
 public class ChainRender {
@@ -23,17 +25,17 @@ public class ChainRender {
     }
 
     public void getToRender(Level level, BlockPos pos, ItemStack item) {
-        ChainSelection selection = chainSelectionToRender(level, pos);
+        ChainSelection selection = chainSelectionToRender(level, pos, item);
         if (selection == null) return;
         renderChainGhostBlock(selection, item, level);
     }
 
     private BlockState stateSwitch(BlockState state, ItemStack item) {
         switch (state.getBlock()) {
-            case ShaftBlock shaft -> {
+            case ShaftBlock ignored -> {
                 return shaftSwitchToBlockState(item, state);
             }
-            case PipeBlock pipe -> {
+            case PipeBlock ignored -> {
                 return pipeSwitchToBlockState(item, state);
             }
             default -> {
@@ -52,14 +54,15 @@ public class ChainRender {
         }
     }
 
-    private ChainSelection chainSelectionToRender(Level level, BlockPos pos){
+    private ChainSelection chainSelectionToRender(Level level, BlockPos pos, ItemStack item){
         BlockState state = level.getBlockState(pos);
         boolean isEncasableBlock = (state.getBlock() instanceof EncasableBlock);
         if(isEncasableBlock != isLookFirst){
             isLookFirst = isEncasableBlock;
             if(isLookFirst){
                 switch (state.getBlock()) {
-                    case ShaftBlock shaft -> {
+                    case ShaftBlock ignored -> {
+                        if(!isCommonCasing(item)) return ChainSelection.empty();
                         chainSelection = ChainCollector.collectShaft(
                                 level,
                                 pos,
@@ -67,16 +70,15 @@ public class ChainRender {
                                 AllBlocks.SHAFT::has,
                                 Config.maxShaftBlocks()
                         );
-                        return chainSelection;
                     }
-                    case PipeBlock pipe -> {
+                    case PipeBlock ignored -> {
+                        if(!isPipeCasing(item)) return ChainSelection.empty();
                         chainSelection = ChainCollector.collectPipe(
                                 level,
                                 pos,
                                 AllBlocks.FLUID_PIPE::has,
                                 Config.maxPipeBlocks()
                         );
-                        return chainSelection;
                     }
                     default -> {
                         return ChainSelection.empty();

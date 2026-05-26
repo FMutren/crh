@@ -1,9 +1,9 @@
 package top.fmutren.crh.interaction.util;
 
 import com.simibubi.create.AllBlocks;
+import com.simibubi.create.content.equipment.wrench.WrenchItem;
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
-import fr.iglee42.createcasing.casings.CasingSets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -14,8 +14,8 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import top.fmutren.crh.interaction.StateSwitch;
 
 import static top.fmutren.crh.Crh.loadCreateCasing;
-import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.crhCreateCasingIsCasingPipe;
-import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.crhCreateCasingIsCasingShaft;
+import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.*;
+import static top.fmutren.crh.interaction.StateSwitch.iterationTypeForItem;
 
 public class PredicatesCreator {
 
@@ -45,26 +45,27 @@ public class PredicatesCreator {
     }
 
     public static boolean isEncasedShaft(BlockState state) {
+        if(AllBlocks.ANDESITE_ENCASED_SHAFT.has(state) ||
+                AllBlocks.BRASS_ENCASED_SHAFT.has(state)) return true;
 
         if(loadCreateCasing){
-            boolean isCreateCasingShaft = crhCreateCasingIsCasingShaft(state);
-            if(isCreateCasingShaft) return true;
+            return crhCreateCasingIsCasingShaft(state);
         }
 
-        if(AllBlocks.ANDESITE_ENCASED_SHAFT.has(state)) return true;
-        return AllBlocks.BRASS_ENCASED_SHAFT.has(state);
+        return false;
     }
 
     public static  boolean isEncasedPipe(BlockState state){
         if(AllBlocks.ENCASED_FLUID_PIPE.has(state)) return true;
+
         if(loadCreateCasing){
-            boolean isCreateCasingPipi = crhCreateCasingIsCasingPipe(state);
-            if(isCreateCasingPipi) return true;
+            return crhCreateCasingIsCasingPipe(state);
         }
+
         return false;
     }
 
-    public static boolean isBeltWithCasing(Level level, BlockPos pos, BlockState state) {
+    public static boolean isEncasedBelt(Level level, BlockPos pos, BlockState state) {
         if (!AllBlocks.BELT.has(state)) {
             return false;
         }
@@ -77,31 +78,34 @@ public class PredicatesCreator {
                 && belt.casing != BeltBlockEntity.CasingType.NONE;
     }
 
-    public static boolean isShaftCasing(ItemStack stack) {
-        return StateSwitch.commonSwitchForHeldItem(stack) == 1;
-    }
-
     public static BeltBlockEntity.CasingType beltCasingType(ItemStack stack) {
-        if (AllBlocks.ANDESITE_CASING.isIn(stack)) return BeltBlockEntity.CasingType.ANDESITE;
 
+        if (AllBlocks.ANDESITE_CASING.isIn(stack)) return BeltBlockEntity.CasingType.ANDESITE;
         if (AllBlocks.BRASS_CASING.isIn(stack)) return BeltBlockEntity.CasingType.BRASS;
 
         if(loadCreateCasing){
-            if(AllBlocks.COPPER_CASING.isIn(stack)) return CasingSets.COPPER.getBeltCasingType();
-
-            if(AllBlocks.RAILWAY_CASING.isIn(stack)) return CasingSets.RAILWAY.getBeltCasingType();
-
-            if(CasingSets.INDUSTRIAL_IRON.getCasing().asItem().equals(stack.getItem())) return CasingSets.INDUSTRIAL_IRON.getBeltCasingType();
-
-            if(CasingSets.SHADOW_STEEL.getCasing().asItem().equals(stack.getItem())) return CasingSets.SHADOW_STEEL.getBeltCasingType();
-
-            if(CasingSets.CREATIVE.getCasing().asItem().equals(stack.getItem())) return CasingSets.CREATIVE.getBeltCasingType();
-
-            if(CasingSets.WEATHERED_IRON.getCasing().asItem().equals(stack.getItem())) return CasingSets.WEATHERED_IRON.getBeltCasingType();
-
-            if(CasingSets.REFINED_RADIANCE.getCasing().asItem().equals(stack.getItem())) return CasingSets.REFINED_RADIANCE.getBeltCasingType();
+            return crhCreateCasingBeltCasingType(stack);
         }
 
         return null;
+    }
+
+    public static boolean isCommonCasing(ItemStack stack) {
+        return iterationTypeForItem(stack) == StateSwitch.iterationType.COMMON_CASING;
+    }
+
+    public static boolean isPipeCasing(ItemStack stack) {
+        return iterationTypeForItem(stack) == StateSwitch.iterationType.PIPE_CASING||
+                iterationTypeForItem(stack) == StateSwitch.iterationType.COMMON_CASING &&
+                loadCreateCasing;
+    }
+
+    public static boolean isCasing(ItemStack itemStack) {
+        return(iterationTypeForItem(itemStack) != StateSwitch.iterationType.WRENCH &&
+                iterationTypeForItem(itemStack) != StateSwitch.iterationType.UNKNOWN);
+    }
+
+    public static boolean isWrench(ItemStack stack) {
+        return stack.getItem() instanceof WrenchItem;
     }
 }

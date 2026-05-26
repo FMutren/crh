@@ -46,7 +46,7 @@ public class CheckHelpersMixin {
         BlockPos pos = ray.getBlockPos();
 
         if(world.getBlockState(pos).getBlock() instanceof EncasableBlock && ENCASE_MAPPING.get().isDown() && enableView()) {
-            if (StateSwitch.commonSwitchForHeldItem(mc.player.getMainHandItem()) != -1) {
+            if (StateSwitch.iterationTypeForItem(mc.player.getMainHandItem()) != StateSwitch.iterationType.UNKNOWN) {
                 setTarget(pos);
             }
         }

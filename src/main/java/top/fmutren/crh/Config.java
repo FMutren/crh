@@ -14,6 +14,7 @@ public final class Config {
     public static final ModConfigSpec SPEC;
     public static final ModConfigSpec.BooleanValue ENABLE_VIEW;
     public static final ModConfigSpec.BooleanValue ENABLE_EMPTY_HAND_MODIFY_PIPE;
+    public static final ModConfigSpec.BooleanValue ENABLE_AUTO_INTERACTION;
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
     static {
@@ -42,6 +43,11 @@ public final class Config {
         ENABLE_EMPTY_HAND_MODIFY_PIPE = BUILDER
                 .comment("Enable empty hand can modify pipe.")
                 .define("enableEmptyHandPipe", true);
+
+        ENABLE_AUTO_INTERACTION = BUILDER
+                .comment("Enable auto encase or open window for chute or fluid pipe when take casing or wrench by off hand")
+                .define("enableAutoInteraction", true);
+
 
         COMPAT_FTB_ULTIMINE = BUILDER
                 .comment("Enable FTB Ultimine compatibility. When FTB Ultimine is installed, CRH will use Ultimine-selected blocks for chain operations.")
@@ -80,6 +86,10 @@ public final class Config {
 
     public static boolean enableEmptyHandModifyPipe() {
         return ENABLE_EMPTY_HAND_MODIFY_PIPE.get();
+    }
+
+    public static boolean enableAutoInteraction() {
+        return ENABLE_AUTO_INTERACTION.get();
     }
 
     public static boolean builtinChainAllowed() {

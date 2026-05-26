@@ -10,9 +10,12 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import top.fmutren.crh.compat.ftbultimine.FTBUltimineCompat;
+import top.fmutren.crh.event.BlockEventCreator;
+import top.fmutren.crh.event.PlayerEventCreator;
 import top.fmutren.crh.input.ClientEventRegister;
 import top.fmutren.crh.network.ModMessages;
-import top.fmutren.crh.server.ServerEventHandlers;
+
+import static top.fmutren.crh.Config.enableAutoInteraction;
 
 @Mod(Crh.MODID)
 public final class Crh {
@@ -24,15 +27,12 @@ public final class Crh {
     public Crh(IEventBus modBus, ModContainer modContainer) {
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
         modBus.addListener(ModMessages::registerPayloads);
-        NeoForge.EVENT_BUS.addListener(ServerEventHandlers::onPlayerLoggedOut);
+        NeoForge.EVENT_BUS.addListener(PlayerEventCreator::onPlayerLoggedOut);
+        NeoForge.EVENT_BUS.addListener(BlockEventCreator::onBlockPlace);
 
-        if (ModList.get().isLoaded("ftbultimine")) {
-            FTBUltimineCompat.register();
-        }
+        if (ModList.get().isLoaded("ftbultimine")) FTBUltimineCompat.register();
 
-        if (FMLEnvironment.dist == Dist.CLIENT) {
-            ClientEventRegister.register(modBus);
-        }
+        if (FMLEnvironment.dist == Dist.CLIENT) ClientEventRegister.register(modBus);
 
         if (ModList.get().isLoaded("createcasing")) loadCreateCasing = true;
     }
