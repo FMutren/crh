@@ -12,6 +12,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import top.fmutren.crh.interaction.ChainSelection;
 
+import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.crhCreateCasingBeltCasingTypeToCasing;
+
 public final class InteractionFeedback {
 
     private InteractionFeedback() {
@@ -44,6 +46,8 @@ public final class InteractionFeedback {
             case ANDESITE -> AllBlocks.ANDESITE_CASING.getDefaultState();
             case BRASS -> AllBlocks.BRASS_CASING.getDefaultState();
             case NONE -> null;
+            default ->  crhCreateCasingBeltCasingTypeToCasing(casingType);
+
         };
         if (soundState == null) {
             return;

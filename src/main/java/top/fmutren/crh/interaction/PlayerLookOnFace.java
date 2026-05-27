@@ -8,7 +8,10 @@ import net.minecraft.world.phys.Vec3;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isPipeOpen;
 
 public class PlayerLookOnFace {
-    public static Direction getPlayerLookingFace(Player player) {
+
+    private PlayerLookOnFace() {}
+
+    public static Direction getPlayerDirection(Player player) {
         if (player == null) return Direction.UP;
 
         Vec3 look = player.getLookAngle();
@@ -30,12 +33,12 @@ public class PlayerLookOnFace {
         }
     }
 
-    public static Direction.Axis FaceToAxis(Direction face) {
+    private static Direction.Axis FaceToAxis(Direction face) {
         if(face == null) return Direction.Axis.Y;
         return face.getAxis();
     }
 
-    public static Direction.Axis FluidPipeFace(Player player, BlockState state) {
+    public static Direction.Axis fluidPipeFace(Player player, BlockState state) {
         int x = 0, y = 0, z = 0;
         for (Direction dir : Direction.values()){
             switch (dir){
@@ -53,6 +56,6 @@ public class PlayerLookOnFace {
         if(x > y && x > z) return Direction.Axis.X;
         else if(y > x && y > z) return Direction.Axis.Y;
         else if(z > x && z > y) return Direction.Axis.Z;
-        return FaceToAxis(getPlayerLookingFace(player));
+        return FaceToAxis(getPlayerDirection(player));
     }
 }
