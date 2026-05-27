@@ -5,13 +5,10 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "crh_forge.refmap.json",
   "mixins": [
-    "CreateBeltBlockMixin",
-    "CreateChuteBlockMixin",
-    "CreateCogWheelBlockMixin",
+    "CheckHelpersMixin",
     "CreateEncasingBlockMixin",
-    "CreateFluidPipeMixin",
-    "CreateShaftBlockMixin",
-    "CreateWrenchItemMixin"
+    "CreateWrenchItemMixin",
+    "compat.ftbcompat.FTBUltimineCompatMixin"
   ],
   "client": [
   ],

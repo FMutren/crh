@@ -11,17 +11,24 @@ import net.minecraft.world.level.block.state.BlockState;
 import top.fmutren.crh.Config;
 import top.fmutren.crh.interaction.ChainSelection;
 
+import java.util.function.Predicate;
+
+import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.crhCreateCasingPredicate;
+import static top.fmutren.crh.crh_forge.loadCreateCasing;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.isCasing;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.isEncasedPipe;
+
 public final class TargetSelector {
 
     private TargetSelector() {
     }
 
     public static ChainSelection selectEncasing(Level level, BlockPos pos, BlockState state, ItemStack stack) {
-        if (AllBlocks.COPPER_CASING.isIn(stack) && AllBlocks.FLUID_PIPE.has(state)) {
-            return ChainCollector.collectPipe(level, pos, AllBlocks.FLUID_PIPE::has, Config.maxPipeBlocks());
+        if (isCasing(stack) && AllBlocks.FLUID_PIPE.has(state)) {
+            if(AllBlocks.COPPER_CASING.has(state) || loadCreateCasing) return ChainCollector.collectPipe(level, pos, AllBlocks.FLUID_PIPE::has, Config.maxPipeBlocks());
         }
 
-        if (PredicatesCreator.isShaftCasing(stack) && AllBlocks.SHAFT.has(state)) {
+        if (PredicatesCreator.isCommonCasing(stack) && AllBlocks.SHAFT.has(state)) {
             Direction.Axis axis = state.getValue(ShaftBlock.AXIS);
             return ChainCollector.collectShaft(level, pos, axis, AllBlocks.SHAFT::has, Config.maxShaftBlocks());
         }
@@ -35,11 +42,16 @@ public final class TargetSelector {
     }
 
     public static ChainSelection select(Level level, BlockPos pos, BlockState state, boolean sneaking) {
-        if (!sneaking && AllBlocks.ENCASED_FLUID_PIPE.has(state)) {
-            return ChainCollector.collectPipe(level, pos, AllBlocks.ENCASED_FLUID_PIPE::has, Config.maxPipeBlocks());
+        if (!sneaking && isEncasedPipe(state)) {
+            Predicate<BlockState> predicate = AllBlocks.ENCASED_FLUID_PIPE::has;
+            if(loadCreateCasing && !AllBlocks.ENCASED_FLUID_PIPE.has(state)) {
+                predicate = crhCreateCasingPredicate(state);
+                if (predicate == null) return ChainSelection.empty();
+            }
+            return ChainCollector.collectPipe(level, pos, predicate, Config.maxPipeBlocks());
         }
 
-        if (!sneaking && PredicatesCreator.isBeltWithCasing(level, pos, state)) {
+        if (!sneaking && PredicatesCreator.isEncasedBelt(level, pos, state)) {
             return ChainCollector.collectBelt(
                     level,
                     pos,

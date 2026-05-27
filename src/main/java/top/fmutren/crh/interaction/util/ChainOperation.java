@@ -28,6 +28,8 @@ import top.fmutren.crh.Config;
 import top.fmutren.crh.interaction.ChainInteraction;
 import top.fmutren.crh.interaction.ChainSelection;
 
+import static top.fmutren.crh.interaction.TryToEncase.tryToEncaseBelt;
+
 public final class ChainOperation {
 
     private ChainOperation() {
@@ -42,7 +44,7 @@ public final class ChainOperation {
             ChainSelection selection
     ) {
         if (PredicatesCreator.beltCasingType(stack) != null && targetsBelt(level, selection)) {
-            return applyBelt(level, player, hand, stack, selection);
+            return applyBelt(level, player, hand, originalHit, stack, selection);
         }
 
         int changed = 0;
@@ -88,17 +90,19 @@ public final class ChainOperation {
             Level level,
             Player player,
             InteractionHand hand,
+            BlockHitResult originalHit,
             ItemStack stack,
             ChainSelection selection
     ) {
-        BeltBlockEntity.CasingType casingType = PredicatesCreator.beltCasingType(stack);
-        if (casingType == null) {
+        if (level == null || player == null || hand == null || originalHit == null
+                || stack == null || selection == null || selection.isEmpty()) {
             return new ChainInteraction.ChainOperationResult(player, hand, selection, 0);
         }
 
         int changed = 0;
-        BlockPos firstChanged = null;
+        BeltBlockEntity.CasingType beltCasingType = PredicatesCreator.beltCasingType(stack);
         boolean creative = player.getAbilities().instabuild;
+        Direction face = originalHit.getDirection();
 
         for (BlockPos targetPos : selection.positions()) {
             if (!creative && stack.isEmpty()) {
@@ -110,38 +114,33 @@ public final class ChainOperation {
             }
 
             BlockState current = level.getBlockState(targetPos);
-            if (!AllBlocks.BELT.has(current)) {
+
+            if (beltCasingType != null && AllBlocks.BELT.has(current)) {
+                if (tryToEncaseBelt(stack, targetPos, level)) {
+                    InteractionFeedback.playBeltCasingSound(level, player, targetPos, beltCasingType);
+                    changed++;
+                }
                 continue;
             }
 
-            if (!(current.getBlock() instanceof BeltBlock beltBlock)) {
+            if (!(current.getBlock() instanceof EncasableBlock encasableBlock)) {
                 continue;
             }
 
-            if (!(level.getBlockEntity(targetPos) instanceof BeltBlockEntity beltEntity)) {
-                continue;
-            }
+            InteractionResult result = encasableBlock.tryEncase(
+                    current,
+                    level,
+                    targetPos,
+                    stack,
+                    player,
+                    hand,
+                    centerHit(targetPos, face)
+            );
 
-            if (beltEntity.casing == casingType) {
-                continue;
+            if (result.consumesAction()) {
+                changed++;
             }
-
-            BlockState previousState = current;
-            beltEntity.setCasingType(casingType);
-            beltBlock.updateCoverProperty(level, targetPos, level.getBlockState(targetPos));
-            beltEntity.setChanged();
-            level.sendBlockUpdated(targetPos, previousState, level.getBlockState(targetPos), Block.UPDATE_ALL);
-
-            if (firstChanged == null) {
-                firstChanged = targetPos.immutable();
-            }
-            changed++;
         }
-
-        if (firstChanged != null) {
-            InteractionFeedback.playBeltCasingSound(level, player, firstChanged, casingType);
-        }
-
         return new ChainInteraction.ChainOperationResult(player, hand, selection, changed);
     }
 

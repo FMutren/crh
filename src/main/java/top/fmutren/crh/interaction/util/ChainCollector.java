@@ -1,6 +1,5 @@
 package top.fmutren.crh.interaction.util;
 
-
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -118,31 +117,6 @@ public final class ChainCollector {
         return new ChainSelection(ordered, truncated);
     }
 
-    private static boolean isAllowed(Level level, BlockPos pos, Predicate<BlockState> allowedState) {
-        return level.isLoaded(pos) && allowedState.test(level.getBlockState(pos));
-    }
-
-    private static BlockPos relative(BlockPos pos, Direction.Axis axis, int amount) {
-        return switch (axis) {
-            case X -> pos.offset(amount, 0, 0);
-            case Y -> pos.offset(0, amount, 0);
-            case Z -> pos.offset(0, 0, amount);
-        };
-    }
-
-    private static boolean hasNextAllowed(
-            Level level,
-            BlockPos origin,
-            Direction.Axis axis,
-            Predicate<BlockState> allowedState,
-            int distance,
-            boolean negativeOpen,
-            boolean positiveOpen
-    ) {
-        return (negativeOpen && isAllowed(level, relative(origin, axis, -distance), allowedState))
-                || (positiveOpen && isAllowed(level, relative(origin, axis, distance), allowedState));
-    }
-
     public static ChainSelection collectPipe(
             Level level,
             BlockPos origin,
@@ -201,6 +175,31 @@ public final class ChainCollector {
         }
 
         return new ChainSelection(ordered, truncated);
+    }
+
+    private static boolean hasNextAllowed(
+            Level level,
+            BlockPos origin,
+            Direction.Axis axis,
+            Predicate<BlockState> allowedState,
+            int distance,
+            boolean negativeOpen,
+            boolean positiveOpen
+    ) {
+        return (negativeOpen && isAllowed(level, relative(origin, axis, -distance), allowedState))
+                || (positiveOpen && isAllowed(level, relative(origin, axis, distance), allowedState));
+    }
+
+    private static boolean isAllowed(Level level, BlockPos pos, Predicate<BlockState> allowedState) {
+        return level.isLoaded(pos) && allowedState.test(level.getBlockState(pos));
+    }
+
+    private static BlockPos relative(BlockPos pos, Direction.Axis axis, int amount) {
+        return switch (axis) {
+            case X -> pos.offset(amount, 0, 0);
+            case Y -> pos.offset(0, amount, 0);
+            case Z -> pos.offset(0, 0, amount);
+        };
     }
 
 }

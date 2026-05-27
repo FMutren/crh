@@ -13,6 +13,7 @@ import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import org.lwjgl.glfw.GLFW;
+import top.fmutren.crh.Config;
 import top.fmutren.crh.network.ModMessages;
 import top.fmutren.crh.network.packet.PipeNetWorkHandle;
 
@@ -35,6 +36,7 @@ public final class RightClick {
     public static void rightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         Level level = event.getLevel();
         if (!level.isClientSide) return;
+        if (!Config.builtinChainAllowed()) return;
 
         syncChainKeyState(event.getEntity());
 
@@ -48,7 +50,7 @@ public final class RightClick {
         ModMessages.sendToServer(new PipeNetWorkHandle(
                 event.getPos(),
                 event.getFace(),
-                InteractionHand.OFF_HAND,
+                hand,
                 event.getEntity().isShiftKeyDown()
         ));
 
