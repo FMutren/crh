@@ -54,6 +54,14 @@ public class CrhCreateCasingCompat {
         return false;
     }
 
+    public static boolean crhCreateCasingIsCasingCogWheel(BlockState state){
+        for(CasingSet casingSets : CASING){
+            if(casingSets.getCogwheel().equals(state.getBlock())) return true;
+            if(casingSets.getLargeCogwheel().equals(state.getBlock())) return true;
+        }
+        return false;
+    }
+
     public static  boolean crhCreateCasingIsCasingPipe(BlockState state){
         for(CasingSet casingSets : CASING){
             if(casingSets.getFluidPipe().equals(state.getBlock())) return true;

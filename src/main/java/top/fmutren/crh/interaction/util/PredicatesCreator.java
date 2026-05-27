@@ -55,6 +55,19 @@ public class PredicatesCreator {
         return false;
     }
 
+    public static boolean isEncasedCogwheel(BlockState state) {
+        if(AllBlocks.ANDESITE_ENCASED_COGWHEEL.has(state) ||
+                AllBlocks.BRASS_ENCASED_COGWHEEL.has(state) ||
+                AllBlocks.ANDESITE_ENCASED_LARGE_COGWHEEL.has(state) ||
+                AllBlocks.BRASS_ENCASED_LARGE_COGWHEEL.has(state)) return true;
+
+        if(loadCreateCasing){
+            return crhCreateCasingIsCasingCogWheel(state);
+        }
+
+        return false;
+    }
+
     public static  boolean isEncasedPipe(BlockState state){
         if(AllBlocks.ENCASED_FLUID_PIPE.has(state)) return true;
 
