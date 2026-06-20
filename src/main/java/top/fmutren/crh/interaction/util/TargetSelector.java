@@ -24,13 +24,17 @@ public final class TargetSelector {
     }
 
     public static ChainSelection selectEncasing(Level level, BlockPos pos, BlockState state, ItemStack stack) {
-        if (isCasing(stack) && AllBlocks.FLUID_PIPE.has(state)) {
+        if (AllBlocks.FLUID_PIPE.has(state)) {
             if(AllBlocks.COPPER_CASING.has(state) || loadCreateCasing) return ChainCollector.collectPipe(level, pos, AllBlocks.FLUID_PIPE::has, Config.maxPipeBlocks());
         }
 
         if (PredicatesCreator.isCommonCasing(stack) && AllBlocks.SHAFT.has(state)) {
             Direction.Axis axis = state.getValue(ShaftBlock.AXIS);
             return ChainCollector.collectShaft(level, pos, axis, AllBlocks.SHAFT::has, Config.maxShaftBlocks());
+        }
+
+        if (AllBlocks.INDUSTRIAL_IRON_BLOCK.isIn(stack) && AllBlocks.CHUTE.has(state)) {
+            return ChainCollector.collectChute(level, pos, AllBlocks.CHUTE::has, Config.maxChuteBlocks());
         }
 
         BeltBlockEntity.CasingType casingType = PredicatesCreator.beltCasingType(stack);

@@ -13,6 +13,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import top.fmutren.crh.interaction.StateSwitch;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+
+import static com.simibubi.create.content.logistics.chute.ChuteBlock.FACING;
+import static com.simibubi.create.content.logistics.chute.ChuteBlock.SHAPE;
+import static com.simibubi.create.content.logistics.chute.ChuteBlock.Shape.INTERSECTION;
 import static top.fmutren.crh.Crh.loadCreateCasing;
 import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.*;
 import static top.fmutren.crh.interaction.StateSwitch.iterationTypeForItem;
@@ -101,6 +108,82 @@ public class PredicatesCreator {
         }
 
         return null;
+    }
+
+    public static BlockPos[] getAroundBlockPos(BlockPos pos){
+         BlockPos[] blockPosArr = new BlockPos[6];
+         blockPosArr[0] = pos.above();
+         blockPosArr[1] = pos.below();
+         blockPosArr[2] = pos.north();
+         blockPosArr[3] = pos.south();
+         blockPosArr[4] = pos.west();
+         blockPosArr[5] = pos.east();
+         return blockPosArr;
+    }
+
+    public static List<BlockPos> getConnectedChute(Level level, BlockPos pos, Predicate<BlockState> allowedBlock){
+        if(level == null || allowedBlock == null || pos == null) return new ArrayList<>();
+
+        List<BlockPos> chute = new ArrayList<>();
+        BlockState originState = level.getBlockState(pos);
+
+        if(!allowedBlock.test(originState)) return new ArrayList<>();
+
+        switch (originState.getValue(FACING)){
+            case DOWN-> {
+                if (allowedBlock.test(level.getBlockState(pos.above()))) chute.add(pos.above());
+                if (allowedBlock.test(level.getBlockState(pos.below()))) chute.add(pos.below());
+            }
+            case NORTH -> {
+                if(allowedBlock.test(level.getBlockState(pos.north().below()))) chute.add(pos.north().below());
+            }
+            case SOUTH -> {
+                if(allowedBlock.test(level.getBlockState(pos.south().below()))) chute.add(pos.south().below());
+            }
+            case WEST -> {
+                if(allowedBlock.test(level.getBlockState(pos.west().below()))) chute.add(pos.west().below());
+            }
+            case EAST -> {
+                if(allowedBlock.test(level.getBlockState(pos.east().below()))) chute.add(pos.east().below());
+            }
+        }
+
+        if(originState.getValue(SHAPE).equals(INTERSECTION)){
+            BlockPos[] around = getAroundBlockPos(pos);
+            for(int i = 2; i < 6; i++){
+                BlockPos nextPos = around[i].above();
+                BlockState nextState = level.getBlockState(nextPos);
+                if(allowedBlock.test(nextState)){
+                    switch (i){
+                        case 2 -> {
+                            if(allowedBlock.test(nextState)){
+                                if (nextState.getValue(FACING).equals(Direction.SOUTH))
+                                    chute.add(nextPos);
+                            }
+                        }
+                        case 3 -> {
+                            if(allowedBlock.test(nextState)){
+                                if (nextState.getValue(FACING).equals(Direction.NORTH))
+                                    chute.add(nextPos);
+                            }
+                        }
+                        case 4 -> {
+                            if(allowedBlock.test(nextState)){
+                                if (nextState.getValue(FACING).equals(Direction.EAST))
+                                    chute.add(nextPos);
+                            }
+                        }
+                        case 5 -> {
+                            if(allowedBlock.test(nextState)){
+                                if (nextState.getValue(FACING).equals(Direction.WEST))
+                                    chute.add(nextPos);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return chute;
     }
 
     public static boolean isCommonCasing(ItemStack stack) {

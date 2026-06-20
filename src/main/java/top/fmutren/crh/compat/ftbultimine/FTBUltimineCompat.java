@@ -4,17 +4,9 @@ import static top.fmutren.crh.compat.ftbultimine.FTBRightClickHandle.FTBRightCli
 
 public final class FTBUltimineCompat {
 
-    private static boolean registered;
-
-    private FTBUltimineCompat() {
-    }
+    private FTBUltimineCompat() {}
 
     public static void register() {
-        if (registered) {
-            return;
-        }
-        registered = true;
-
         FTBRightClickEventHandler();
     }
 

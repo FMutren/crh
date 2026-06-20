@@ -3,6 +3,7 @@ package top.fmutren.crh.compat.ftbultimine;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.fluids.pipes.EncasedPipeBlock;
+import com.simibubi.create.content.kinetics.belt.BeltBlock;
 import dev.ftb.mods.ftbultimine.api.rightclick.RegisterRightClickHandlerEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -43,10 +44,19 @@ public class FTBRightClickHandle {
                     if (originState.getBlock() instanceof EncasedPipeBlock)
                         targetItem = AllBlocks.FLUID_PIPE.asItem();
                     for (BlockPos pos : positions) {
+                        if (originState.getBlock() instanceof BeltBlock){
+                            ftbCompatHandleWrench(level, pos, player, hand, heldItem);
+                            return 1;
+                        }
                         ftbCompatHandleWrench(level, pos, player, hand, heldItem);
                         count++;
                     }
-                    if (player.isShiftKeyDown() && !isEncasedShaft(originState) && !isEncasedCogwheel(originState)) returnItem(player, targetItem, count);
+                    if (player.isShiftKeyDown() &&
+                            !isEncasedShaft(originState) &&
+                            !isEncasedCogwheel(originState) &&
+                            !player.isCreative() &&
+                            originState.getBlock() instanceof IWrenchable)
+                        returnItem(player, targetItem, count);
                 }
                 case COMMON_CASING, PIPE_CASING, CHUTE_CASING -> {
                     if(player.isShiftKeyDown()) return 0;

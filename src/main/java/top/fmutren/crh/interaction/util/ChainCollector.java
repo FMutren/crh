@@ -1,15 +1,21 @@
 package top.fmutren.crh.interaction.util;
 
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.checkerframework.checker.units.qual.C;
 import top.fmutren.crh.interaction.ChainSelection;
 
 import java.util.*;
 import java.util.function.Predicate;
+
+import static com.simibubi.create.content.logistics.chute.ChuteBlock.FACING;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.getAroundBlockPos;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.getConnectedChute;
 
 public final class ChainCollector {
 
@@ -174,6 +180,98 @@ public final class ChainCollector {
             }
         }
 
+        return new ChainSelection(ordered, truncated);
+    }
+
+    public static ChainSelection collectChute(
+            Level level,
+            BlockPos origin,
+            Predicate<BlockState> allowedState,
+            int limit
+    ){
+        if (limit <= 0 || !isAllowed(level, origin, allowedState)) {
+            return ChainSelection.empty();
+        }
+
+        ArrayDeque<BlockPos> queue = new ArrayDeque<>();
+        Set<BlockPos> visited = new HashSet<>(limit * 2);
+        List<BlockPos> ordered = new ArrayList<>(limit);
+        boolean truncated = false;
+
+        queue.add(origin);
+        visited.add(origin);
+
+        while (!queue.isEmpty() && ordered.size() < limit) {
+            BlockPos current = queue.poll();
+            BlockState currentState = level.getBlockState(current);
+            if (!allowedState.test(currentState)){
+                ordered.add(current);
+                visited.add(current);
+
+                List<BlockPos> connectedChutePos = getConnectedChute(level, current, allowedState);
+
+                for (BlockPos neighbor : connectedChutePos) {
+
+                    if(!level.isLoaded(neighbor)) continue;
+
+                    if(visited.contains(neighbor)) continue;
+
+                    if(!allowedState.test(level.getBlockState(neighbor))) continue;
+
+                    if (ordered.size() < limit) {
+                        visited.add(neighbor);
+                        queue.addLast(neighbor);
+                    } else {
+                        truncated = true;
+                    }
+                }
+            }
+        }
+
+        return new ChainSelection(ordered, truncated);
+    }
+
+    public static ChainSelection collectCommon(
+            Level level,
+            BlockPos origin,
+            Predicate<BlockState> allowedState,
+            int limit
+    ){
+        if (limit <= 0 || !isAllowed(level, origin, allowedState)) {
+            return ChainSelection.empty();
+        }
+
+        ArrayDeque<BlockPos> queue = new ArrayDeque<>();
+        Set<BlockPos> visited = new HashSet<>(limit * 2);
+        List<BlockPos> ordered = new ArrayList<>(limit);
+        boolean truncated = false;
+
+        queue.add(origin);
+        visited.add(origin);
+
+        while (!queue.isEmpty() && ordered.size() < limit) {
+            BlockPos current = queue.poll();
+            BlockState currentState = level.getBlockState(current);
+            if(allowedState.test(currentState)) {
+                ordered.add(current);
+                visited.add(current);
+                for(BlockPos neighbor : getAroundBlockPos(current)){
+
+                    if(!level.isLoaded(neighbor)) continue;
+
+                    if(visited.contains(neighbor)) continue;
+
+                    if(!allowedState.test(level.getBlockState(neighbor))) continue;
+
+                    if (ordered.size() < limit) {
+                        visited.add(neighbor);
+                        queue.addLast(neighbor);
+                    } else {
+                        truncated = true;
+                    }
+                }
+            }
+        }
         return new ChainSelection(ordered, truncated);
     }
 
