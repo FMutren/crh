@@ -15,6 +15,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.fml.ModList;
 
 import static top.fmutren.crh.interaction.StateSwitch.iterationTypeForItem;
 import static top.fmutren.crh.interaction.TryToEncase.tryToEncaseAllType;
@@ -35,14 +36,11 @@ public class FTBRightClickHandle {
             Level level = player.level();
             ItemStack heldItem = player.getItemInHand(hand);
             BlockState originState = level.getBlockState(context.origPos());
-            Item targetItem = originState.getBlock().asItem();
 
             int count = 0;
 
             switch (iterationTypeForItem(heldItem)) {
                 case WRENCH -> {
-                    if (originState.getBlock() instanceof EncasedPipeBlock)
-                        targetItem = AllBlocks.FLUID_PIPE.asItem();
                     for (BlockPos pos : positions) {
                         if (originState.getBlock() instanceof BeltBlock){
                             ftbCompatHandleWrench(level, pos, player, hand, heldItem);
@@ -51,12 +49,6 @@ public class FTBRightClickHandle {
                         ftbCompatHandleWrench(level, pos, player, hand, heldItem);
                         count++;
                     }
-                    if (player.isShiftKeyDown() &&
-                            !isEncasedShaft(originState) &&
-                            !isEncasedCogwheel(originState) &&
-                            !player.isCreative() &&
-                            originState.getBlock() instanceof IWrenchable)
-                        returnItem(player, targetItem, count);
                 }
                 case COMMON_CASING, PIPE_CASING, CHUTE_CASING -> {
                     if(player.isShiftKeyDown()) return 0;
@@ -85,18 +77,10 @@ public class FTBRightClickHandle {
             if (player.isShiftKeyDown()) {
                 level.levelEvent(2001, pos, Block.getId(state));
                 wrenchable.onSneakWrenched(state, useOnContext);
-
             } else {
                 wrenchable.onWrenched(state, useOnContext);
 
             }
-        }
-    }
-
-    private static void returnItem(Player player, Item item, int count){
-        if(!player.isCreative() && !player.isSpectator()) {
-            ItemStack stack = new ItemStack(item, count);
-            player.addItem(stack);
         }
     }
 }
