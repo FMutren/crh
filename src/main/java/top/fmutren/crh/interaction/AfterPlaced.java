@@ -1,6 +1,5 @@
 package top.fmutren.crh.interaction;
 
-import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.decoration.encasing.EncasableBlock;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.fluids.pipes.AxisPipeBlock;

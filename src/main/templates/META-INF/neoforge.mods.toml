@@ -49,3 +49,10 @@ type = "optional"
 versionRange = "[1.8.0,)"
 ordering = "AFTER"
 side = "BOTH"
+
+[[dependencies."${mod_id}"]]
+modId = "copycats"
+type = "optional"
+versionRange = "[3.0.0,)"
+ordering = "AFTER"
+side = "BOTH"

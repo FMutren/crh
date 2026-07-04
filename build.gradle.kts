@@ -164,6 +164,7 @@ dependencies {
     compileOnly(libs.flywheel) { isTransitive = false }
     compileOnly(libs.ftbUltimineNeoForge)
     compileOnly(libs.createCasing)
+    compileOnly(libs.copycats)
 }
 
 publishing {

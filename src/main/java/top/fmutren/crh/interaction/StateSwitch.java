@@ -13,7 +13,8 @@ import java.util.Map;
 
 import static top.fmutren.crh.Crh.loadCreateCasing;
 import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.*;
-import static top.fmutren.crh.interaction.util.PredicatesCreator.*;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.isCommonCasing;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.isWrench;
 
 public class StateSwitch {
 

@@ -1,27 +1,18 @@
 package top.fmutren.crh.compat.ftbultimine;
 
-import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.content.fluids.pipes.EncasedPipeBlock;
-import com.simibubi.create.content.kinetics.belt.BeltBlock;
 import dev.ftb.mods.ftbultimine.api.rightclick.RegisterRightClickHandlerEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.fml.ModList;
 
 import static top.fmutren.crh.interaction.StateSwitch.iterationTypeForItem;
 import static top.fmutren.crh.interaction.TryToEncase.tryToEncaseAllType;
 import static top.fmutren.crh.interaction.util.ChainOperation.centerHit;
-import static top.fmutren.crh.interaction.util.PredicatesCreator.isEncasedCogwheel;
-import static top.fmutren.crh.interaction.util.PredicatesCreator.isEncasedShaft;
 
 
 public class FTBRightClickHandle {
@@ -33,20 +24,28 @@ public class FTBRightClickHandle {
         {
             Player player = context.player();
             if(player.isSpectator() || !player.mayBuild()) return 0;
+            Direction face = context.face();
             Level level = player.level();
             ItemStack heldItem = player.getItemInHand(hand);
-            BlockState originState = level.getBlockState(context.origPos());
 
             int count = 0;
 
             switch (iterationTypeForItem(heldItem)) {
                 case WRENCH -> {
                     for (BlockPos pos : positions) {
-                        if (originState.getBlock() instanceof BeltBlock){
-                            ftbCompatHandleWrench(level, pos, player, hand, heldItem);
-                            return 1;
+                        BlockState state = level.getBlockState(pos);
+                        if (state.getBlock() instanceof IWrenchable wrenchable) {
+                            UseOnContext useOnContext = new UseOnContext(level,
+                                    player,
+                                    hand,
+                                    heldItem,
+                                    centerHit(pos, face));
+                            if (player.isShiftKeyDown()) {
+                                wrenchable.onSneakWrenched(state, useOnContext);
+                            } else {
+                                wrenchable.onWrenched(state, useOnContext);
+                            }
                         }
-                        ftbCompatHandleWrench(level, pos, player, hand, heldItem);
                         count++;
                     }
                 }
@@ -61,26 +60,5 @@ public class FTBRightClickHandle {
             }
             return count;
         }));
-    }
-
-    //仅用于兼容FTB的wrench方法，其他地方放请勿调用
-    private static void ftbCompatHandleWrench(Level level, BlockPos pos, Player player, InteractionHand hand, ItemStack heldItem) {
-        BlockState state = level.getBlockState(pos);
-        if (state.getBlock() instanceof IWrenchable wrenchable) {
-
-            UseOnContext useOnContext = new UseOnContext(level,
-                    player,
-                    hand,
-                    heldItem,
-                    centerHit(pos, Direction.UP));
-
-            if (player.isShiftKeyDown()) {
-                level.levelEvent(2001, pos, Block.getId(state));
-                wrenchable.onSneakWrenched(state, useOnContext);
-            } else {
-                wrenchable.onWrenched(state, useOnContext);
-
-            }
-        }
     }
 }

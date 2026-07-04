@@ -15,7 +15,6 @@ import java.util.function.Predicate;
 
 import static top.fmutren.crh.Crh.loadCreateCasing;
 import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.crhCreateCasingPredicate;
-import static top.fmutren.crh.interaction.util.PredicatesCreator.isCasing;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isEncasedPipe;
 
 public final class TargetSelector {

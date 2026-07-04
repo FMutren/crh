@@ -1,19 +1,16 @@
 package top.fmutren.crh.interaction.util;
 
-import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import org.checkerframework.checker.units.qual.C;
 import top.fmutren.crh.interaction.ChainSelection;
 
 import java.util.*;
 import java.util.function.Predicate;
 
-import static com.simibubi.create.content.logistics.chute.ChuteBlock.FACING;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.getAroundBlockPos;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.getConnectedChute;
 
