@@ -4,7 +4,6 @@ import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.decoration.encasing.EncasableBlock;
 import com.simibubi.create.content.decoration.encasing.EncasedBlock;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.content.equipment.wrench.WrenchItem;
 import com.simibubi.create.content.fluids.pipes.EncasedPipeBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
 import com.simibubi.create.content.kinetics.simpleRelays.CogWheelBlock;
@@ -52,18 +51,10 @@ public class FTBRightClickHandle {
                 if (originState.getBlock() instanceof EncasedPipeBlock)
                     targetItem = AllBlocks.FLUID_PIPE.asItem();
                 for (BlockPos pos : positions) {
-                    if(originState.getBlock() instanceof BeltBlock){
-                        ftbCompatHandleWrench(level, pos, player, hand, heldItem, originState);
-                        return 1;
-                    }
                     ftbCompatHandleWrench(level, pos, player, hand, heldItem, originState);
                     count++;
                 }
-                if (player.isShiftKeyDown() &&
-                        !isEncasedShaft(originState) &&
-                        !isEncasedCogwheel(originState) &&
-                        originState.getBlock() instanceof IWrenchable)
-                    returnItem(player, targetItem, count);
+                if (player.isShiftKeyDown() && !isEncasedShaft(originState) && !isEncasedCogwheel(originState)) returnItem(player, targetItem, count);
             }
             case COMMON_CASING, PIPE_CASING, CHUTE_CASING -> {
                 if(player.isShiftKeyDown()) return 0;
