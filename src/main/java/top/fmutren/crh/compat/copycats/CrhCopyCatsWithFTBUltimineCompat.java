@@ -32,6 +32,7 @@ public class CrhCopyCatsWithFTBUltimineCompat {
                             BlockState targetState = level.getBlockState(pos);
                             if(targetState.getBlock() instanceof ICopycatBlock icb) {
                                 icb.useItemOn(heldItem, targetState, level, pos, player, hand, centerHit(pos, face));
+                                count++;
                             }
 
                         }
