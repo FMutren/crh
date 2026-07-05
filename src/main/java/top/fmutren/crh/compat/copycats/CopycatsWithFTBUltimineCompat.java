@@ -34,7 +34,7 @@ public class CopycatsWithFTBUltimineCompat {
             for(BlockPos pos : positions) {
                 BlockState targetState = level.getBlockState(pos);
                 if(targetState.getBlock() instanceof ICopycatBlock icb) {
-                    icb.use(targetState, level, pos, player, InteractionHand.MAIN_HAND, centerHit(pos, face));
+                    targetState.getBlock().use(targetState, level, pos, player, InteractionHand.MAIN_HAND, centerHit(pos, face));
                     count++;
                 }
 
