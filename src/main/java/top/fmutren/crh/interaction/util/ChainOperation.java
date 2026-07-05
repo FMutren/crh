@@ -4,7 +4,6 @@ import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.decoration.encasing.EncasableBlock;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.fluids.FluidTransportBehaviour;
-import com.simibubi.create.content.kinetics.belt.BeltBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;

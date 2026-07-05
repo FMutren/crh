@@ -7,16 +7,21 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraftforge.fml.ModList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import static top.fmutren.crh.compat.copycats.CopycatsWithFTBUltimineCompat.CopycatsWithFTBUltimineRightClickHandler;
 import static top.fmutren.crh.compat.ftbultimine.FTBRightClickHandle.FTBRightClickEventHandler;
 
 @Pseudo
-@Mixin(value = PlatformMethodsImpl.class, remap = false)
+@Mixin(
+        value = PlatformMethodsImpl.class,
+        remap = false
+)
 public final class FTBUltimineCompatMixin {
 
     @Inject(
@@ -31,6 +36,7 @@ public final class FTBUltimineCompatMixin {
                                                     FTBUltiminePlayerData data,
                                                     CallbackInfoReturnable<Integer> cir)
     {
-        FTBRightClickEventHandler(shapeContext, hand, data);
+        FTBRightClickEventHandler(shapeContext, hand, data, face);
+        if(ModList.get().isLoaded("copycats")) CopycatsWithFTBUltimineRightClickHandler(shapeContext, hand, data, face);
     }
 }

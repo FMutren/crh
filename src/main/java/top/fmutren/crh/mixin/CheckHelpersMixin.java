@@ -18,7 +18,10 @@ import javax.annotation.Nullable;
 import static top.fmutren.crh.Config.enableView;
 import static top.fmutren.crh.input.RightClick.ENCASE_MAPPING;
 
-@Mixin(value = PlacementClient.class, remap = false)
+@Mixin(
+        value = PlacementClient.class,
+        remap = false
+)
 public class CheckHelpersMixin {
     @Shadow
     static void setTarget(@Nullable BlockPos target){}

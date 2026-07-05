@@ -124,6 +124,7 @@ dependencies {
     implementation(fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}"))
     implementation(fg.deobf("fr.iglee42:CreateCasing:${minecraft_version}-${creareCasing}"))
     implementation(fg.deobf("dev.ftb.mods:ftb-ultimine-forge:${ftbUltimine}"))
+    implementation(fg.deobf("maven.modrinth:UT2M39wf:${copycats}"))
 
     runtimeOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"))
 

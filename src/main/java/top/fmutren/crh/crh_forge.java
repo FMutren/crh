@@ -11,7 +11,6 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import top.fmutren.crh.event.BlockEventCreator;
-import top.fmutren.crh.mixin.compat.ftbcompat.FTBUltimineCompatMixin;
 import top.fmutren.crh.input.ClientEventRegister;
 import top.fmutren.crh.server.ServerEventHandlers;
 
