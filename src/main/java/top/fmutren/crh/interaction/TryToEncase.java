@@ -32,7 +32,6 @@ public class TryToEncase {
     }
 
     public static boolean tryToEncaseCommonType(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, ItemStack heldItem) {
-        if(!isCommonCasing(heldItem)) return false;
         if(!(state.getBlock() instanceof EncasableBlock encasableBlock)) return false;
 
         encasableBlock.tryEncase(state, level, pos, heldItem, player, hand, centerHit(pos, Direction.UP));

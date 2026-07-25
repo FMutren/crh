@@ -81,6 +81,7 @@ public class StateSwitch {
                 AllBlocks.BRASS_CASING.isIn(itemStack)) return iterationType.COMMON_CASING;
 
         if(AllBlocks.COPPER_CASING.isIn(itemStack)) return iterationType.PIPE_CASING;
+
         if(AllBlocks.INDUSTRIAL_IRON_BLOCK.isIn(itemStack)) return iterationType.CHUTE_CASING;
 
         return iterationType.UNKNOWN;
