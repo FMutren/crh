@@ -4,6 +4,7 @@ import com.copycatsplus.copycats.foundation.copycat.ICopycatBlock;
 import dev.ftb.mods.ftbultimine.api.rightclick.RegisterRightClickHandlerEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -30,8 +31,8 @@ public class CrhCopyCatsWithFTBUltimineCompat {
                     if(heldItem.getItem() instanceof BlockItem) {
                         for(BlockPos pos : positions) {
                             BlockState targetState = level.getBlockState(pos);
-                            if(targetState.getBlock() instanceof ICopycatBlock icb) {
-                                icb.useItemOn(heldItem, targetState, level, pos, player, hand, centerHit(pos, face));
+                            if(targetState.getBlock() instanceof ICopycatBlock) {
+                                targetState.useItemOn(heldItem, level, player, InteractionHand.MAIN_HAND, centerHit(pos, face.getOpposite()));
                                 count++;
                             }
 
