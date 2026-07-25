@@ -14,5 +14,4 @@ public final class ClientEventRegister {
         NeoForge.EVENT_BUS.addListener(PlayerEventCreator::tick);
         NeoForge.EVENT_BUS.addListener(RightClick::rightClickBlock);
     }
-
 }

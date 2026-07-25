@@ -9,6 +9,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.jetbrains.annotations.NotNull;
+import top.fmutren.crh.Config;
 import top.fmutren.crh.Crh;
 import top.fmutren.crh.server.ServerPayloadHandler;
 
@@ -22,17 +23,21 @@ public final class ModMessages {
     public static void registerPayloads(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar(NETWORK_VERSION);
 
-        registrar.playToServer(
-                PipeConnectionPayload.TYPE,
-                PipeConnectionPayload.STREAM_CODEC,
-                ServerPayloadHandler::handlePipeConnection
-        );
+        if(Config.enableEmptyHandModifyPipe()){
+            registrar.playToServer(
+                    PipeConnectionPayload.TYPE,
+                    PipeConnectionPayload.STREAM_CODEC,
+                    ServerPayloadHandler::handlePipeConnection
+            );
+        }
 
-        registrar.playToServer(
-                ChainKeyStatePayload.TYPE,
-                ChainKeyStatePayload.STREAM_CODEC,
-                ServerPayloadHandler::handleChainKeyState
-        );
+        if(Config.builtinChainAllowed()){
+            registrar.playToServer(
+                    ChainKeyStatePayload.TYPE,
+                    ChainKeyStatePayload.STREAM_CODEC,
+                    ServerPayloadHandler::handleChainKeyState
+            );
+        }
     }
 
     public record PipeConnectionPayload(

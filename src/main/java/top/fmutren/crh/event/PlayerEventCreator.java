@@ -21,13 +21,12 @@ import static top.fmutren.crh.interaction.util.PredicatesCreator.isWrench;
 
 public class PlayerEventCreator {
     public static void tick(PlayerTickEvent.Post event) {
+        if(Config.ftbUltimineCompatActive()) return;
         net.minecraft.world.entity.player.Player player = event.getEntity();
         if (Minecraft.getInstance().player != player) return;
         Level level = event.getEntity().level();
 
         syncChainKeyState(player);
-
-        if (!Config.builtinChainAllowed()) return;
 
         if (ENCASE_MAPPING.get().consumeClick()) {
             String result = null;

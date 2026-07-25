@@ -9,6 +9,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -17,7 +18,7 @@ import org.lwjgl.glfw.GLFW;
 import top.fmutren.crh.Config;
 import top.fmutren.crh.network.ModMessages;
 
-import static top.fmutren.crh.Config.enableEmptyHandModifyPipe;
+import static top.fmutren.crh.Config.ftbUltimineCompatActive;
 
 public final class RightClick {
 
@@ -34,8 +35,8 @@ public final class RightClick {
     }
 
     public static void rightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-        if(!enableEmptyHandModifyPipe()) return;
-        if (!Config.builtinChainAllowed()) return;
+
+        if(!Config.enableEmptyHandModifyPipe() || ModList.get().isLoaded("create_cyber_goggles")) return;
 
         Level level = event.getLevel();
         if (!level.isClientSide) return;
@@ -59,6 +60,7 @@ public final class RightClick {
     }
 
     public static void registerBindings(RegisterKeyMappingsEvent event) {
+        if(ftbUltimineCompatActive()) return;
         event.register(ENCASE_MAPPING.get());
     }
 
