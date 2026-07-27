@@ -10,6 +10,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.event.level.BlockEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
@@ -30,12 +31,12 @@ public interface CreateIWrenchableFixMixin {
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         if (world instanceof ServerLevel serverLevel) {
-            state.getBlock().playerWillDestroy(serverLevel, pos, state, player);
+            new BlockEvent.BreakEvent(world, pos, state, player);
             if (!player.isCreative()) {
                 Block.getDrops(state, serverLevel, pos, world.getBlockEntity(pos), player, context.getItemInHand())
                         .forEach(itemStack ->
-                            player.getInventory()
-                                    .placeItemBackInInventory(itemStack)
+                                player.getInventory()
+                                        .placeItemBackInInventory(itemStack)
                         );
             }
             state.spawnAfterBreak(serverLevel, pos, ItemStack.EMPTY, true);
