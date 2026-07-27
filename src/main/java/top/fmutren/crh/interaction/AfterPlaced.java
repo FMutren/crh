@@ -33,7 +33,7 @@ public class AfterPlaced {
         if(!isCasing(heldItem)) return;
         if(!(state.getBlock() instanceof EncasableBlock) &&
                 !(state.getBlock() instanceof ChuteBlock)) return;
-        tryToEncaseAllType(state, level, pos, player, InteractionHand.OFF_HAND, heldItem);
+        tryToEncaseAllType(state, level, pos, player, InteractionHand.OFF_HAND, heldItem, centerHit(pos, Direction.UP));
     }
 
     public static void tryAutoOpenWindow(BlockState state, Level level, BlockPos pos, Player player) {

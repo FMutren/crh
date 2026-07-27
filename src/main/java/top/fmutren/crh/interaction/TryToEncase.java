@@ -16,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import top.fmutren.crh.interaction.util.PredicatesCreator;
 
 import static top.fmutren.crh.interaction.util.ChainOperation.centerHit;
@@ -25,17 +26,16 @@ public class TryToEncase {
 
     private TryToEncase(){}
 
-    public static boolean tryToEncaseAllType(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, ItemStack heldItem) {
-        return tryToEncaseCommonType(state, level, pos, player, hand, heldItem) ||
+    public static boolean tryToEncaseAllType(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, ItemStack heldItem, BlockHitResult hitResult) {
+        return tryToEncaseCommonType(state, level, pos, player, hand, hitResult) ||
                 tryToEncaseChute(level, pos, player, heldItem) ||
                 tryToEncaseBelt(heldItem, pos, level);
     }
 
-    public static boolean tryToEncaseCommonType(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, ItemStack heldItem) {
-        if(!isCommonCasing(heldItem)) return false;
-        if(!(state.getBlock() instanceof EncasableBlock encasableBlock)) return false;
+    public static boolean tryToEncaseCommonType(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if(!(state.getBlock() instanceof EncasableBlock)) return false;
 
-        encasableBlock.tryEncase(state, level, pos, heldItem, player, hand, centerHit(pos, Direction.UP));
+        state.use(level, player, hand, hitResult);
         return true;
     }
 
