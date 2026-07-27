@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.fml.ModList;
 import org.lwjgl.glfw.GLFW;
 import top.fmutren.crh.Config;
 import top.fmutren.crh.network.ModMessages;
@@ -36,7 +37,7 @@ public final class RightClick {
     public static void rightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         Level level = event.getLevel();
         if (!level.isClientSide) return;
-        if (!Config.builtinChainAllowed()) return;
+        if (!Config.enableEmptyHandModifyPipe()) return;
 
         syncChainKeyState(event.getEntity());
 
@@ -59,7 +60,7 @@ public final class RightClick {
     }
 
     public static void registerBindings(RegisterKeyMappingsEvent event) {
-        event.register(ENCASE_MAPPING.get());
+        if(ModList.get().isLoaded("ftbultimine")) event.register(ENCASE_MAPPING.get());
     }
 
 }
