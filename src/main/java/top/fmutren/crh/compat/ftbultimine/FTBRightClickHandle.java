@@ -36,6 +36,10 @@ public class FTBRightClickHandle {
         switch (iterationTypeForItem(heldItem)) {
             case WRENCH -> {
                 for (BlockPos pos : positions) {
+                    if(count == 0) {
+                        count++;
+                        continue;
+                    } //ftb不知道为什么总会多交互一次，所以手动取消第一次💦
                     BlockState state = level.getBlockState(pos);
                     if (state.getBlock() instanceof IWrenchable wrenchable) {
 
@@ -43,7 +47,7 @@ public class FTBRightClickHandle {
                                 player,
                                 hand,
                                 heldItem,
-                                centerHit(pos, face));
+                                centerHit(pos, face.getOpposite()));
 
                         if (player.isShiftKeyDown()) {
                             wrenchable.onSneakWrenched(state, useOnContext);
@@ -57,8 +61,12 @@ public class FTBRightClickHandle {
             case COMMON_CASING, PIPE_CASING, CHUTE_CASING -> {
                 if(player.isShiftKeyDown()) return 0;
                 for (BlockPos pos : positions) {
+                    if(count == 0) {
+                        count++;
+                        continue;
+                    }
                     BlockState state = level.getBlockState(pos);
-                    if(!tryToEncaseAllType(state, level, pos, player, hand, heldItem)) return 0;
+                    if(!tryToEncaseAllType(state, level, pos, player, hand, heldItem, centerHit(pos, face.getOpposite()))) return 0;
                 }
                 count++;
             }
