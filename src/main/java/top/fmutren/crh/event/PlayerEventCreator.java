@@ -19,6 +19,8 @@ import static top.fmutren.crh.input.RightClick.ENCASE_MAPPING;
 public class PlayerEventCreator {
     public static void tick(TickEvent.PlayerTickEvent event) {
 
+        if(Config.builtinChainAllowed()) return;
+
         Player player = event.player;
         if (Minecraft.getInstance().player != player) return;
         Level level = player.level();
