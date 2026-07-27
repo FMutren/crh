@@ -7,7 +7,6 @@ import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import com.simibubi.create.content.logistics.chute.ChuteBlock;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -19,7 +18,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import top.fmutren.crh.interaction.util.PredicatesCreator;
 
-import static top.fmutren.crh.interaction.util.ChainOperation.centerHit;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isCommonCasing;
 
 public class TryToEncase {
