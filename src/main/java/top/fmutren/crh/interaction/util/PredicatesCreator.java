@@ -19,6 +19,7 @@ import java.util.function.Predicate;
 
 import static com.simibubi.create.content.logistics.chute.ChuteBlock.FACING;
 import static com.simibubi.create.content.logistics.chute.ChuteBlock.SHAPE;
+import static com.simibubi.create.content.logistics.chute.ChuteBlock.Shape.ENCASED;
 import static com.simibubi.create.content.logistics.chute.ChuteBlock.Shape.INTERSECTION;
 import static top.fmutren.crh.Crh.loadCreateCasing;
 import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.*;
@@ -49,6 +50,15 @@ public class PredicatesCreator {
 
     public static BooleanProperty pipeProperty(Direction direction) {
         return PipeBlock.PROPERTY_BY_DIRECTION.get(direction);
+    }
+
+    public static boolean isEncasableChute(BlockState state) {
+        if (!AllBlocks.CHUTE.has(state)) return false;
+        return state.getValue(SHAPE) != ENCASED && state.getValue(SHAPE) != INTERSECTION;
+    }
+
+    public static boolean isEncasedChute(BlockState state) {
+        return AllBlocks.CHUTE.has(state) && state.getValue(SHAPE) == ENCASED;
     }
 
     public static boolean isEncasedShaft(BlockState state) {

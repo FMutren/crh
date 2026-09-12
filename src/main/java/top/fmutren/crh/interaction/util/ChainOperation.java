@@ -30,6 +30,7 @@ import top.fmutren.crh.interaction.ChainInteraction;
 import top.fmutren.crh.interaction.ChainSelection;
 
 import static top.fmutren.crh.interaction.TryToEncase.tryToEncaseBelt;
+import static top.fmutren.crh.interaction.TryToEncase.tryToEncaseChute;
 
 public final class ChainOperation {
 
@@ -70,6 +71,11 @@ public final class ChainOperation {
                     InteractionFeedback.playBeltCasingSound(level, player, targetPos, beltCasingType);
                     changed++;
                 }
+                continue;
+            }
+
+            if (AllBlocks.CHUTE.has(current) && tryToEncaseChute(level, targetPos, player, stack)) {
+                changed++;
                 continue;
             }
 

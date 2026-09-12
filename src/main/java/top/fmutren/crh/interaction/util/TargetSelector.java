@@ -33,7 +33,7 @@ public final class TargetSelector {
         }
 
         if (AllBlocks.INDUSTRIAL_IRON_BLOCK.isIn(stack) && AllBlocks.CHUTE.has(state)) {
-            return ChainCollector.collectChute(level, pos, AllBlocks.CHUTE::has, Config.maxChuteBlocks());
+            return ChainCollector.collectChute(level, pos, PredicatesCreator::isEncasableChute, Config.maxChuteBlocks());
         }
 
         BeltBlockEntity.CasingType casingType = PredicatesCreator.beltCasingType(stack);
@@ -61,6 +61,10 @@ public final class TargetSelector {
                     Config.maxBeltBlocks(),
                     belt -> belt.casing != BeltBlockEntity.CasingType.NONE
             );
+        }
+
+        if (!sneaking && PredicatesCreator.isEncasedChute(state)) {
+            return ChainCollector.collectChute(level, pos, PredicatesCreator::isEncasedChute, Config.maxChuteBlocks());
         }
 
         if (sneaking && PredicatesCreator.isEncasedShaft(state)) {
