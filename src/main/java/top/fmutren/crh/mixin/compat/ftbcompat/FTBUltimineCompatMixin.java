@@ -26,7 +26,8 @@ public final class FTBUltimineCompatMixin {
 
     @Inject(
             method = "blockRightClick",
-            at = @At("TAIL")
+            at = @At("TAIL"),
+            cancellable = true
     )
     private static void crhFTBBlockRightClickCompat(ShapeContext shapeContext,
                                                     ServerPlayer serverPlayer,
@@ -36,7 +37,11 @@ public final class FTBUltimineCompatMixin {
                                                     FTBUltiminePlayerData data,
                                                     CallbackInfoReturnable<Integer> cir)
     {
-        FTBRightClickEventHandler(shapeContext, hand, data, face);
-        if(ModList.get().isLoaded("copycats")) CopycatsWithFTBUltimineRightClickHandler(shapeContext, hand, data, face);
+        int count = FTBRightClickEventHandler(shapeContext, hand, data, face);
+        if(ModList.get().isLoaded("copycats")) count += CopycatsWithFTBUltimineRightClickHandler(shapeContext, hand, data, face);
+        if(count > 0) {
+            Integer base = cir.getReturnValue();
+            cir.setReturnValue((base == null ? 0 : base) + count);
+        }
     }
 }
