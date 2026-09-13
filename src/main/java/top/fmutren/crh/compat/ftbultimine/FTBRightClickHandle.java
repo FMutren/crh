@@ -16,7 +16,6 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 import static top.fmutren.crh.interaction.StateSwitch.iterationTypeForItem;
-import static top.fmutren.crh.interaction.TryToEncase.tryToEncaseAllType;
 import static top.fmutren.crh.interaction.util.ChainOperation.centerHit;
 
 
@@ -73,9 +72,25 @@ public class FTBRightClickHandle {
                 }
                 case COMMON_CASING, PIPE_CASING, CHUTE_CASING -> {
                     if(player.isShiftKeyDown()) return 0;
+
+                    BlockHitResult referenceHit = playerPick(player);
+                    Direction interactionFace = context.face();
+                    Vec3 localHit = null;
+                    if (referenceHit != null && referenceHit.getBlockPos().equals(context.origPos())) {
+                        interactionFace = referenceHit.getDirection();
+                        localHit = referenceHit.getLocation()
+                                .subtract(Vec3.atLowerCornerOf(referenceHit.getBlockPos()));
+                    }
+
                     for (BlockPos pos : positions) {
+
+                        BlockHitResult hit = localHit != null
+                                ? new BlockHitResult(Vec3.atLowerCornerOf(pos).add(localHit), interactionFace, pos, false)
+                                : centerHit(pos, interactionFace);
+
+
                         BlockState state = level.getBlockState(pos);
-                        if(!tryToEncaseAllType(state, level, pos, player, hand, heldItem)) return 0;
+                        state.useItemOn(heldItem, level, player, hand, hit);
                     }
                     count++;
                 }
