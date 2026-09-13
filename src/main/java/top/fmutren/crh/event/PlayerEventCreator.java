@@ -19,15 +19,13 @@ import static top.fmutren.crh.input.RightClick.ENCASE_MAPPING;
 public class PlayerEventCreator {
     public static void tick(TickEvent.PlayerTickEvent event) {
 
-        if(Config.builtinChainAllowed()) return;
+        if(Config.ftbUltimineCompatActive()) return;
 
         Player player = event.player;
         if (Minecraft.getInstance().player != player) return;
         Level level = player.level();
 
         syncChainKeyState(player);
-
-        if (!Config.builtinChainAllowed()) return;
 
         if (ENCASE_MAPPING.get().consumeClick()) {
             String result = null;
