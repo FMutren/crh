@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import top.fmutren.crh.compat.ftbultimine.FTBUltimineCompat;
 import top.fmutren.crh.event.BlockEventCreator;
 import top.fmutren.crh.input.ClientEventRegister;
 import top.fmutren.crh.server.ServerEventHandlers;
@@ -33,6 +34,8 @@ public class crh_forge {
         if (FMLEnvironment.dist == Dist.CLIENT) ClientEventRegister.register(modBus);
 
         if (ModList.get().isLoaded("createcasing")) loadCreateCasing = true;
+
+        if (ModList.get().isLoaded("ftbultimine")) FTBUltimineCompat.register();
     }
 
     public static ResourceLocation id(String path) {
