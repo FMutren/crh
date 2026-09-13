@@ -11,6 +11,8 @@ import top.fmutren.crh.interaction.ChainSelection;
 import java.util.*;
 import java.util.function.Predicate;
 
+import static top.fmutren.crh.interaction.util.PredicatesCreator.getConnectedChute;
+
 public final class ChainCollector {
 
     private static final Direction[] DIRECTIONS = Direction.values();
@@ -168,6 +170,51 @@ public final class ChainCollector {
                 visited.add(nextPos);
                 if (ordered.size() + queue.size() < limit) {
                     queue.addLast(nextPos);
+                } else {
+                    truncated = true;
+                }
+            }
+        }
+
+        return new ChainSelection(ordered, truncated);
+    }
+
+    public static ChainSelection collectChute(
+            Level level,
+            BlockPos origin,
+            Predicate<BlockState> allowedState,
+            int limit
+    ){
+        if (limit <= 0 || !isAllowed(level, origin, allowedState)) {
+            return ChainSelection.empty();
+        }
+
+        ArrayDeque<BlockPos> queue = new ArrayDeque<>();
+        Set<BlockPos> visited = new HashSet<>(limit * 2);
+        List<BlockPos> ordered = new ArrayList<>(limit);
+        boolean truncated = false;
+
+        BlockPos immutableOrigin = origin.immutable();
+        queue.add(immutableOrigin);
+        visited.add(immutableOrigin);
+
+        while (!queue.isEmpty() && ordered.size() < limit) {
+            BlockPos current = queue.poll();
+            BlockState currentState = level.getBlockState(current);
+            if (!allowedState.test(currentState)) {
+                continue;
+            }
+
+            ordered.add(current);
+
+            for (BlockPos neighbor : getConnectedChute(level, current, allowedState)) {
+                if (!level.isLoaded(neighbor) || visited.contains(neighbor)) {
+                    continue;
+                }
+
+                if (ordered.size() + queue.size() < limit) {
+                    visited.add(neighbor);
+                    queue.addLast(neighbor.immutable());
                 } else {
                     truncated = true;
                 }

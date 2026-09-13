@@ -10,6 +10,7 @@ public class Config {
     public static final ForgeConfigSpec.IntValue MAX_PIPE_BLOCKS;
     public static final ForgeConfigSpec.IntValue MAX_SHAFT_BLOCKS;
     public static final ForgeConfigSpec.IntValue MAX_BELT_BLOCKS;
+    public static final ForgeConfigSpec.IntValue MAX_CHUTE_BLOCKS;
     public static final ForgeConfigSpec.DoubleValue MAX_EMPTY_HAND_PIPE_REACH;
     public static final ForgeConfigSpec.BooleanValue COMPAT_FTB_ULTIMINE;
     public static final ForgeConfigSpec.BooleanValue DISABLE_BUILTIN_CHAIN_WHEN_FTB_ULTIMINE_ENABLED;
@@ -33,6 +34,10 @@ public class Config {
         MAX_BELT_BLOCKS = BUILDER
                 .comment("Maximum belt segments affected by one chain operation.")
                 .defineInRange("maxBeltBlocks", 128, 1, 4096);
+
+        MAX_CHUTE_BLOCKS = BUILDER
+                .comment("Maximum chute affected by one chain operation.")
+                .defineInRange("maxChuteBlocks", 128, 1, 4096);
 
         MAX_EMPTY_HAND_PIPE_REACH = BUILDER
                 .comment("Maximum squared block reach allowed for the empty-hand pipe-connection packet.")
@@ -76,6 +81,10 @@ public class Config {
 
     public static int maxBeltBlocks() {
         return MAX_BELT_BLOCKS.get();
+    }
+
+    public static int maxChuteBlocks() {
+        return MAX_CHUTE_BLOCKS.get();
     }
 
     public static double maxEmptyHandPipeReachSqr() {

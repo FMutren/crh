@@ -15,8 +15,8 @@ import java.util.function.Predicate;
 
 import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.crhCreateCasingPredicate;
 import static top.fmutren.crh.crh_forge.loadCreateCasing;
-import static top.fmutren.crh.interaction.util.PredicatesCreator.isCasing;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isEncasedPipe;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.isPipeCasing;
 
 public final class TargetSelector {
 
@@ -24,13 +24,17 @@ public final class TargetSelector {
     }
 
     public static ChainSelection selectEncasing(Level level, BlockPos pos, BlockState state, ItemStack stack) {
-        if (isCasing(stack) && AllBlocks.FLUID_PIPE.has(state)) {
-            if(AllBlocks.COPPER_CASING.has(state) || loadCreateCasing) return ChainCollector.collectPipe(level, pos, AllBlocks.FLUID_PIPE::has, Config.maxPipeBlocks());
+        if (AllBlocks.FLUID_PIPE.has(state)) {
+            if(isPipeCasing(stack)) return ChainCollector.collectPipe(level, pos, AllBlocks.FLUID_PIPE::has, Config.maxPipeBlocks());
         }
 
         if (PredicatesCreator.isCommonCasing(stack) && AllBlocks.SHAFT.has(state)) {
             Direction.Axis axis = state.getValue(ShaftBlock.AXIS);
             return ChainCollector.collectShaft(level, pos, axis, AllBlocks.SHAFT::has, Config.maxShaftBlocks());
+        }
+
+        if (AllBlocks.INDUSTRIAL_IRON_BLOCK.isIn(stack) && AllBlocks.CHUTE.has(state)) {
+            return ChainCollector.collectChute(level, pos, PredicatesCreator::isEncasableChute, Config.maxChuteBlocks());
         }
 
         BeltBlockEntity.CasingType casingType = PredicatesCreator.beltCasingType(stack);
@@ -58,6 +62,10 @@ public final class TargetSelector {
                     Config.maxBeltBlocks(),
                     belt -> belt.casing != BeltBlockEntity.CasingType.NONE
             );
+        }
+
+        if (!sneaking && PredicatesCreator.isEncasedChute(state)) {
+            return ChainCollector.collectChute(level, pos, PredicatesCreator::isEncasedChute, Config.maxChuteBlocks());
         }
 
         if (sneaking && PredicatesCreator.isEncasedShaft(state)) {
