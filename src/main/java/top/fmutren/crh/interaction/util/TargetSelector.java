@@ -16,6 +16,7 @@ import java.util.function.Predicate;
 import static top.fmutren.crh.Crh.loadCreateCasing;
 import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.crhCreateCasingPredicate;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isEncasedPipe;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.isPipeCasing;
 
 public final class TargetSelector {
 
@@ -24,7 +25,7 @@ public final class TargetSelector {
 
     public static ChainSelection selectEncasing(Level level, BlockPos pos, BlockState state, ItemStack stack) {
         if (AllBlocks.FLUID_PIPE.has(state)) {
-            if(AllBlocks.COPPER_CASING.has(state) || loadCreateCasing) return ChainCollector.collectPipe(level, pos, AllBlocks.FLUID_PIPE::has, Config.maxPipeBlocks());
+            if(isPipeCasing(stack)) return ChainCollector.collectPipe(level, pos, AllBlocks.FLUID_PIPE::has, Config.maxPipeBlocks());
         }
 
         if (PredicatesCreator.isCommonCasing(stack) && AllBlocks.SHAFT.has(state)) {
