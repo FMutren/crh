@@ -31,18 +31,21 @@ public class PlayerEventCreator {
 
         if (ENCASE_MAPPING.get().consumeClick()) {
             String result = null;
+            ChatFormatting color = null;
             ItemStack mainHand = player.getItemInHand(InteractionHand.MAIN_HAND);
             ItemStack offHand = player.getItemInHand(InteractionHand.OFF_HAND);
 
             if (isCreateWrench(mainHand) || isCreateWrench(offHand)) {
                 result = "crh.message.altdownwithwrench";
+                color = ChatFormatting.RED;
             }
 
             if (isCreateCasing(mainHand) || isCreateCasing(offHand)) {
                 result = "crh.message.altdownwithcasing";
+                color = ChatFormatting.GREEN;
             }
             if (result == null) return;
-            player.displayClientMessage(Component.translatable(result).withStyle(ChatFormatting.GREEN), true);
+            player.displayClientMessage(Component.translatable(result).withStyle(color), true);
         }
 
         if(ENCASE_MAPPING.get().isDown()) {
