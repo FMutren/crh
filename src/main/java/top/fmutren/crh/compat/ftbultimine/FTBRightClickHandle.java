@@ -1,6 +1,5 @@
 package top.fmutren.crh.compat.ftbultimine;
 
-import com.copycatsplus.copycats.foundation.copycat.ICopycatBlock;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import dev.ftb.mods.ftbultimine.api.rightclick.RegisterRightClickHandlerEvent;
 import net.minecraft.core.BlockPos;
