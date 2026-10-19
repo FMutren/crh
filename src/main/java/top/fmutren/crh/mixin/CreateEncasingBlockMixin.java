@@ -2,6 +2,7 @@ package top.fmutren.crh.mixin;
 
 import com.simibubi.create.content.fluids.pipes.FluidPipeBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
+import com.simibubi.create.content.kinetics.simpleRelays.CogWheelBlock;
 import com.simibubi.create.content.kinetics.simpleRelays.ShaftBlock;
 import com.simibubi.create.content.logistics.chute.ChuteBlock;
 import net.minecraft.core.BlockPos;
@@ -23,7 +24,8 @@ import top.fmutren.crh.interaction.ChainInteraction;
                 FluidPipeBlock.class,
                 ShaftBlock.class,
                 BeltBlock.class,
-                ChuteBlock.class
+                ChuteBlock.class,
+                CogWheelBlock.class
         },
         remap = false
 )
