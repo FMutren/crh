@@ -31,27 +31,26 @@ public class PlayerEventCreator {
         if (ENCASE_MAPPING.get().consumeClick()) {
             String result = null;
             ChatFormatting color = null;
-            ItemStack mainHand = player.getItemInHand(InteractionHand.MAIN_HAND);
-            ItemStack offHand = player.getItemInHand(InteractionHand.OFF_HAND);
+            ItemStack mainHand = player.getMainHandItem();
 
-            if (isWrench(mainHand) || isWrench(offHand)) {
+            if (isWrench(mainHand)) {
                 result = "crh.message.altdownwithwrench";
                 color = ChatFormatting.RED;
             }
 
-            if (isCasing(mainHand) || isCasing(offHand)) {
+            if (isCasing(mainHand)) {
                 result = "crh.message.altdownwithcasing";
                 color = ChatFormatting.GREEN;
             }
             if (result == null) return;
-            player.displayClientMessage(Component.translatable(result).withStyle(color), true);
+            if(Config.enableTextTip()) player.displayClientMessage(Component.translatable(result).withStyle(color), true);
         }
 
         if(ENCASE_MAPPING.get().isDown()) {
             if(!level.isClientSide) return;
             if(!(Minecraft.getInstance().hitResult instanceof BlockHitResult hit)) return;
             BlockPos pos = hit.getBlockPos();
-            ItemStack mainHand = player.getItemInHand(InteractionHand.MAIN_HAND);
+            ItemStack mainHand = player.getMainHandItem();
             if(Config.enableView()) {
                 ChainRender instance = new ChainRender();
                 instance.getToRender(level, pos, mainHand);

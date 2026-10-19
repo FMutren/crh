@@ -5,10 +5,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 public final class Config {
 
-    public static final ModConfigSpec.IntValue MAX_PIPE_BLOCKS;
-    public static final ModConfigSpec.IntValue MAX_SHAFT_BLOCKS;
-    public static final ModConfigSpec.IntValue MAX_BELT_BLOCKS;
-    public static final ModConfigSpec.IntValue MAX_CHUTE_BLOCKS;
+    public static final ModConfigSpec.IntValue MAX_CHAIN_BLOCKS;
     public static final ModConfigSpec.DoubleValue MAX_EMPTY_HAND_PIPE_REACH;
     public static final ModConfigSpec.BooleanValue COMPAT_FTB_ULTIMINE;
     public static final ModConfigSpec.BooleanValue DISABLE_BUILTIN_CHAIN_WHEN_FTB_ULTIMINE_ENABLED;
@@ -16,26 +13,15 @@ public final class Config {
     public static final ModConfigSpec.BooleanValue ENABLE_VIEW;
     public static final ModConfigSpec.BooleanValue ENABLE_EMPTY_HAND_MODIFY_PIPE;
     public static final ModConfigSpec.BooleanValue ENABLE_AUTO_INTERACTION;
+    public static final ModConfigSpec.BooleanValue ENABLE_TEXT_TIP;
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
     static {
         BUILDER.push("chain_interaction");
 
-        MAX_PIPE_BLOCKS = BUILDER
-                .comment("Maximum connected fluid/encased fluid pipe blocks affected by one chain operation.")
+        MAX_CHAIN_BLOCKS = BUILDER
+                .comment("Maximum distance of chain interaction.")
                 .defineInRange("maxPipeBlocks", 64, 1, 4096);
-
-        MAX_SHAFT_BLOCKS = BUILDER
-                .comment("Maximum shaft or encased shaft blocks affected by one chain operation.")
-                .defineInRange("maxShaftBlocks", 128, 1, 4096);
-
-        MAX_BELT_BLOCKS = BUILDER
-                .comment("Maximum belt segments affected by one chain operation.")
-                .defineInRange("maxBeltBlocks", 128, 1, 4096);
-
-        MAX_CHUTE_BLOCKS = BUILDER
-                .comment("Maximum chute affected by one chain operation.")
-                .defineInRange("maxChuteBlocks", 128, 1, 4096);
 
         MAX_EMPTY_HAND_PIPE_REACH = BUILDER
                 .comment("Maximum squared block reach allowed for the empty-hand pipe-connection packet.")
@@ -62,6 +48,10 @@ public final class Config {
                 .comment("Disable CRH built-in chain selection when FTB Ultimine compatibility is active.")
                 .define("disableBuiltinChainWhenFtbUltimineCompatEnabled", true);
 
+        ENABLE_TEXT_TIP = BUILDER
+                .comment("Enable chain interaction tips on the sreen")
+                .define("enableTextTip", false);
+
         BUILDER.pop();
         SPEC = BUILDER.build();
     }
@@ -69,20 +59,8 @@ public final class Config {
     private Config() {
     }
 
-    public static int maxPipeBlocks() {
-        return MAX_PIPE_BLOCKS.get();
-    }
-
-    public static int maxShaftBlocks() {
-        return MAX_SHAFT_BLOCKS.get();
-    }
-
-    public static int maxBeltBlocks() {
-        return MAX_BELT_BLOCKS.get();
-    }
-
-    public static int maxChuteBlocks(){
-        return MAX_CHUTE_BLOCKS.get();
+    public static int maxChainBlocks() {
+        return MAX_CHAIN_BLOCKS.get();
     }
 
     public static double maxEmptyHandPipeReachSqr() {
@@ -112,6 +90,10 @@ public final class Config {
 
     public static boolean disableBuiltinChainWhenFtbUltimineCompatEnabled() {
         return DISABLE_BUILTIN_CHAIN_WHEN_FTB_ULTIMINE_ENABLED.get();
+    }
+
+    public static boolean enableTextTip() {
+        return ENABLE_TEXT_TIP.get();
     }
 
     public static boolean compatFtbUltimine() {
