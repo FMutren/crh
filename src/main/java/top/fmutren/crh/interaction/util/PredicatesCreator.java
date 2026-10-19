@@ -22,8 +22,6 @@ import static com.simibubi.create.content.logistics.chute.ChuteBlock.FACING;
 import static com.simibubi.create.content.logistics.chute.ChuteBlock.SHAPE;
 import static com.simibubi.create.content.logistics.chute.ChuteBlock.Shape.ENCASED;
 import static com.simibubi.create.content.logistics.chute.ChuteBlock.Shape.INTERSECTION;
-import static top.fmutren.crh.Crh.loadCreateCasing;
-import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.*;
 import static top.fmutren.crh.interaction.BuildCasingType.CASINGS;
 
 public class PredicatesCreator {
@@ -86,18 +84,6 @@ public class PredicatesCreator {
 
         return level.getBlockEntity(pos) instanceof BeltBlockEntity belt
                 && belt.casing != BeltBlockEntity.CasingType.NONE;
-    }
-
-    public static BeltBlockEntity.CasingType beltCasingType(ItemStack stack) {
-
-        if (AllBlocks.ANDESITE_CASING.isIn(stack)) return BeltBlockEntity.CasingType.ANDESITE;
-        if (AllBlocks.BRASS_CASING.isIn(stack)) return BeltBlockEntity.CasingType.BRASS;
-
-        if(loadCreateCasing){
-            return crhCreateCasingBeltCasingType(stack);
-        }
-
-        return null;
     }
 
     public static BlockPos[] getAroundBlockPos(BlockPos pos){

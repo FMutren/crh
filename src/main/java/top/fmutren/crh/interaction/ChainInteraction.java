@@ -29,6 +29,11 @@ public final class ChainInteraction {
             InteractionHand hand,
             BlockHitResult hitResult
     ) {
+        // 正在由 CRH 自己委托 useItemOn 时，不要再次进入连锁，交给原版逻辑处理。
+        if (ChainDelegation.isActive()) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+
         if (!canUseChain(player) || player.isShiftKeyDown()) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
@@ -39,7 +44,7 @@ public final class ChainInteraction {
         }
 
         if (level.isClientSide) {
-            if (AllBlocks.BELT.has(state) && PredicatesCreator.beltCasingType(stack) != null) {
+            if (AllBlocks.BELT.has(state)) {
                 return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             }
             return ItemInteractionResult.SUCCESS;

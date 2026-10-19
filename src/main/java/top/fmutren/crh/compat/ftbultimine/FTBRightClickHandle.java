@@ -15,6 +15,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
+import top.fmutren.crh.interaction.ChainDelegation;
+
 import static top.fmutren.crh.interaction.util.ChainOperation.centerHit;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isCasing;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isWrench;
@@ -90,7 +92,12 @@ public class FTBRightClickHandle {
 
 
                     BlockState state = level.getBlockState(pos);
-                    state.useItemOn(heldItem, level, player, hand, hit);
+                    ChainDelegation.enter();
+                    try {
+                        state.useItemOn(heldItem, level, player, hand, hit);
+                    } finally {
+                        ChainDelegation.exit();
+                    }
                 }
                 count++;
             }

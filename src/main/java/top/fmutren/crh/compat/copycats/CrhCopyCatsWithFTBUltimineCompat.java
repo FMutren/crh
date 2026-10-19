@@ -13,6 +13,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
+import top.fmutren.crh.interaction.ChainDelegation;
+
 import static top.fmutren.crh.compat.ftbultimine.FTBRightClickHandle.playerPick;
 import static top.fmutren.crh.interaction.util.ChainOperation.centerHit;
 
@@ -49,7 +51,13 @@ public class CrhCopyCatsWithFTBUltimineCompat {
                                 ? new BlockHitResult(Vec3.atLowerCornerOf(pos).add(localHit), interactionFace, pos, false)
                                 : centerHit(pos, interactionFace);
 
-                        ItemInteractionResult result = targetState.useItemOn(heldItem, level, player, hand, hit);
+                        ChainDelegation.enter();
+                        ItemInteractionResult result;
+                        try {
+                            result = targetState.useItemOn(heldItem, level, player, hand, hit);
+                        } finally {
+                            ChainDelegation.exit();
+                        }
                         if (result.consumesAction()) count++;
                     }
 

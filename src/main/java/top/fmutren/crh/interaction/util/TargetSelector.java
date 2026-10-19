@@ -33,9 +33,8 @@ public final class TargetSelector {
             return ChainCollector.collectChute(level, pos, PredicatesCreator::isEncasableChute, Config.maxChainBlocks());
         }
 
-        BeltBlockEntity.CasingType casingType = PredicatesCreator.beltCasingType(stack);
-        if (casingType != null && AllBlocks.BELT.has(state)) {
-            return ChainCollector.collectBelt(level, pos, Config.maxChainBlocks(), belt -> belt.casing != casingType);
+        if (AllBlocks.BELT.has(state) && PredicatesCreator.isCasing(stack)) {
+            return ChainCollector.collectBelt(level, pos, Config.maxChainBlocks(), belt -> true);
         }
 
         if (PredicatesCreator.isCommonCasing(stack) && AllBlocks.COGWHEEL.has(state)){

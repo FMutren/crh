@@ -43,7 +43,7 @@ public class ChainRender {
         for(BlockPos pos : selection.positions()){
             BlockState blockState = level.getBlockState(pos);
             BlockState state = stateSwitch(blockState, itemStack);
-            if(blockState == state) return;
+            if(blockState == state) continue;
             renderGhostBlock(pos, state);
         }
     }
