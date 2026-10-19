@@ -1,6 +1,7 @@
 package top.fmutren.crh.interaction.util;
 
 import com.simibubi.create.AllBlocks;
+import com.simibubi.create.content.decoration.encasing.EncasingRegistry;
 import com.simibubi.create.content.equipment.wrench.WrenchItem;
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
@@ -11,10 +12,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import top.fmutren.crh.interaction.StateSwitch;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static com.simibubi.create.content.logistics.chute.ChuteBlock.FACING;
@@ -23,7 +24,7 @@ import static com.simibubi.create.content.logistics.chute.ChuteBlock.Shape.ENCAS
 import static com.simibubi.create.content.logistics.chute.ChuteBlock.Shape.INTERSECTION;
 import static top.fmutren.crh.Crh.loadCreateCasing;
 import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.*;
-import static top.fmutren.crh.interaction.StateSwitch.iterationTypeForItem;
+import static top.fmutren.crh.interaction.BuildCasingType.CASINGS;
 
 public class PredicatesCreator {
 
@@ -62,37 +63,16 @@ public class PredicatesCreator {
     }
 
     public static boolean isEncasedShaft(BlockState state) {
-        if(AllBlocks.ANDESITE_ENCASED_SHAFT.has(state) ||
-                AllBlocks.BRASS_ENCASED_SHAFT.has(state)) return true;
-
-        if(loadCreateCasing){
-            return crhCreateCasingIsCasingShaft(state);
-        }
-
-        return false;
+        return EncasingRegistry.getVariants(AllBlocks.SHAFT.get()).contains(state.getBlock());
     }
 
     public static boolean isEncasedCogwheel(BlockState state) {
-        if(AllBlocks.ANDESITE_ENCASED_COGWHEEL.has(state) ||
-                AllBlocks.BRASS_ENCASED_COGWHEEL.has(state) ||
-                AllBlocks.ANDESITE_ENCASED_LARGE_COGWHEEL.has(state) ||
-                AllBlocks.BRASS_ENCASED_LARGE_COGWHEEL.has(state)) return true;
-
-        if(loadCreateCasing){
-            return crhCreateCasingIsCasingCogWheel(state);
-        }
-
-        return false;
+        return EncasingRegistry.getVariants(AllBlocks.COGWHEEL.get()).contains(state.getBlock()) ||
+                EncasingRegistry.getVariants(AllBlocks.LARGE_COGWHEEL.get()).contains(state.getBlock());
     }
 
     public static  boolean isEncasedPipe(BlockState state){
-        if(AllBlocks.ENCASED_FLUID_PIPE.has(state)) return true;
-
-        if(loadCreateCasing){
-            return crhCreateCasingIsCasingPipe(state);
-        }
-
-        return false;
+        return EncasingRegistry.getVariants(AllBlocks.FLUID_PIPE.get()).contains(state.getBlock());
     }
 
     public static boolean isEncasedBelt(Level level, BlockPos pos, BlockState state) {
@@ -197,18 +177,21 @@ public class PredicatesCreator {
     }
 
     public static boolean isCommonCasing(ItemStack stack) {
-        return iterationTypeForItem(stack) == StateSwitch.iterationType.COMMON_CASING;
+        return CASINGS.getOrDefault(stack.getItem(), Set.of()).stream()
+                .anyMatch(e ->
+                        e.base() == AllBlocks.SHAFT.get() ||
+                        e.base() == AllBlocks.COGWHEEL.get() ||
+                        e.base() == AllBlocks.LARGE_COGWHEEL.get()
+                );
     }
 
     public static boolean isPipeCasing(ItemStack stack) {
-        return iterationTypeForItem(stack) == StateSwitch.iterationType.PIPE_CASING||
-                iterationTypeForItem(stack) == StateSwitch.iterationType.COMMON_CASING &&
-                loadCreateCasing;
+        return CASINGS.getOrDefault(stack.getItem(), Set.of()).stream()
+                .anyMatch(e -> e.base() == AllBlocks.FLUID_PIPE.get());
     }
 
-    public static boolean isCasing(ItemStack itemStack) {
-        return(iterationTypeForItem(itemStack) != StateSwitch.iterationType.WRENCH &&
-                iterationTypeForItem(itemStack) != StateSwitch.iterationType.UNKNOWN);
+    public static boolean isCasing(ItemStack stack) {
+        return  CASINGS.containsKey(stack.getItem());
     }
 
     public static boolean isWrench(ItemStack stack) {

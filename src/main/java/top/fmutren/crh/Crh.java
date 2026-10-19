@@ -14,6 +14,7 @@ import top.fmutren.crh.compat.ftbultimine.FTBUltimineCompat;
 import top.fmutren.crh.event.BlockEventCreator;
 import top.fmutren.crh.event.PlayerEventCreator;
 import top.fmutren.crh.input.ClientEventRegister;
+import top.fmutren.crh.interaction.BuildCasingType;
 import top.fmutren.crh.network.ModMessages;
 
 @Mod(Crh.MODID)
@@ -26,6 +27,7 @@ public final class Crh {
     public Crh(IEventBus modBus, ModContainer modContainer) {
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
         modBus.addListener(ModMessages::registerPayloads);
+        modBus.addListener(BuildCasingType::buildCasingMap);
         NeoForge.EVENT_BUS.addListener(PlayerEventCreator::onPlayerLoggedOut);
         NeoForge.EVENT_BUS.addListener(BlockEventCreator::onBlockPlace);
 

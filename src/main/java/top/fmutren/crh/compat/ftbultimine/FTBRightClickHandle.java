@@ -15,8 +15,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-import static top.fmutren.crh.interaction.StateSwitch.iterationTypeForItem;
 import static top.fmutren.crh.interaction.util.ChainOperation.centerHit;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.isCasing;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.isWrench;
 
 
 public class FTBRightClickHandle {
@@ -33,46 +34,9 @@ public class FTBRightClickHandle {
 
             int count = 0;
 
-            switch (iterationTypeForItem(heldItem)) {
-                case WRENCH -> {
-                    final int[] processed = {0};
-                    WrenchChainGuard.run(player, () -> {
-                        BlockHitResult referenceHit = playerPick(player);
-                        Direction interactionFace = context.face();
-                        Vec3 localHit = null;
-                        if (referenceHit != null && referenceHit.getBlockPos().equals(context.origPos())) {
-                            interactionFace = referenceHit.getDirection();
-                            localHit = referenceHit.getLocation()
-                                    .subtract(Vec3.atLowerCornerOf(referenceHit.getBlockPos()));
-                        }
-                        for (BlockPos pos : positions) {
-
-                            BlockHitResult hit = localHit != null
-                                    ? new BlockHitResult(Vec3.atLowerCornerOf(pos).add(localHit), interactionFace, pos, false)
-                                    : centerHit(pos, interactionFace);
-
-                            BlockState state = level.getBlockState(pos);
-                            if (!(state.getBlock() instanceof IWrenchable wrenchable)) {
-                                continue;
-                            }
-                            UseOnContext useOnContext = new UseOnContext(level,
-                                    player,
-                                    hand,
-                                    heldItem,
-                                    hit);
-                            InteractionResult result = player.isShiftKeyDown()
-                                    ? wrenchable.onSneakWrenched(state, useOnContext)
-                                    : wrenchable.onWrenched(state, useOnContext);
-                            if (result.consumesAction()) {
-                                processed[0]++;
-                            }
-                        }
-                    });
-                    count = processed[0];
-                }
-                case COMMON_CASING, PIPE_CASING, CHUTE_CASING -> {
-                    if(player.isShiftKeyDown()) return 0;
-
+            if(isWrench(heldItem)){
+                final int[] processed = {0};
+                WrenchChainGuard.run(player, () -> {
                     BlockHitResult referenceHit = playerPick(player);
                     Direction interactionFace = context.face();
                     Vec3 localHit = null;
@@ -81,19 +45,54 @@ public class FTBRightClickHandle {
                         localHit = referenceHit.getLocation()
                                 .subtract(Vec3.atLowerCornerOf(referenceHit.getBlockPos()));
                     }
-
                     for (BlockPos pos : positions) {
 
                         BlockHitResult hit = localHit != null
                                 ? new BlockHitResult(Vec3.atLowerCornerOf(pos).add(localHit), interactionFace, pos, false)
                                 : centerHit(pos, interactionFace);
 
-
                         BlockState state = level.getBlockState(pos);
-                        state.useItemOn(heldItem, level, player, hand, hit);
+                        if (!(state.getBlock() instanceof IWrenchable wrenchable)) {
+                            continue;
+                        }
+                        UseOnContext useOnContext = new UseOnContext(level,
+                                player,
+                                hand,
+                                heldItem,
+                                hit);
+                        InteractionResult result = player.isShiftKeyDown()
+                                ? wrenchable.onSneakWrenched(state, useOnContext)
+                                : wrenchable.onWrenched(state, useOnContext);
+                        if (result.consumesAction()) {
+                            processed[0]++;
+                        }
                     }
-                    count++;
+                });
+                count = processed[0];
+            }
+            else if(isCasing(heldItem)){
+                if(player.isShiftKeyDown()) return 0;
+
+                BlockHitResult referenceHit = playerPick(player);
+                Direction interactionFace = context.face();
+                Vec3 localHit = null;
+                if (referenceHit != null && referenceHit.getBlockPos().equals(context.origPos())) {
+                    interactionFace = referenceHit.getDirection();
+                    localHit = referenceHit.getLocation()
+                            .subtract(Vec3.atLowerCornerOf(referenceHit.getBlockPos()));
                 }
+
+                for (BlockPos pos : positions) {
+
+                    BlockHitResult hit = localHit != null
+                            ? new BlockHitResult(Vec3.atLowerCornerOf(pos).add(localHit), interactionFace, pos, false)
+                            : centerHit(pos, interactionFace);
+
+
+                    BlockState state = level.getBlockState(pos);
+                    state.useItemOn(heldItem, level, player, hand, hit);
+                }
+                count++;
             }
             return count;
         }));

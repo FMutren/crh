@@ -11,12 +11,12 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import top.fmutren.crh.interaction.StateSwitch;
 
 import javax.annotation.Nullable;
 
 import static top.fmutren.crh.Config.enableView;
 import static top.fmutren.crh.input.RightClick.ENCASE_MAPPING;
+import static top.fmutren.crh.interaction.util.PredicatesCreator.isCasing;
 
 @Mixin(PlacementClient.class)
 public class CheckHelpersMixin {
@@ -46,7 +46,7 @@ public class CheckHelpersMixin {
         BlockPos pos = ray.getBlockPos();
 
         if(world.getBlockState(pos).getBlock() instanceof EncasableBlock && ENCASE_MAPPING.get().isDown() && enableView()) {
-            if (StateSwitch.iterationTypeForItem(mc.player.getMainHandItem()) != StateSwitch.iterationType.UNKNOWN) {
+            if (isCasing(mc.player.getMainHandItem())) {
                 setTarget(pos);
             }
         }
