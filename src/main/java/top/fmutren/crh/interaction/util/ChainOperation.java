@@ -4,8 +4,6 @@ import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.decoration.encasing.EncasableBlock;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.fluids.FluidTransportBehaviour;
-import com.simibubi.create.content.kinetics.belt.BeltBlock;
-import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -50,7 +48,6 @@ public final class ChainOperation {
         }
 
         int changed = 0;
-//        BeltBlockEntity.CasingType beltCasingType = PredicatesCreator.beltCasingType(stack);
         boolean creative = player.getAbilities().instabuild;
         Direction face = originalHit.getDirection();
 
@@ -64,18 +61,6 @@ public final class ChainOperation {
             }
 
             BlockState current = level.getBlockState(targetPos);
-
-//            if (beltCasingType != null && AllBlocks.BELT.has(current)) {
-//                if (tryToEncase(current , level, targetPos, player, hand, player.getItemInHand(hand), face)) {
-//                    changed++;
-//                }
-//                continue;
-//            }
-//
-//            if (AllBlocks.CHUTE.has(current) && tryToEncase(current , level, targetPos, player, hand, player.getItemInHand(hand), face)) {
-//                changed++;
-//                continue;
-//            }
 
             if (!(current.getBlock() instanceof EncasableBlock) && !AllBlocks.BELT.has(current)) {
                 continue;
@@ -96,84 +81,11 @@ public final class ChainOperation {
         return new ChainInteraction.ChainOperationResult(player, hand, selection, changed);
     }
 
-//    private static boolean applySingleBeltCasing(
-//            Level level,
-//            BlockPos targetPos,
-//            BlockState current,
-//            BeltBlockEntity.CasingType casingType
-//    ) {
-//        if (!(current.getBlock() instanceof BeltBlock beltBlock)) {
-//            return false;
-//        }
-//
-//        if (!(level.getBlockEntity(targetPos) instanceof BeltBlockEntity beltEntity)) {
-//            return false;
-//        }
-//
-//        if (beltEntity.casing == casingType) {
-//            return false;
-//        }
-//
-//        beltEntity.setCasingType(casingType);
-//        beltBlock.updateCoverProperty(level, targetPos, level.getBlockState(targetPos));
-//        beltEntity.setChanged();
-//
-//        BlockState updatedState = level.getBlockState(targetPos);
-//        level.sendBlockUpdated(targetPos, current, updatedState, Block.UPDATE_ALL);
-//        return true;
-//    }
-
     public static BlockHitResult centerHit(BlockPos pos, Direction face) {
         return new BlockHitResult(Vec3.atCenterOf(pos), face, pos, false);
     }
 
-//    public static ChainInteraction.ChainOperationResult applyBelt(
-//            Level level,
-//            Player player,
-//            InteractionHand hand,
-//            ItemStack stack,
-//            ChainSelection selection
-//    ) {
-//        BeltBlockEntity.CasingType casingType = PredicatesCreator.beltCasingType(stack);
-//        if (casingType == null || selection == null || selection.isEmpty()) {
-//            return new ChainInteraction.ChainOperationResult(player, hand, selection, 0);
-//        }
-//
-//        int changed = 0;
-//        BlockPos firstChanged = null;
-//        boolean creative = player.getAbilities().instabuild;
-//
-//        for (BlockPos targetPos : selection.positions()) {
-//            if (!creative && stack.isEmpty()) {
-//                break;
-//            }
-//
-//            if (!level.isLoaded(targetPos)) {
-//                continue;
-//            }
-//
-//            BlockState current = level.getBlockState(targetPos);
-//
-//            if (!AllBlocks.BELT.has(current)) {
-//                continue;
-//            }
-//
-//            if (applySingleBeltCasing(level, targetPos, current, casingType)) {
-//                if (firstChanged == null) {
-//                    firstChanged = targetPos.immutable();
-//                }
-//                changed++;
-//            }
-//        }
-//
-//        if (firstChanged != null) {
-//            InteractionFeedback.playBeltCasingSound(level, player, firstChanged, casingType);
-//        }
-//
-//        return new ChainInteraction.ChainOperationResult(player, hand, selection, changed);
-//    }
-
-    public static boolean applyPipe(
+    public static void applyPipe(
             Player player,
             Level level,
             BlockPos pos,
@@ -185,10 +97,8 @@ public final class ChainOperation {
 
         if (result.consumesAction()) {
             player.swing(hand, true);
-            return true;
         }
 
-        return false;
     }
 
     private static PipeApplyResult applyPipeInternal(
@@ -308,10 +218,6 @@ public final class ChainOperation {
 
         boolean consumesAction() {
             return this == CONSUMED || this == CHANGED;
-        }
-
-        boolean changed() {
-            return this == CHANGED;
         }
 
     }

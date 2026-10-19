@@ -13,7 +13,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import top.fmutren.crh.Config;
-import top.fmutren.crh.interaction.util.*;
+import top.fmutren.crh.interaction.util.ChainKeyStateTracker;
+import top.fmutren.crh.interaction.util.ChainOperation;
+import top.fmutren.crh.interaction.util.InteractionFeedback;
+import top.fmutren.crh.interaction.util.TargetSelector;
 
 public final class ChainInteraction {
 
@@ -34,7 +37,7 @@ public final class ChainInteraction {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
-        if (!canUseChain(player) || player.isShiftKeyDown()) {
+        if (canNotUseChain(player) || player.isShiftKeyDown()) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
@@ -54,17 +57,17 @@ public final class ChainInteraction {
                 .toItemInteractionResult();
     }
 
-    public static boolean canUseChain(Player player) {
-        return Config.builtinChainAllowed()
-                && player != null
-                && !player.isSpectator()
-                && player.mayBuild()
-                && ChainKeyStateTracker.isDown(player);
+    public static boolean canNotUseChain(Player player) {
+        return !Config.builtinChainAllowed()
+                || player == null
+                || player.isSpectator()
+                || !player.mayBuild()
+                || !ChainKeyStateTracker.isDown(player);
     }
 
     public static InteractionResult tryHandleWrench(UseOnContext context) {
         Player player = context.getPlayer();
-        if (!canUseChain(player)) {
+        if (canNotUseChain(player) || player == null) {
             return InteractionResult.PASS;
         }
 
@@ -85,7 +88,7 @@ public final class ChainInteraction {
         return ChainOperation.applyWrench(context, selection).toInteractionResult();
     }
 
-    public static boolean tryTogglePipeConnection(
+    public static void tryTogglePipeConnection(
             Player player,
             Level level,
             BlockPos pos,
@@ -93,7 +96,7 @@ public final class ChainInteraction {
             InteractionHand hand,
             boolean shift
     ) {
-        return ChainOperation.applyPipe(player, level, pos, face, hand, shift);
+        ChainOperation.applyPipe(player, level, pos, face, hand, shift);
     }
 
     public record ChainOperationResult(
