@@ -195,29 +195,32 @@ public final class ChainCollector {
         List<BlockPos> ordered = new ArrayList<>(limit);
         boolean truncated = false;
 
-        BlockPos immutableOrigin = origin.immutable();
-        queue.add(immutableOrigin);
-        visited.add(immutableOrigin);
+        queue.add(origin);
+        visited.add(origin);
 
         while (!queue.isEmpty() && ordered.size() < limit) {
             BlockPos current = queue.poll();
             BlockState currentState = level.getBlockState(current);
-            if (!allowedState.test(currentState)) {
-                continue;
-            }
+            if (!allowedState.test(currentState)){
+                ordered.add(current);
+                visited.add(current);
 
-            ordered.add(current);
+                List<BlockPos> connectedChutePos = getConnectedChute(level, current, allowedState);
 
-            for (BlockPos neighbor : getConnectedChute(level, current, allowedState)) {
-                if (!level.isLoaded(neighbor) || visited.contains(neighbor)) {
-                    continue;
-                }
+                for (BlockPos neighbor : connectedChutePos) {
 
-                if (ordered.size() + queue.size() < limit) {
-                    visited.add(neighbor);
-                    queue.addLast(neighbor.immutable());
-                } else {
-                    truncated = true;
+                    if(!level.isLoaded(neighbor)) continue;
+
+                    if(visited.contains(neighbor)) continue;
+
+                    if(!allowedState.test(level.getBlockState(neighbor))) continue;
+
+                    if (ordered.size() < limit) {
+                        visited.add(neighbor);
+                        queue.addLast(neighbor);
+                    } else {
+                        truncated = true;
+                    }
                 }
             }
         }
