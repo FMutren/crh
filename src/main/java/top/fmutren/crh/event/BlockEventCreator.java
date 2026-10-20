@@ -9,6 +9,7 @@ import net.minecraftforge.event.level.BlockEvent;
 import static top.fmutren.crh.Config.enableAutoInteraction;
 import static top.fmutren.crh.interaction.AfterPlaced.tryAutoEncase;
 import static top.fmutren.crh.interaction.AfterPlaced.tryAutoOpenWindow;
+import static top.fmutren.crh.interaction.PlayerLookOnFace.getPlayerDirection;
 
 public class BlockEventCreator {
     public static void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
@@ -20,7 +21,7 @@ public class BlockEventCreator {
         BlockPos pos = event.getPos();
         BlockState state = level.getBlockState(pos);
 
-        tryAutoEncase(state, level, pos, player);
+        tryAutoEncase(state, level, pos, player, getPlayerDirection(player));
         tryAutoOpenWindow(state, level, pos, player);
     }
 }

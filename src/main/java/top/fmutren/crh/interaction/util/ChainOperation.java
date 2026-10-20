@@ -4,7 +4,6 @@ import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.decoration.encasing.EncasableBlock;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.fluids.FluidTransportBehaviour;
-import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,8 +26,7 @@ import top.fmutren.crh.Config;
 import top.fmutren.crh.interaction.ChainInteraction;
 import top.fmutren.crh.interaction.ChainSelection;
 
-import static top.fmutren.crh.interaction.TryToEncase.tryToEncaseBelt;
-import static top.fmutren.crh.interaction.TryToEncase.tryToEncaseChute;
+import static top.fmutren.crh.interaction.TryToEncase.tryToEncase;
 
 public final class ChainOperation {
 
@@ -43,70 +41,12 @@ public final class ChainOperation {
             ItemStack stack,
             ChainSelection selection
     ) {
-        if (PredicatesCreator.beltCasingType(stack) != null && targetsBelt(level, selection)) {
-            return applyBelt(level, player, hand, originalHit, stack, selection);
-        }
-
-        int changed = 0;
-        for (BlockPos targetPos : selection.positions()) {
-            if (!level.isLoaded(targetPos)) {
-                continue;
-            }
-
-            BlockState current = level.getBlockState(targetPos);
-
-            if (AllBlocks.CHUTE.has(current) && tryToEncaseChute(level, targetPos, player, stack)) {
-                changed++;
-                continue;
-            }
-
-            if (!(current.getBlock() instanceof EncasableBlock encasableBlock)) {
-                continue;
-            }
-
-            InteractionResult result = encasableBlock.tryEncase(
-                    current,
-                    level,
-                    targetPos,
-                    stack,
-                    player,
-                    hand,
-                    centerHit(targetPos, originalHit.getDirection())
-            );
-
-            if (result.consumesAction()) {
-                changed++;
-            }
-        }
-
-        return new ChainInteraction.ChainOperationResult(player, hand, selection, changed);
-    }
-
-
-    private static boolean targetsBelt(Level level, ChainSelection selection) {
-        for (BlockPos targetPos : selection.positions()) {
-            if (level.isLoaded(targetPos) && AllBlocks.BELT.has(level.getBlockState(targetPos))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static ChainInteraction.ChainOperationResult applyBelt(
-            Level level,
-            Player player,
-            InteractionHand hand,
-            BlockHitResult originalHit,
-            ItemStack stack,
-            ChainSelection selection
-    ) {
         if (level == null || player == null || hand == null || originalHit == null
                 || stack == null || selection == null || selection.isEmpty()) {
             return new ChainInteraction.ChainOperationResult(player, hand, selection, 0);
         }
 
         int changed = 0;
-        BeltBlockEntity.CasingType beltCasingType = PredicatesCreator.beltCasingType(stack);
         boolean creative = player.getAbilities().instabuild;
         Direction face = originalHit.getDirection();
 
@@ -121,28 +61,18 @@ public final class ChainOperation {
 
             BlockState current = level.getBlockState(targetPos);
 
-            if (beltCasingType != null && AllBlocks.BELT.has(current)) {
-                if (tryToEncaseBelt(stack, targetPos, level)) {
-                    InteractionFeedback.playBeltCasingSound(level, player, targetPos, beltCasingType);
-                    changed++;
-                }
+            if (!(current.getBlock() instanceof EncasableBlock) && !AllBlocks.BELT.has(current)) {
                 continue;
             }
 
-            if (!(current.getBlock() instanceof EncasableBlock encasableBlock)) {
-                continue;
-            }
-
-            InteractionResult result = encasableBlock.tryEncase(
-                    current,
+            InteractionResult result = tryToEncase(current,
                     level,
                     targetPos,
-                    stack,
                     player,
                     hand,
-                    centerHit(targetPos, face)
+                    stack,
+                    face
             );
-
             if (result.consumesAction()) {
                 changed++;
             }
@@ -154,7 +84,7 @@ public final class ChainOperation {
         return new BlockHitResult(Vec3.atCenterOf(pos), face, pos, false);
     }
 
-    public static boolean applyPipe(
+    public static void applyPipe(
             Player player,
             Level level,
             BlockPos pos,
@@ -163,37 +93,37 @@ public final class ChainOperation {
             boolean shift
     ) {
         if (player == null || level == null || pos == null || face == null || hand == null) {
-            return false;
+            return;
         }
 
         if (level.isClientSide || player.isSpectator() || !player.mayBuild()) {
-            return false;
+            return;
         }
 
         if (!player.getItemInHand(hand).isEmpty()) {
-            return false;
+            return;
         }
 
         if (!level.isLoaded(pos) || player.distanceToSqr(Vec3.atCenterOf(pos)) > Config.maxEmptyHandPipeReachSqr()) {
-            return false;
+            return;
         }
 
         BlockState state = level.getBlockState(pos);
         if (!PredicatesCreator.isManualPipe(state)) {
-            return false;
+            return;
         }
 
         Direction targetFace = shift ? face.getOpposite() : face;
         BooleanProperty property = PredicatesCreator.pipeProperty(targetFace);
         if (property == null || !state.hasProperty(property)) {
-            return false;
+            return;
         }
 
         boolean current = state.getValue(property);
         if (AllBlocks.FLUID_PIPE.has(state) && current && PredicatesCreator.countOpenPipeFaces(state) <= 2) {
             player.displayClientMessage(Component.translatable("crh.message.pipelowerthantwo")
                     .withStyle(ChatFormatting.RED), true);
-            return true;
+            return;
         }
 
         BlockState updated = state.setValue(property, !current);
@@ -203,7 +133,6 @@ public final class ChainOperation {
         FluidTransportBehaviour.loadFlows(level, pos);
         level.playSound(null, pos, SoundEvents.COPPER_PLACE, SoundSource.BLOCKS, 0.6f, 1.2f);
         player.swing(hand, true);
-        return true;
     }
 
     public static ChainInteraction.ChainOperationResult applyWrench(

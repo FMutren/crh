@@ -13,6 +13,7 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import top.fmutren.crh.compat.ftbultimine.FTBUltimineCompat;
 import top.fmutren.crh.event.BlockEventCreator;
 import top.fmutren.crh.input.ClientEventRegister;
+import top.fmutren.crh.interaction.BuildCasingType;
 import top.fmutren.crh.server.ServerEventHandlers;
 
 import static top.fmutren.crh.network.ModMessages.registerPayloads;
@@ -27,6 +28,7 @@ public class crh_forge {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         ModLoadingContext context = ModLoadingContext.get();
         context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        modBus.addListener(BuildCasingType::buildCasingMap);
         MinecraftForge.EVENT_BUS.addListener(ServerEventHandlers::onPlayerLoggedOut);
         MinecraftForge.EVENT_BUS.addListener(BlockEventCreator::onBlockPlace);
         registerPayloads();

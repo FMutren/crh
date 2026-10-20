@@ -11,10 +11,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import top.fmutren.crh.Config;
 import top.fmutren.crh.interaction.ChainSelection;
 
-import java.util.function.Predicate;
-
-import static top.fmutren.crh.compat.createcasing.CrhCreateCasingCompat.crhCreateCasingPredicate;
-import static top.fmutren.crh.crh_forge.loadCreateCasing;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isEncasedPipe;
 import static top.fmutren.crh.interaction.util.PredicatesCreator.isPipeCasing;
 
@@ -25,21 +21,24 @@ public final class TargetSelector {
 
     public static ChainSelection selectEncasing(Level level, BlockPos pos, BlockState state, ItemStack stack) {
         if (AllBlocks.FLUID_PIPE.has(state)) {
-            if(isPipeCasing(stack)) return ChainCollector.collectPipe(level, pos, AllBlocks.FLUID_PIPE::has, Config.maxPipeBlocks());
+            if(isPipeCasing(stack)) return ChainCollector.collectPipe(level, pos, AllBlocks.FLUID_PIPE::has, Config.maxChainBlocks());
         }
 
         if (PredicatesCreator.isCommonCasing(stack) && AllBlocks.SHAFT.has(state)) {
             Direction.Axis axis = state.getValue(ShaftBlock.AXIS);
-            return ChainCollector.collectShaft(level, pos, axis, AllBlocks.SHAFT::has, Config.maxShaftBlocks());
+            return ChainCollector.collectShaft(level, pos, axis, AllBlocks.SHAFT::has, Config.maxChainBlocks());
         }
 
         if (AllBlocks.INDUSTRIAL_IRON_BLOCK.isIn(stack) && AllBlocks.CHUTE.has(state)) {
-            return ChainCollector.collectChute(level, pos, PredicatesCreator::isEncasableChute, Config.maxChuteBlocks());
+            return ChainCollector.collectChute(level, pos, PredicatesCreator::isEncasableChute, Config.maxChainBlocks());
         }
 
-        BeltBlockEntity.CasingType casingType = PredicatesCreator.beltCasingType(stack);
-        if (casingType != null && AllBlocks.BELT.has(state)) {
-            return ChainCollector.collectBelt(level, pos, Config.maxBeltBlocks(), belt -> belt.casing != casingType);
+        if (AllBlocks.BELT.has(state) && PredicatesCreator.isCasing(stack)) {
+            return ChainCollector.collectBelt(level, pos, Config.maxChainBlocks(), belt -> true);
+        }
+
+        if (PredicatesCreator.isCommonCasing(stack) && AllBlocks.COGWHEEL.has(state)){
+            return ChainCollector.collectCommon(level, pos, AllBlocks.COGWHEEL::has, Config.maxChainBlocks());
         }
 
         return ChainSelection.empty();
@@ -47,25 +46,20 @@ public final class TargetSelector {
 
     public static ChainSelection select(Level level, BlockPos pos, BlockState state, boolean sneaking) {
         if (!sneaking && isEncasedPipe(state)) {
-            Predicate<BlockState> predicate = AllBlocks.ENCASED_FLUID_PIPE::has;
-            if(loadCreateCasing && !AllBlocks.ENCASED_FLUID_PIPE.has(state)) {
-                predicate = crhCreateCasingPredicate(state);
-                if (predicate == null) return ChainSelection.empty();
-            }
-            return ChainCollector.collectPipe(level, pos, predicate, Config.maxPipeBlocks());
+            return ChainCollector.collectPipe(level, pos, PredicatesCreator::isEncasedPipe, Config.maxChainBlocks());
         }
 
         if (!sneaking && PredicatesCreator.isEncasedBelt(level, pos, state)) {
             return ChainCollector.collectBelt(
                     level,
                     pos,
-                    Config.maxBeltBlocks(),
+                    Config.maxChainBlocks(),
                     belt -> belt.casing != BeltBlockEntity.CasingType.NONE
             );
         }
 
         if (!sneaking && PredicatesCreator.isEncasedChute(state)) {
-            return ChainCollector.collectChute(level, pos, PredicatesCreator::isEncasedChute, Config.maxChuteBlocks());
+            return ChainCollector.collectChute(level, pos, PredicatesCreator::isEncasedChute, Config.maxChainBlocks());
         }
 
         if (sneaking && PredicatesCreator.isEncasedShaft(state)) {
@@ -75,7 +69,16 @@ public final class TargetSelector {
                     pos,
                     axis,
                     PredicatesCreator::isEncasedShaft,
-                    Config.maxShaftBlocks()
+                    Config.maxChainBlocks()
+            );
+        }
+
+        if (sneaking && PredicatesCreator.isEncasedCogwheel(state)){
+            return ChainCollector.collectCommon(
+                    level,
+                    pos,
+                    PredicatesCreator::isEncasedCogwheel,
+                    Config.maxChainBlocks()
             );
         }
 
