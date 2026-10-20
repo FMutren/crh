@@ -16,9 +16,13 @@ import top.fmutren.crh.interaction.ChainInteraction;
 public abstract class CreateWrenchItemMixin {
 
     @Inject(
-            method = "m_6225_",
+            // "useOn" is the official-mapping name used in dev, "m_6225_" is the SRG
+            // name present in the production jar. require = 0 tolerates the other
+            // name being absent in the current environment.
+            method = {"useOn", "m_6225_"},
             at = @At("HEAD"),
-            cancellable = true
+            cancellable = true,
+            require = 0
     )
     private void crh$chainWrenchUse(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
         InteractionResult result = ChainInteraction.tryHandleWrench(context);

@@ -2,6 +2,7 @@ package top.fmutren.crh.mixin;
 
 import com.simibubi.create.content.fluids.pipes.FluidPipeBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
+import com.simibubi.create.content.kinetics.simpleRelays.CogWheelBlock;
 import com.simibubi.create.content.kinetics.simpleRelays.ShaftBlock;
 import com.simibubi.create.content.logistics.chute.ChuteBlock;
 import net.minecraft.core.BlockPos;
@@ -22,16 +23,21 @@ import top.fmutren.crh.interaction.ChainInteraction;
                 FluidPipeBlock.class,
                 ShaftBlock.class,
                 BeltBlock.class,
-                ChuteBlock.class
+                ChuteBlock.class,
+                CogWheelBlock.class
         },
         remap = false
 )
 public abstract class CreateEncasingBlockMixin {
 
     @Inject(
-            method = "m_6227_",
+            // "use" is the official-mapping name used in dev, "m_6227_" is the SRG
+            // name present in the production jar. require = 0 tolerates the other
+            // name being absent in the current environment.
+            method = {"use", "m_6227_"},
             at = @At("HEAD"),
-            cancellable = true
+            cancellable = true,
+            require = 0
     )
     private void crh$chainEncasingUse(
             BlockState state,
